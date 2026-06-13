@@ -864,20 +864,23 @@ app.get('/api/faturas', (req, res) => {
     const paginas = Math.ceil(total / porPagina) || 1;
     const slice = arquivos.slice((pagina - 1) * porPagina, pagina * porPagina);
 
-    // Agrupa por cliente — usa regex para extrair CPF (padrão fixo) como âncora
+    // Agrupa por cliente — âncora pelo MM-YYYY no final do nome
     const clientes = {};
     for (const arq of slice) {
-      const m = arq.match(/^(.+?)_(\d{3}\.\d{3}\.\d{3}-\d{2})_(\d{2}-\d{4})\.pdf$/i);
+      const m = arq.match(/^(.+)_(\d{2}-\d{4})\.pdf$/i);
       let nome, cpf, mesAno, chave;
       if (m) {
-        [, nome, cpf, mesAno] = m;
+        const antes = m[1]; // tudo antes de _MM-YYYY
+        mesAno = m[2];
+        const sep = antes.lastIndexOf('_');
+        cpf  = sep >= 0 ? antes.substring(sep + 1) : '';
+        nome = sep >= 0 ? antes.substring(0, sep)  : antes;
         chave = `${nome}_${cpf}`;
       } else {
-        const partes = arq.split('_');
-        nome  = partes[0];
-        cpf   = partes[1] || '';
-        mesAno = (partes[2] || '').replace('.pdf', '');
-        chave = `${nome}_${cpf}`;
+        nome = arq.replace('.pdf', '');
+        cpf = '';
+        mesAno = '';
+        chave = nome;
       }
       if (!clientes[chave]) clientes[chave] = { nome, cpf, faturas: [] };
       clientes[chave].faturas.push({ arquivo: arq, mesAno });

@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VONIXX TELECOM — Controle de Faturas & IQ</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────────────────────────────── -->
+<header>
+  <div class="header-left">
+    <div class="logo-wrap">
+      <span class="logo-icon">📡</span>
+      <div>
+        <h1>VONIXX TELECOM</h1>
+        <span class="subtitle">Dashboard Controle de Faturas &amp; IQ por Safra</span>
+      </div>
+    </div>
+  </div>
+  <div class="header-center">
+    <button class="nav-btn active" data-tab="dashboard" onclick="mudarAba(this)">Dashboard</button>
+    <button class="nav-btn" data-tab="risco" onclick="mudarAba(this)">Risco &amp; Inadimplência <span id="badge-risco" class="nav-badge">—</span></button>
+    <button class="nav-btn" data-tab="pg-atraso" onclick="mudarAba(this)">Pago em Atraso <span id="badge-pg-atraso" class="nav-badge">—</span></button>
+    <button class="nav-btn" data-tab="faturas" onclick="mudarAba(this)">📄 Faturas</button>
+    <button class="nav-btn" data-tab="comandos" onclick="mudarAba(this)">🤖 Comandos</button>
+  </div>
+  <div class="header-right">
+    <span id="ultima-atualizacao" class="ts">—</span>
+    <button class="btn btn-secondary" onclick="atualizarDados()">🔄 Atualizar</button>
+  </div>
+</header>
+
+<!-- ─── Filtros ─────────────────────────────────────────────────────────────── -->
+<section class="filtros">
+  <div class="filtro-grupo">
+    <label>Safra</label>
+    <select id="filtro-safra" onchange="aplicarFiltros()">
+      <option value="">Todas</option>
+    </select>
+  </div>
+  <div class="filtro-grupo">
+    <label>Vendedor</label>
+    <select id="filtro-vendedor" onchange="aplicarFiltros()">
+      <option value="">Todos</option>
+    </select>
+  </div>
+  <div class="filtro-grupo">
+    <label>Estado</label>
+    <select id="filtro-estado" onchange="aplicarFiltros()">
+      <option value="">Todos</option>
+    </select>
+  </div>
+  <div class="filtro-grupo">
+    <label>Nível de Risco</label>
+    <select id="filtro-nivel" onchange="aplicarFiltros()">
+      <option value="">Todos</option>
+      <option value="EM_DIA">Em Dia</option>
+      <option value="N1">N1 — Alerta (1-15d)</option>
+      <option value="N2">N2 — Alerta (16-27d)</option>
+      <option value="N3">N3 — Alerta (28-32d)</option>
+      <option value="INADIMPLENTE">Inadimplente (33+d)</option>
+    </select>
+  </div>
+</section>
+
+<!-- ═══ ABA: DASHBOARD ═══════════════════════════════════════════════════════ -->
+<div id="tab-dashboard" class="tab-content active">
+
+  <!-- KPI Row 1 -->
+  <section class="kpi-grid kpi-row1">
+    <div class="kpi kpi-destaque" id="card-iq">
+      <div class="kpi-label">IQ Projetado (F3)</div>
+      <div class="kpi-value" id="v-iq">—</div>
+      <div class="kpi-sub">% clientes sem inadimplência</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Total Instalados</div>
+      <div class="kpi-value" id="v-total">—</div>
+      <div class="kpi-sub">no período filtrado</div>
+    </div>
+    <div class="kpi kpi-azul">
+      <div class="kpi-label">4 Faturas Pagas (IQ+)</div>
+      <div class="kpi-value" id="v-f4pagas">—</div>
+      <div class="kpi-sub">clientes com 4 faturas pagas</div>
+    </div>
+    <div class="kpi kpi-vermelho">
+      <div class="kpi-label">Com Atraso</div>
+      <div class="kpi-value" id="v-com-atraso">—</div>
+      <div class="kpi-sub" id="v-com-atraso-pct">—% do total</div>
+    </div>
+    <div class="kpi kpi-laranja">
+      <div class="kpi-label">Pago em Atraso</div>
+      <div class="kpi-value" id="v-pg-atraso">—</div>
+      <div class="kpi-sub" id="v-pg-atraso-pct">—% do total</div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Em Andamento</div>
+      <div class="kpi-value" id="v-em-andamento">—</div>
+      <div class="kpi-sub">safra incompleta (&lt; 4 fat.)</div>
+    </div>
+    <div class="kpi kpi-vermelho-escuro">
+      <div class="kpi-label">Em Risco</div>
+      <div class="kpi-value" id="v-em-risco">—</div>
+      <div class="kpi-sub" id="v-em-risco-sub">Leve: — · Médio: — · Alto: —</div>
+    </div>
+  </section>
+
+  <!-- KPI Row 2: % por fatura -->
+  <section class="kpi-grid kpi-row2">
+    <div class="kpi kpi-pct">
+      <div class="kpi-label">% Fatura 1 Paga</div>
+      <div class="kpi-value" id="v-pct-f1">—</div>
+      <div class="kpi-sub" id="v-sub-f1">—</div>
+    </div>
+    <div class="kpi kpi-pct">
+      <div class="kpi-label">% Fatura 2 Paga</div>
+      <div class="kpi-value" id="v-pct-f2">—</div>
+      <div class="kpi-sub" id="v-sub-f2">—</div>
+    </div>
+    <div class="kpi kpi-pct">
+      <div class="kpi-label">% Fatura 3 Paga</div>
+      <div class="kpi-value" id="v-pct-f3">—</div>
+      <div class="kpi-sub" id="v-sub-f3">—</div>
+    </div>
+    <div class="kpi kpi-pct">
+      <div class="kpi-label">% Fatura 4 Paga</div>
+      <div class="kpi-value" id="v-pct-f4">—</div>
+      <div class="kpi-sub" id="v-sub-f4">—</div>
+    </div>
+    <div class="kpi kpi-ts">
+      <div class="kpi-label">Última Atualização</div>
+      <div class="kpi-value kpi-hora" id="v-hora">—</div>
+      <div class="kpi-sub" id="v-data">—</div>
+    </div>
+  </section>
+
+  <!-- Alertas e Status Safra -->
+  <section class="alertas-grid">
+    <div class="alerta-section">
+      <div class="alerta-title">Níveis Progressivos de Alerta por Dias de Atraso</div>
+      <div class="alertas-row">
+        <div class="alerta-card alerta-verde">
+          <div class="alerta-label">Em Dia</div>
+          <div class="alerta-val" id="v-em-dia">—</div>
+          <div class="alerta-sub">sem atraso em nenhuma fatura</div>
+        </div>
+        <div class="alerta-card alerta-amarelo">
+          <div class="alerta-label">N1 — Alerta (1-15 dias)</div>
+          <div class="alerta-val" id="v-n1">—</div>
+          <div class="alerta-sub">risco leve · NÃO impacta IQ</div>
+        </div>
+        <div class="alerta-card alerta-laranja">
+          <div class="alerta-label">N2 — Alerta (16-27 dias)</div>
+          <div class="alerta-val" id="v-n2">—</div>
+          <div class="alerta-sub">risco moderado · NÃO impacta IQ</div>
+        </div>
+        <div class="alerta-card alerta-vermelho-claro">
+          <div class="alerta-label">N3 — Alerta (28-32 dias)</div>
+          <div class="alerta-val" id="v-n3">—</div>
+          <div class="alerta-sub">risco crítico · tolerância planilha (3d)</div>
+        </div>
+        <div class="alerta-card alerta-vermelho">
+          <div class="alerta-label">Inadimplentes (33+ dias)</div>
+          <div class="alerta-val" id="v-inadim">—</div>
+          <div class="alerta-sub">⚫ impacta IQ diretamente</div>
+        </div>
+      </div>
+    </div>
+    <div class="alerta-section">
+      <div class="alerta-title">Status da Safra (somente concluídas)</div>
+      <div class="alertas-row">
+        <div class="alerta-card alerta-verde">
+          <div class="alerta-label">COMPLETO</div>
+          <div class="alerta-val" id="v-completo">—</div>
+          <div class="alerta-sub">todas as 4 faturas pagas</div>
+        </div>
+        <div class="alerta-card alerta-amarelo">
+          <div class="alerta-label">PARCIAL</div>
+          <div class="alerta-val" id="v-parcial">—</div>
+          <div class="alerta-sub">pagas + grace period (1-29d)</div>
+        </div>
+        <div class="alerta-card alerta-vermelho">
+          <div class="alerta-label">QUEBRA</div>
+          <div class="alerta-val" id="v-quebra">—</div>
+          <div class="alerta-sub">inadimplente ≥ 33 dias</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Análise visual -->
+  <div class="secao-titulo">📊 Análise Visual &amp; Gráficos Interativos</div>
+
+  <section class="graficos-grid">
+    <!-- Status Geral - donut -->
+    <div class="grafico-card grafico-donut-wrap">
+      <h3>Status Geral das Faturas</h3>
+      <p class="grafico-sub">distribuição de saúde da base</p>
+      <div class="donut-container">
+        <canvas id="g-status-geral"></canvas>
+        <div class="donut-centro">
+          <div class="donut-pct" id="donut-iq">—</div>
+          <div class="donut-label">IQ Atual</div>
+        </div>
+      </div>
+      <div class="donut-legenda" id="donut-legenda"></div>
+    </div>
+
+    <!-- Distribuição de Risco -->
+    <div class="grafico-card">
+      <h3>Distribuição de Risco</h3>
+      <p class="grafico-sub">por faixa de dias de atraso</p>
+      <canvas id="g-risco"></canvas>
+    </div>
+
+    <!-- IQ por Safra -->
+    <div class="grafico-card grafico-largo">
+      <h3>Evolução do IQ por Safra</h3>
+      <p class="grafico-sub" id="g-iq-safra-sub">% IQ positivo por mês de instalação</p>
+      <canvas id="g-iq-safra"></canvas>
+    </div>
+
+    <!-- Status por Safra -->
+    <div class="grafico-card grafico-largo">
+      <h3>Status das Faturas por Safra</h3>
+      <p class="grafico-sub">Em Dia · Alerta (1-32d) · Inadimplente (33+d)</p>
+      <canvas id="g-status-safra"></canvas>
+    </div>
+
+    <!-- Comparativo F1-F4 -->
+    <div class="grafico-card grafico-largo">
+      <h3>Comparativo Fatura 1–4 por Safra</h3>
+      <p class="grafico-sub">% de pagamento por número de fatura</p>
+      <canvas id="g-comp-faturas"></canvas>
+    </div>
+
+    <!-- Risco por Safra -->
+    <div class="grafico-card grafico-largo">
+      <h3>Clientes em Risco por Safra</h3>
+      <p class="grafico-sub">por nível de alerta progressivo</p>
+      <canvas id="g-risco-safra"></canvas>
+    </div>
+
+    <!-- Ranking Vendedores IQ -->
+    <div class="grafico-card">
+      <h3>Ranking de Vendedores por IQ</h3>
+      <p class="grafico-sub">top 10 · 🥇🥈🥉 top 3</p>
+      <canvas id="g-rank-vendedores"></canvas>
+    </div>
+
+    <!-- Vendedores com Mais Atrasos -->
+    <div class="grafico-card">
+      <h3>Vendedores com Mais Atrasos</h3>
+      <p class="grafico-sub">N1/N2/N3 + Inadimplente</p>
+      <canvas id="g-atrasos-vendedores"></canvas>
+    </div>
+
+    <!-- Estados -->
+    <div class="grafico-card">
+      <h3>Distribuição por Estado</h3>
+      <p class="grafico-sub">top 10 UFs</p>
+      <canvas id="g-estados"></canvas>
+    </div>
+
+    <!-- Cidades -->
+    <div class="grafico-card">
+      <h3>Distribuição por Cidade</h3>
+      <p class="grafico-sub">top 10 cidades</p>
+      <canvas id="g-cidades"></canvas>
+    </div>
+
+    <!-- Funil -->
+    <div class="grafico-card grafico-largo">
+      <h3>Funil da Safra — Jornada do Cliente</h3>
+      <p class="grafico-sub">instalados → F1 → F2 → F3 → F4 IQ+</p>
+      <div class="funil-wrap">
+        <canvas id="g-funil" style="max-height:220px"></canvas>
+        <div class="funil-tabela" id="funil-tabela"></div>
+      </div>
+    </div>
+  </section>
+
+</div><!-- /tab-dashboard -->
+
+<!-- ═══ ABA: RISCO ════════════════════════════════════════════════════════════ -->
+<div id="tab-risco" class="tab-content">
+  <div class="tabela-section">
+    <div class="tabela-header">
+      <h3>⚠️ Clientes em Risco &amp; Inadimplentes</h3>
+      <span id="tabela-risco-info">—</span>
+    </div>
+    <div class="tabela-controles">
+      <input type="text" id="busca-risco" class="busca-input" placeholder="Buscar cliente, vendedor…" oninput="buscarTabela('risco')" />
+    </div>
+    <div class="tabela-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th><th>Vendedor</th><th>Safra</th><th>Plano</th>
+            <th>Estado</th><th>Nível</th><th>Dias Atraso</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-risco"><tr><td colspan="7" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="paginacao" id="pag-risco"></div>
+  </div>
+</div>
+
+<!-- ═══ ABA: PAGO EM ATRASO ══════════════════════════════════════════════════ -->
+<div id="tab-pg-atraso" class="tab-content">
+  <div class="tabela-section">
+    <div class="tabela-header">
+      <h3>🟡 Clientes com Pagamento em Atraso</h3>
+      <span id="tabela-pg-info">—</span>
+    </div>
+    <div class="tabela-controles">
+      <input type="text" id="busca-pg" class="busca-input" placeholder="Buscar cliente, vendedor…" oninput="buscarTabela('pg')" />
+    </div>
+    <div class="tabela-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th><th>Vendedor</th><th>Safra</th><th>Plano</th><th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-pg"><tr><td colspan="5" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="paginacao" id="pag-pg"></div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: TOKEN ══════════════════════════════════════════════════════════ -->
+<div id="modal-token" class="modal-overlay" style="display:none" onclick="fecharModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-icon">🔐</span>
+      <div>
+        <div class="modal-titulo">Token do Portal TIM</div>
+        <div class="modal-sub">Robô <strong id="modal-estado-label">—</strong></div>
+      </div>
+    </div>
+    <p class="modal-instrucao" id="modal-token-subtitulo">⚡ Robô pronto! Digite o token AGORA (válido por ~30s):</p>
+    <input type="text" id="modal-token-input" class="modal-input" placeholder="000000"
+      maxlength="10" autocomplete="off" inputmode="numeric"
+      onkeydown="if(event.key==='Enter') confirmarToken()" />
+    <div class="modal-botoes">
+      <button class="btn btn-secondary" onclick="fecharModalBtn()">Cancelar</button>
+      <button class="btn btn-success" onclick="confirmarToken()">▶ Iniciar Robô</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ABA: FATURAS ════════════════════════════════════════════════════════ -->
+<div id="tab-faturas" class="tab-content">
+  <div class="faturas-wrap">
+    <div class="faturas-header">
+      <h3>📄 Faturas PDF</h3>
+      <div class="faturas-busca-wrap">
+        <input type="text" id="faturas-busca" class="faturas-busca" placeholder="🔍 Buscar por nome ou CPF..." oninput="debounceBuscarFaturas(this.value)" />
+        <span id="faturas-total" class="faturas-total"></span>
+      </div>
+    </div>
+
+    <div id="faturas-lista" class="faturas-lista">
+      <div class="faturas-vazio">Digite um nome ou CPF para buscar faturas</div>
+    </div>
+
+    <div id="faturas-paginacao" class="faturas-paginacao"></div>
+  </div>
+</div>
+
+<!-- ═══ ABA: COMANDOS ════════════════════════════════════════════════════════ -->
+<div id="tab-comandos" class="tab-content">
+  <div class="comandos-wrap">
+    <div class="comandos-header">
+      <h3>🤖 Comandos do Sistema</h3>
+      <div class="status-badges">
+        <span class="badge" id="badge-robo">⏹ Robô: parado</span>
+        <span class="badge" id="badge-disparo">⏹ Disparo: parado</span>
+      </div>
+    </div>
+
+    <!-- Aviso VPS (oculto por padrão, mostrado via JS quando MODO=vps) -->
+    <div id="aviso-vps" class="aviso-vps" style="display:none">
+      ⚠️ <strong>Modo VPS</strong> — Os robôs SGR rodam apenas localmente (PC com Chrome). Aqui você pode visualizar dados e acompanhar relatórios.
+    </div>
+
+    <!-- Robôs por estado -->
+    <div class="robos-estados apenas-local">
+      <div class="robo-card" id="card-PR">
+        <div class="robo-estado-label">🤖 Robô PR</div>
+        <div class="robo-badge" id="badge-PR">⏹ parado</div>
+        <div class="robo-btns">
+          <button class="btn btn-success btn-sm" onclick="iniciarEstado('PR')">▶ Iniciar</button>
+          <button class="btn btn-danger btn-sm" id="parar-PR" onclick="pararEstado('PR')" disabled>⏹ Parar</button>
+        </div>
+      </div>
+      <div class="robo-card" id="card-SC">
+        <div class="robo-estado-label">🤖 Robô SC</div>
+        <div class="robo-badge" id="badge-SC">⏹ parado</div>
+        <div class="robo-btns">
+          <button class="btn btn-success btn-sm" onclick="iniciarEstado('SC')">▶ Iniciar</button>
+          <button class="btn btn-danger btn-sm" id="parar-SC" onclick="pararEstado('SC')" disabled>⏹ Parar</button>
+        </div>
+      </div>
+      <div class="robo-card" id="card-RS">
+        <div class="robo-estado-label">🤖 Robô RS</div>
+        <div class="robo-badge" id="badge-RS">⏹ parado</div>
+        <div class="robo-btns">
+          <button class="btn btn-success btn-sm" onclick="iniciarEstado('RS')">▶ Iniciar</button>
+          <button class="btn btn-danger btn-sm" id="parar-RS" onclick="pararEstado('RS')" disabled>⏹ Parar</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="separador"></div>
+
+    <div class="disparo-section apenas-local">
+      <div class="disparo-header">
+        <span class="disparo-label">📋 Relatório para Disparo</span>
+        <button class="btn btn-secondary btn-sm" onclick="carregarRelatorios()">🔄 Atualizar lista</button>
+      </div>
+      <div class="disparo-select-wrap">
+        <select id="select-relatorio" class="disparo-select" onchange="atualizarInfoRelatorio()">
+          <option value="">— Selecione um relatório —</option>
+        </select>
+        <div class="disparo-limite-wrap">
+          <input type="number" id="disparo-limite" class="disparo-limite-input" placeholder="Todos" min="1" max="9999" title="Deixe vazio para disparar para todos" />
+          <span class="disparo-limite-tag">limite</span>
+        </div>
+        <div class="disparo-limite-wrap">
+          <input type="number" id="disparo-delay" class="disparo-limite-input" placeholder="30" min="5" max="300" value="30" title="Segundos entre cada envio" />
+          <span class="disparo-limite-tag">seg/envio</span>
+        </div>
+        <div class="disparo-limite-wrap">
+          <input type="number" id="disparo-lote" class="disparo-limite-input" placeholder="50" min="5" max="500" value="50" title="Pausa automática a cada N clientes" />
+          <span class="disparo-limite-tag">por lote</span>
+        </div>
+        <div class="disparo-limite-wrap">
+          <input type="number" id="disparo-pausa-lote" class="disparo-limite-input" placeholder="300" min="60" max="3600" value="300" title="Segundos de pausa entre lotes" />
+          <span class="disparo-limite-tag">seg pausa</span>
+        </div>
+        <button class="btn btn-primary" id="btn-disparar" onclick="dispararFaturas()">📤 Disparar WhatsApp</button>
+        <button class="btn btn-danger" id="btn-parar-disparo" onclick="pararDisparo()" style="display:none">⏹ Parar Disparo</button>
+      </div>
+      <div id="disparo-relatorio-info" class="disparo-info"></div>
+
+      <!-- Barra de progresso -->
+      <div id="disparo-progresso-wrap" class="progresso-wrap" style="display:none">
+        <div class="progresso-header">
+          <span class="progresso-label" id="progresso-label">Aguardando...</span>
+          <span class="progresso-pct" id="progresso-pct">0%</span>
+        </div>
+        <div class="progresso-bar-bg">
+          <div class="progresso-bar-fill" id="progresso-bar-fill" style="width:0%"></div>
+        </div>
+        <div class="progresso-sub" id="progresso-sub">0 / 0 clientes</div>
+      </div>
+    </div>
+
+    <div class="comandos-botoes">
+      <button class="btn btn-secondary" onclick="atualizarDados()">🔄 Atualizar Dashboard</button>
+    </div>
+
+    <div class="separador"></div>
+
+    <div class="console-duplo">
+      <div class="rel-disparo-section">
+        <div class="disparo-header">
+          <span class="disparo-label">📊 Relatório Parcial dos Robôs</span>
+          <a href="/api/relatorio-parcial" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
+        </div>
+        <div class="rel-disparo-lista">
+          <span class="disparo-info">Baixe o relatório consolidado (PR + SC + RS) a qualquer momento, mesmo com os robôs ativos.</span>
+        </div>
+      </div>
+      <div class="rel-disparo-section">
+        <div class="disparo-header">
+          <span class="disparo-label">📊 Relatórios de Disparo</span>
+          <button class="btn btn-secondary btn-sm" onclick="carregarRelatoriosDisparo()">🔄 Atualizar</button>
+        </div>
+        <div id="rel-disparo-lista" class="rel-disparo-lista">
+          <span class="disparo-info">Nenhum disparo realizado ainda.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="console-duplo">
+      <div class="console-painel">
+        <div class="console-titulo">📤 Log de Disparo</div>
+        <div class="console" id="console-disparo">
+          <div class="console-linha console-info">Aguardando disparo...</div>
+        </div>
+      </div>
+      <div class="console-painel">
+        <div class="console-titulo">🤖 Log Robô PDF</div>
+        <div class="console" id="console-log">
+          <div class="console-linha console-info">Sistema pronto. Aguardando comandos...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ TABELA ANALÍTICA (presente em todas as abas dashboard/risco/pg) ═══════ -->
+<div id="tab-dashboard-tabela" class="tab-extra">
+  <div class="tabela-section">
+    <div class="tabela-header">
+      <h3>📋 Tabela Analítica de Clientes</h3>
+      <span id="tabela-info">—</span>
+    </div>
+    <div class="tabela-controles">
+      <input type="text" id="busca-tabela" class="busca-input" placeholder="Buscar cliente, vendedor…" oninput="buscarTabela('main')" />
+    </div>
+    <div class="tabela-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th onclick="ordenar('cliente')">Cliente ↕</th>
+            <th onclick="ordenar('vendedor')">Vendedor ↕</th>
+            <th onclick="ordenar('safra')">Safra ↕</th>
+            <th onclick="ordenar('plano')">Plano ↕</th>
+            <th onclick="ordenar('estado')">Estado ↕</th>
+            <th onclick="ordenar('nivelAlerta')">Nível ↕</th>
+          </tr>
+        </thead>
+        <tbody id="tabela-body"><tr><td colspan="6" class="loading">Carregando...</td></tr></tbody>
+      </table>
+    </div>
+    <div class="paginacao" id="paginacao"></div>
+  </div>
+</div>
+
+<footer class="rodape">VONIXX TELECOM · Controle de Faturas e IQ por Safra · Dados via Google Sheets</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

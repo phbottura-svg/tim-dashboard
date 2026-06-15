@@ -210,14 +210,25 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
   if (!['PR', 'SC', 'RS'].includes(estado)) return res.status(400).json({ erro: 'Estado inválido. Use PR, SC ou RS' });
   if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
   try {
-    const conteudo = req.file.buffer.toString('utf8').replace(/^﻿/, '');
-    const registros = parseCSV(conteudo, {
-      delimiter: ';',
-      columns: true,
-      skip_empty_lines: true,
-      relax_quotes: true,
-      trim: true,
-    });
+    const mime = req.file.mimetype || '';
+    const nome = req.file.originalname || '';
+    const isXlsx = nome.endsWith('.xlsx') || nome.endsWith('.xls') || mime.includes('spreadsheet') || mime.includes('excel');
+
+    let registros;
+    if (isXlsx) {
+      const wb = xlsx.read(req.file.buffer, { type: 'buffer' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      registros = xlsx.utils.sheet_to_json(ws, { defval: '' });
+    } else {
+      const conteudo = req.file.buffer.toString('utf8').replace(/^﻿/, '');
+      registros = parseCSV(conteudo, {
+        delimiter: ';',
+        columns: true,
+        skip_empty_lines: true,
+        relax_quotes: true,
+        trim: true,
+      });
+    }
 
     const ufsNoArquivo = [...new Set(registros.map(r => r['UF']).filter(Boolean))];
     if (ufsNoArquivo.length > 0 && !ufsNoArquivo.includes(estado)) {

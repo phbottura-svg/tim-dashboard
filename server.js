@@ -135,36 +135,46 @@ function cruzarBases() {
   const sonarRS = lerJSON(BASE_SONAR.RS, []);
   const sonarTotal = [...sonarPR, ...sonarSC, ...sonarRS];
 
-  const indiceSonar = {};
-  sonarTotal.forEach(s => { if (s.os) indiceSonar[s.os] = s; });
+  // Índice de clientes por OS para enriquecimento
+  const indiceClientes = {};
+  clientes.forEach(c => { if (c.os) indiceClientes[c.os] = c; });
 
-  const baseCruzada = clientes.map(cliente => {
-    const sonar = indiceSonar[cliente.os] || null;
+  // Sonar é a base primária — cada registro Sonar é uma linha
+  const baseCruzada = sonarTotal.map(sonar => {
+    const cliente = indiceClientes[sonar.os] || null;
     return {
-      ...cliente,
-      mesGross: sonar?.mesGross || null,
-      status: sonar ? calcularStatus(sonar.statusPagamento, sonar.dataVencimento) : 'SEM DADOS',
-      statusPagamento: sonar?.statusPagamento || null,
-      detalhamento: sonar?.detalhamento || null,
-      dataVencimento: sonar?.dataVencimento || null,
-      dataPagamento: sonar?.dataPagamento || null,
-      numeroFatura: sonar?.numeroFatura || null,
-      mesVencimento: sonar?.mesVencimento || null,
-      churn: sonar?.churn === 'Sim',
-      uf: sonar?.uf || null,
-      cruzado: sonar !== null,
-      contatos: [cliente.contatoPrincipal, cliente.contatoResponsavel].filter(Boolean),
+      os: sonar.os,
+      mesGross: sonar.mesGross || null,
+      mesVencimento: sonar.mesVencimento || null,
+      dataVencimento: sonar.dataVencimento || null,
+      dataPagamento: sonar.dataPagamento || null,
+      statusPagamento: sonar.statusPagamento || null,
+      detalhamento: sonar.detalhamento || null,
+      numeroFatura: sonar.numeroFatura || null,
+      uf: sonar.uf || null,
+      churn: sonar.churn === 'Sim',
+      loginVendedor: sonar.loginVendedor || null,
+      status: calcularStatus(sonar.statusPagamento, sonar.dataVencimento),
+      // Dados do cliente (quando existe match)
+      nome: cliente?.nome || null,
+      cpf: cliente?.cpf || null,
+      vendedor: cliente?.vendedor || null,
+      contatoPrincipal: cliente?.contatoPrincipal || null,
+      contatoResponsavel: cliente?.contatoResponsavel || null,
+      mesGrossManual: cliente?.mesGrossManual || null,
+      contatos: cliente ? [cliente.contatoPrincipal, cliente.contatoResponsavel].filter(Boolean) : [],
+      cruzado: cliente !== null,
     };
   });
 
   salvarJSON(BASE_CRUZADA_PATH, baseCruzada);
   const meta = lerJSON(SONAR_META_PATH, {});
   meta.ultimaAtualizacao = new Date().toISOString();
-  meta.totalClientes = clientes.length;
+  meta.totalSonar = sonarTotal.length;
   meta.totalCruzados = baseCruzada.filter(c => c.cruzado).length;
   salvarJSON(SONAR_META_PATH, meta);
 
-  emitirEvento('cache', { msg: `Base cruzada: ${meta.totalCruzados}/${clientes.length} clientes`, ts: meta.ultimaAtualizacao });
+  emitirEvento('cache', { msg: `Base cruzada: ${meta.totalCruzados}/${sonarTotal.length} registros Sonar`, ts: meta.ultimaAtualizacao });
   return baseCruzada;
 }
 

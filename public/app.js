@@ -270,7 +270,7 @@ async function carregarStatusImportacao() {
       if (total === 0) {
         elCruz.textContent = '— Nenhum dado importado';
       } else {
-        elCruz.textContent = `✅ ${cruzados} clientes cruzados · ⚠️ ${semMatch} sem match`;
+        elCruz.textContent = `✅ ${cruzados} registros Sonar com cliente · ⚠️ ${semMatch} sem match`;
       }
     }
 

@@ -78,6 +78,18 @@ function limparTelefone(tel) {
   return n.startsWith('55') ? n : `55${n}`;
 }
 
+const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+
+function excelSerialParaMes(val) {
+  if (!val) return null;
+  const s = String(val).trim();
+  // Já está no formato texto (ex: "Janeiro/2026")
+  if (isNaN(s)) return s;
+  // Converte serial Excel para "Mês/Ano"
+  const d = new Date(Math.round((Number(s) - 25569) * 86400 * 1000));
+  return `${MESES_PT[d.getUTCMonth()]}/${d.getUTCFullYear()}`;
+}
+
 function calcularStatus(statusPagamento, dataVencimento) {
   if (!statusPagamento) return 'SEM DADOS';
   const sp = String(statusPagamento);
@@ -258,7 +270,7 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
     const processados = registros.map(r => ({
       os: String(r['NÚMERO ORDEM'] || '').trim(),
       custcode: String(r['COD CUSTCODE CLIENTE'] || '').replace(/[="]/g, '').trim(),
-      mesGross: r['MÊS GROSS'] || null,
+      mesGross: excelSerialParaMes(r['MÊS GROSS']),
       numeroFatura: r['NÚMERO FATURA'] || null,
       statusPagamento: r['STATUS PAGAMENTO'] || null,
       detalhamento: r['DETALHAMENTO FATURA'] || null,

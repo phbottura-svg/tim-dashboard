@@ -271,40 +271,33 @@
 <div id="tab-ajustes" class="tab-content">
   <div class="ajustes-wrap">
     <div class="ajustes-header">
-      <h3>🔧 Clientes Sem Cruzamento — Ajuste por Mês</h3>
-      <span id="ajustes-total-label">—</span>
+      <div class="ajustes-header-top">
+        <h3>🔧 Clientes Sem Cruzamento</h3>
+        <span id="ajustes-total-label">—</span>
+      </div>
+      <div class="ajustes-filtros">
+        <select id="ajustes-filtro-mes" onchange="carregarAjustes()" style="min-width:160px">
+          <option value="">Todos os meses</option>
+        </select>
+        <input type="text" id="busca-ajustes" class="busca-input" placeholder="Buscar cliente ou OS..." oninput="filtrarTabelaAjustes()" style="width:220px" />
+        <a id="btn-exportar-mes" class="btn btn-secondary btn-sm" href="/api/ajustes/exportar/" download>📥 Exportar Excel</a>
+      </div>
     </div>
 
-    <!-- Resumo por mês -->
-    <div id="ajustes-lista-meses" class="ajustes-lista-meses">
-      <div class="loading">Carregando...</div>
-    </div>
-
-    <!-- Detalhe de um mês (oculto por padrão) -->
-    <div id="ajustes-detalhe" class="ajustes-detalhe" style="display:none">
-      <div class="ajustes-detalhe-header">
-        <button class="btn btn-secondary btn-sm" onclick="fecharDetalhe()">← Voltar</button>
-        <h4 id="ajustes-detalhe-titulo">—</h4>
-        <div class="ajustes-detalhe-acoes">
-          <input type="text" id="busca-ajustes" class="busca-input" placeholder="Buscar cliente..." oninput="filtrarTabelaAjustes()" style="width:200px" />
-          <a id="btn-exportar-mes" class="btn btn-secondary btn-sm" href="#" download>📥 Exportar Excel</a>
-          <button class="btn btn-success btn-sm" onclick="concluirMes()">✅ Marcar como concluído</button>
-        </div>
-      </div>
-      <div class="tabela-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Cliente</th>
-              <th>CPF</th>
-              <th>OS Atual</th>
-              <th>Ação</th>
-            </tr>
-          </thead>
-          <tbody id="ajustes-tbody"></tbody>
-        </table>
-      </div>
+    <div class="tabela-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Cliente</th>
+            <th>CPF</th>
+            <th>Mês Gross</th>
+            <th>OS Atual</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="ajustes-tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>

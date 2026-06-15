@@ -528,64 +528,48 @@ function renderPag(elId, pagAtual, totalPag, onPag) {
 
 // ─── Aba Ajustes ──────────────────────────────────────────────────────────────
 
-let ajusteMesAtual = null;
 let ajusteClientesAtual = [];
 
 async function carregarAjustes() {
-  document.getElementById('ajustes-detalhe').style.display = 'none';
-  const lista = document.getElementById('ajustes-lista-meses');
-  lista.style.display = '';
-  lista.innerHTML = '<div class="loading">Carregando...</div>';
+  const mesSel = document.getElementById('ajustes-filtro-mes')?.value || '';
+  const tbody = document.getElementById('ajustes-tbody');
+  tbody.innerHTML = '<tr><td colspan="6" class="loading">Carregando...</td></tr>';
+
   try {
     const d = await fetch('/api/ajustes/resumo').then(r => r.json());
     setText('ajustes-total-label', `Total sem cruzamento: ${d.total}`);
 
-    if (!d.grupos?.length) {
-      lista.innerHTML = '<div class="ajustes-vazio">✅ Todos os clientes estão cruzados!</div>';
-      return;
+    // Popula filtro de mês
+    const sel = document.getElementById('ajustes-filtro-mes');
+    const mesAnterior = sel.value;
+    sel.innerHTML = '<option value="">Todos os meses</option>' +
+      (d.grupos || []).map(g => `<option value="${g.mes}" ${g.mes === mesAnterior ? 'selected' : ''}>${g.mes} (${g.total})</option>`).join('');
+
+    // Atualiza link exportar
+    const btnExp = document.getElementById('btn-exportar-mes');
+    if (btnExp) btnExp.href = mesSel ? `/api/ajustes/exportar/${encodeURIComponent(mesSel)}` : '/api/ajustes/exportar/';
+
+    // Carrega clientes do mês selecionado ou todos
+    let clientes = [];
+    if (mesSel) {
+      const r = await fetch(`/api/ajustes/mes/${encodeURIComponent(mesSel)}`).then(r => r.json());
+      clientes = r.clientes || [];
+    } else {
+      const r = await fetch('/api/ajustes/todos').then(r => r.json());
+      clientes = r.clientes || [];
     }
 
-    lista.innerHTML = d.grupos.map(g => {
-      const barFill = g.total > 0 ? 0 : 100;
-      return `<div class="ajuste-mes-card ${g.concluido ? 'concluido' : ''}">
-        <div class="ajuste-mes-info">
-          <span class="ajuste-mes-nome">📅 ${g.mes}</span>
-          <span class="ajuste-mes-count">${g.total} pendentes</span>
-          ${g.concluido ? `<span class="ajuste-concluido-badge">✅ Concluído</span>` : ''}
-        </div>
-        <div class="ajuste-mes-acoes">
-          <button class="btn btn-secondary btn-sm" onclick="verMes('${encodeURIComponent(g.mes)}', '${g.mes}')">Ver</button>
-          <a class="btn btn-secondary btn-sm" href="/api/ajustes/exportar/${encodeURIComponent(g.mes)}" download>📥 Exportar</a>
-        </div>
-      </div>`;
-    }).join('');
+    ajusteClientesAtual = clientes;
+    renderTabelaAjustes(clientes);
   } catch (err) {
-    lista.innerHTML = `<div class="ajustes-vazio">Erro: ${err.message}</div>`;
-  }
-}
-
-async function verMes(mesEnc, mesLabel) {
-  ajusteMesAtual = decodeURIComponent(mesEnc);
-  document.getElementById('ajustes-lista-meses').style.display = 'none';
-  const detalhe = document.getElementById('ajustes-detalhe');
-  detalhe.style.display = 'block';
-  setText('ajustes-detalhe-titulo', `${mesLabel} — clientes sem cruzamento`);
-  const btnExportar = document.getElementById('btn-exportar-mes');
-  if (btnExportar) btnExportar.href = `/api/ajustes/exportar/${mesEnc}`;
-
-  try {
-    const d = await fetch(`/api/ajustes/mes/${mesEnc}`).then(r => r.json());
-    ajusteClientesAtual = d.clientes || [];
-    renderTabelaAjustes(ajusteClientesAtual);
-  } catch (err) {
-    document.getElementById('ajustes-tbody').innerHTML = `<tr><td colspan="5">Erro: ${err.message}</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6">Erro: ${err.message}</td></tr>`;
   }
 }
 
 function renderTabelaAjustes(clientes) {
   const tbody = document.getElementById('ajustes-tbody');
   if (!clientes.length) {
-    tbody.innerHTML = '<tr><td colspan="5" class="loading">Nenhum cliente neste mês</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" class="loading">✅ Nenhum cliente pendente</td></tr>';
     return;
   }
   tbody.innerHTML = clientes.map((c, i) => `
@@ -593,6 +577,7 @@ function renderTabelaAjustes(clientes) {
       <td>${i + 1}</td>
       <td>${c.nome || '—'}</td>
       <td class="cpf-col">${c.cpf || '—'}</td>
+      <td>${c.mesGross || '<em class="dim">Sem data</em>'}</td>
       <td id="os-cell-${i}" class="os-edit-cell">
         <span class="os-valor">${c.os || '<em class="dim">vazio</em>'}</span>
         <button class="btn-edit-os" onclick="editarOS(${i})" title="Editar OS">✏️</button>
@@ -647,9 +632,7 @@ async function salvarOS(idx) {
     const cell = document.getElementById(`os-cell-${idx}`);
     if (cell) cell.innerHTML = `<span class="os-valor">${osNova}</span> <button class="btn-edit-os" onclick="editarOS(${idx})" title="Editar OS">✏️</button>`;
     const statusCell = document.getElementById(`status-cell-${idx}`);
-    if (statusCell) statusCell.innerHTML = `<span class="ajuste-corrigido">✅ Cruzado</span>`;
-
-    // Atualiza badge
+    if (statusCell) statusCell.innerHTML = `<span class="ajuste-corrigido">✅ Corrigido</span>`;
     await carregarStatusImportacao();
   } catch (err) { alert('Erro: ' + err.message); }
 }
@@ -657,26 +640,6 @@ async function salvarOS(idx) {
 function cancelarOS(idx, osOriginal) {
   const cell = document.getElementById(`os-cell-${idx}`);
   if (cell) cell.innerHTML = `<span class="os-valor">${osOriginal || '<em class="dim">vazio</em>'}</span> <button class="btn-edit-os" onclick="editarOS(${idx})" title="Editar OS">✏️</button>`;
-}
-
-function fecharDetalhe() {
-  document.getElementById('ajustes-detalhe').style.display = 'none';
-  document.getElementById('ajustes-lista-meses').style.display = '';
-  ajusteMesAtual = null;
-}
-
-async function concluirMes() {
-  if (!ajusteMesAtual) return;
-  if (!confirm(`Marcar "${ajusteMesAtual}" como concluído?`)) return;
-  try {
-    await fetch('/api/ajustes/concluir', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ mes: ajusteMesAtual }),
-    });
-    fecharDetalhe();
-    carregarAjustes();
-  } catch (err) { alert('Erro: ' + err.message); }
 }
 
 // ─── Modal Token ──────────────────────────────────────────────────────────────

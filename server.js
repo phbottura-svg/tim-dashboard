@@ -554,6 +554,14 @@ app.get('/api/ajustes/resumo', (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+app.get('/api/ajustes/todos', (req, res) => {
+  try {
+    const baseCruzada = lerJSON(BASE_CRUZADA_PATH, []);
+    const clientes = baseCruzada.filter(c => !c.cruzado);
+    res.json({ total: clientes.length, clientes });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 app.get('/api/ajustes/mes/:mes', (req, res) => {
   try {
     const mes = decodeURIComponent(req.params.mes);

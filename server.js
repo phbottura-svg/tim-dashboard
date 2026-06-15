@@ -250,9 +250,9 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
 
     let registros;
     if (isXlsx) {
-      const wb = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: true });
+      const wb = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: true, cellNF: true });
       const ws = wb.Sheets[wb.SheetNames[0]];
-      registros = XLSX.utils.sheet_to_json(ws, { defval: '' });
+      registros = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
     } else {
       const conteudo = req.file.buffer.toString('utf8').replace(/^﻿/, '');
       registros = parseCSV(conteudo, {

@@ -534,6 +534,7 @@ let ajusteClientesAtual = [];
 async function carregarAjustes() {
   document.getElementById('ajustes-detalhe').style.display = 'none';
   const lista = document.getElementById('ajustes-lista-meses');
+  lista.style.display = '';
   lista.innerHTML = '<div class="loading">Carregando...</div>';
   try {
     const d = await fetch('/api/ajustes/resumo').then(r => r.json());

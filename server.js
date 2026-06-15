@@ -108,7 +108,7 @@ function cruzarBases() {
     const sonar = indiceSonar[cliente.os] || null;
     return {
       ...cliente,
-      mesGross: sonar?.mesGross || null,
+      mesGross: sonar?.mesGross || cliente.mesGrossManual || null,
       status: sonar ? calcularStatus(sonar.statusPagamento, sonar.dataVencimento) : 'SEM DADOS',
       statusPagamento: sonar?.statusPagamento || null,
       detalhamento: sonar?.detalhamento || null,
@@ -185,6 +185,7 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
         contatoPrincipal: limparTelefone(row[3]),
         contatoResponsavel: limparTelefone(row[4]) || null,
         os: String(row[5] || '').trim(),
+        mesGrossManual: String(row[6] || '').trim() || null,
       }))
       .filter(r => r.nome && r.os);
 

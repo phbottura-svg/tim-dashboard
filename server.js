@@ -80,6 +80,21 @@ function limparTelefone(tel) {
 
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
+function converterDataParaMesAno(val) {
+  if (!val) return null;
+  // Serial Excel (número)
+  if (!isNaN(val) && val !== '') {
+    const d = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
+    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
+    return `${mm}/${d.getUTCFullYear()}`;
+  }
+  // DD/MM/YYYY ou D/M/YYYY
+  const m = String(val).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (m) return `${m[2].padStart(2, '0')}/${m[3]}`;
+  // Já está no formato MM/YYYY
+  return val;
+}
+
 function excelSerialParaMes(val) {
   if (!val) return null;
   // Objeto Date (xlsx com cellDates:true)
@@ -201,7 +216,7 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
         contatoPrincipal: limparTelefone(row[3]),
         contatoResponsavel: limparTelefone(row[4]) || null,
         os: String(row[5] || '').trim(),
-        mesGrossManual: String(row[6] || '').trim() || null,
+        mesGrossManual: converterDataParaMesAno(String(row[6] || '').trim()),
       }))
       .filter(r => r.nome && r.os);
 

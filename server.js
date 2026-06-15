@@ -151,6 +151,12 @@ function aplicarFiltros(lista, q) {
 
 const uploadMemory = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
+// ─── Modelo Base Clientes ─────────────────────────────────────────────────────
+
+app.get('/api/modelo-base-clientes', (req, res) => {
+  res.download(path.join(__dirname, 'public', 'modelo-base-clientes.xlsx'), 'modelo-base-clientes.xlsx');
+});
+
 // ─── Importar Clientes Excel ──────────────────────────────────────────────────
 
 app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) => {

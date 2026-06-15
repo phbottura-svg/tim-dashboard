@@ -618,7 +618,7 @@ app.get('/api/ajustes/resumo', (req, res) => {
 
     const grupos = {};
     semMatch.forEach(c => {
-      const chave = c.mesGrossManual || 'Sem data';
+      const chave = c.mesGross || 'Sem data';
       if (!grupos[chave]) grupos[chave] = [];
       grupos[chave].push(c);
     });
@@ -650,7 +650,7 @@ app.get('/api/ajustes/mes/:mes', (req, res) => {
   try {
     const mes = decodeURIComponent(req.params.mes);
     const baseCruzada = lerJSON(BASE_CRUZADA_PATH, []);
-    const clientes = baseCruzada.filter(c => !c.cruzado && (c.mesGrossManual === mes || (mes === 'Sem data' && !c.mesGrossManual)));
+    const clientes = baseCruzada.filter(c => !c.cruzado && (c.mesGross === mes || (mes === 'Sem data' && !c.mesGross)));
     res.json({ mes, total: clientes.length, clientes });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -659,7 +659,7 @@ app.get('/api/ajustes/exportar/:mes', (req, res) => {
   try {
     const mes = decodeURIComponent(req.params.mes);
     const baseCruzada = lerJSON(BASE_CRUZADA_PATH, []);
-    const clientes = baseCruzada.filter(c => !c.cruzado && (c.mesGrossManual === mes || (mes === 'Sem data' && !c.mesGrossManual)));
+    const clientes = baseCruzada.filter(c => !c.cruzado && (c.mesGross === mes || (mes === 'Sem data' && !c.mesGross)));
     const headers = ['Nome', 'CPF', 'OS', 'Vendedor', 'Estado', 'Mês Gross'];
     const linhas = [headers, ...clientes.map(c => [c.nome, c.cpf, c.os, c.vendedor, c.uf, c.mesGross])];
     const wb = XLSX.utils.book_new();

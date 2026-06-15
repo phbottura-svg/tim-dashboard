@@ -232,6 +232,20 @@
     </div>
     <div class="tabela-controles">
       <input type="text" id="busca-tabela" class="busca-input" placeholder="Buscar por nome, CPF, OS…" oninput="buscarTabela()" />
+      <select id="tabela-filtro-status" class="filtro-select-sm" onchange="buscarTabela()">
+        <option value="">Todos status</option>
+        <option value="ADIMPLENTE">Adimplente</option>
+        <option value="INADIMPLENTE">Inadimplente</option>
+        <option value="SEM DADOS">Sem Dados</option>
+      </select>
+      <select id="tabela-filtro-uf" class="filtro-select-sm" onchange="buscarTabela()">
+        <option value="">Todas UFs</option>
+        <option value="PR">PR</option>
+        <option value="SC">SC</option>
+        <option value="RS">RS</option>
+      </select>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-churn" onchange="buscarTabela()"> Churn</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-sem-match" onchange="buscarTabela()"> Sem Match</label>
     </div>
     <div class="tabela-wrapper">
       <table>

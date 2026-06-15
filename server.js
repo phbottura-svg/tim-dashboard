@@ -209,10 +209,14 @@ function aplicarFiltros(lista, q) {
   let l = lista;
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));
+  if (q.uf)       l = l.filter(c => c.uf === q.uf);
   if (q.vendedor) l = l.filter(c => c.vendedor === q.vendedor);
   if (q.status)   l = l.filter(c => q.status.split(',').includes(c.status));
+  if (q.statusTabela) l = l.filter(c => c.status === q.statusTabela);
   if (q.contatos === '2') l = l.filter(c => (c.contatos?.length || 0) >= 2);
   if (q.contatos === '1') l = l.filter(c => (c.contatos?.length || 0) === 1);
+  if (q.churn === '1') l = l.filter(c => c.churn);
+  if (q.semMatch === '1') l = l.filter(c => !c.cruzado);
   return l;
 }
 

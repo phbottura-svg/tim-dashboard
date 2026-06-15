@@ -486,6 +486,12 @@ async function carregarTabela() {
   p.set('direcao', state.direcao);
   const busca = document.getElementById('busca-tabela')?.value;
   if (busca) p.set('busca', busca);
+  const statusTabela = document.getElementById('tabela-filtro-status')?.value;
+  if (statusTabela) p.set('statusTabela', statusTabela);
+  const ufTabela = document.getElementById('tabela-filtro-uf')?.value;
+  if (ufTabela) p.set('uf', ufTabela);
+  if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
+  if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
 
   try {
     const d = await fetch('/api/clientes?' + p).then(r => r.json());

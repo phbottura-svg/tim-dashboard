@@ -309,7 +309,30 @@ header h1 { font-size: 18px; font-weight: 800; color: var(--azul-c); letter-spac
 .tabela-header h3 { font-size: 14px; font-weight: 700; color: var(--azul-c); }
 .tabela-header span { font-size: 12px; color: var(--dim); }
 
-.tabela-controles { padding: 10px 20px; border-bottom: 1px solid var(--border); }
+.tabela-controles { padding: 10px 20px; border-bottom: 1px solid var(--border); display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.filtro-select-sm {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--texto);
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: var(--fonte);
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.filtro-select-sm:focus { border-color: var(--azul); }
+.filtro-toggle {
+  display: flex; align-items: center; gap: 5px;
+  font-size: 12px; color: var(--texto-sec);
+  cursor: pointer; padding: 4px 8px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--bg3); transition: border-color 0.2s;
+  white-space: nowrap;
+}
+.filtro-toggle:hover { border-color: var(--azul); }
+.filtro-toggle input[type=checkbox] { accent-color: var(--azul); cursor: pointer; }
 .busca-input {
   background: var(--bg3);
   border: 1px solid var(--border);

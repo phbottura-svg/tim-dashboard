@@ -82,10 +82,14 @@ const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho',
 
 function excelSerialParaMes(val) {
   if (!val) return null;
+  // Objeto Date (xlsx com cellDates:true)
+  if (val instanceof Date) {
+    return `${MESES_PT[val.getUTCMonth()]}/${val.getUTCFullYear()}`;
+  }
   const s = String(val).trim();
   // Já está no formato texto (ex: "Janeiro/2026")
   if (isNaN(s)) return s;
-  // Converte serial Excel para "Mês/Ano"
+  // Serial numérico do Excel
   const d = new Date(Math.round((Number(s) - 25569) * 86400 * 1000));
   return `${MESES_PT[d.getUTCMonth()]}/${d.getUTCFullYear()}`;
 }
@@ -246,7 +250,7 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
 
     let registros;
     if (isXlsx) {
-      const wb = XLSX.read(req.file.buffer, { type: 'buffer' });
+      const wb = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: true });
       const ws = wb.Sheets[wb.SheetNames[0]];
       registros = XLSX.utils.sheet_to_json(ws, { defval: '' });
     } else {

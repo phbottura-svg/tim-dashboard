@@ -228,7 +228,10 @@
   <div class="tabela-section">
     <div class="tabela-header">
       <h3>📋 Tabela de Clientes</h3>
-      <span id="tabela-info">—</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span id="tabela-info">—</span>
+        <a id="btn-exportar-clientes" class="btn btn-secondary btn-sm" href="/api/clientes/exportar" download>📥 Exportar Excel</a>
+      </div>
     </div>
     <div class="tabela-controles">
       <input type="text" id="busca-tabela" class="busca-input" placeholder="Buscar por nome, CPF, OS…" oninput="buscarTabela()" />

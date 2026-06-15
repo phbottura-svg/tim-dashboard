@@ -547,6 +547,8 @@ async function carregarTabela() {
       </tr>`;
     }).join('');
     setText('tabela-info', `${d.total.toLocaleString('pt-BR')} clientes`);
+    const btnExp = document.getElementById('btn-exportar-clientes');
+    if (btnExp) btnExp.href = '/api/clientes/exportar?' + p;
     renderPag('paginacao', d.pagina, d.totalPaginas, pg => { state.pagina = pg; carregarTabela(); });
   } catch {}
 }

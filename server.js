@@ -479,6 +479,40 @@ app.get('/api/clientes', (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+app.get('/api/clientes/exportar', (req, res) => {
+  try {
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    let lista = aplicarFiltros(todos, req.query);
+    if (req.query.busca) {
+      const b = req.query.busca.toLowerCase();
+      lista = lista.filter(c =>
+        (c.nome || '').toLowerCase().includes(b) ||
+        (c.vendedor || '').toLowerCase().includes(b) ||
+        (c.cpf || '').includes(b) ||
+        (c.os || '').includes(b)
+      );
+    }
+    // Descobre max faturas
+    const maxF = Math.max(0, ...lista.map(c => c.totalFaturas || 0));
+    const fHeaders = Array.from({length: maxF}, (_, i) => [`F${i+1} Status`, `F${i+1} Vencimento`, `F${i+1} Pagamento`]).flat();
+    const headers = ['Cliente', 'CPF', 'OS', 'Vendedor', 'UF', 'Mês Gross', 'Total Faturas', 'Faturas Pagas', 'Status', 'Churn', ...fHeaders];
+    const linhas = lista.map(c => {
+      const base = [c.nome||'', c.cpf||'', c.os||'', c.vendedor||'', c.uf||'', c.mesGross||'', c.totalFaturas||0, c.faturasPagas||0, c.status||'', c.churn ? 'Sim' : 'Não'];
+      const fCols = Array.from({length: maxF}, (_, i) => {
+        const fat = (c.faturas||[]).find(f => f.numero === i+1);
+        return fat ? [fat.status||'', fat.dataVencimento||'', fat.dataPagamento||''] : ['','',''];
+      }).flat();
+      return [...base, ...fCols];
+    });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Clientes');
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+    res.setHeader('Content-Disposition', 'attachment; filename="clientes.xlsx"');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // ─── Filtros/Opções ───────────────────────────────────────────────────────────
 
 app.get('/api/filtros/opcoes', (req, res) => {

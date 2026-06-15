@@ -125,12 +125,12 @@
     </div>
   </section>
 
-  <!-- KPIs -->
+  <!-- KPIs Linha 1: Totais -->
   <section class="kpi-grid kpi-row1">
     <div class="kpi">
-      <div class="kpi-label">Total Registros</div>
+      <div class="kpi-label">Total Clientes</div>
       <div class="kpi-value" id="v-total">—</div>
-      <div class="kpi-sub">registros Sonar</div>
+      <div class="kpi-sub">OSs únicas no Sonar</div>
     </div>
     <div class="kpi kpi-verde">
       <div class="kpi-label">Adimplentes</div>
@@ -165,8 +165,14 @@
     <div class="kpi kpi-amarelo" onclick="mudarAbaBtn('ajustes')" style="cursor:pointer">
       <div class="kpi-label">🔧 Ajustes</div>
       <div class="kpi-value" id="v-sem-cruzamento">—</div>
-      <div class="kpi-sub">sem cruzamento · <u>Ver relatório</u></div>
+      <div class="kpi-sub">sem match · <u>Ver relatório</u></div>
     </div>
+  </section>
+
+  <!-- KPIs Linha 2: Por Fatura -->
+  <div class="secao-titulo">📋 Status por Fatura</div>
+  <section class="kpi-grid kpi-faturas" id="kpi-faturas-grid">
+    <!-- gerado dinamicamente pelo JS -->
   </section>
 
   <!-- Gráficos -->
@@ -229,20 +235,22 @@
     </div>
     <div class="tabela-wrapper">
       <table>
-        <thead>
+        <thead id="tabela-thead">
           <tr>
             <th onclick="ordenar('nome')">Cliente ↕</th>
             <th onclick="ordenar('cpf')">CPF ↕</th>
             <th onclick="ordenar('os')">OS ↕</th>
             <th onclick="ordenar('vendedor')">Vendedor ↕</th>
-            <th onclick="ordenar('uf')">Estado ↕</th>
+            <th onclick="ordenar('uf')">UF ↕</th>
             <th onclick="ordenar('mesGross')">Mês Gross ↕</th>
+            <th onclick="ordenar('totalFaturas')">Faturas ↕</th>
+            <th onclick="ordenar('faturasPagas')">Pagas ↕</th>
             <th onclick="ordenar('status')">Status ↕</th>
-            <th>Vencimento</th>
             <th>Churn</th>
+            <!-- colunas de faturas geradas dinamicamente -->
           </tr>
         </thead>
-        <tbody id="tabela-body"><tr><td colspan="9" class="loading">Importe dados para visualizar</td></tr></tbody>
+        <tbody id="tabela-body"><tr><td colspan="10" class="loading">Importe dados para visualizar</td></tr></tbody>
       </table>
     </div>
     <div class="paginacao" id="paginacao"></div>

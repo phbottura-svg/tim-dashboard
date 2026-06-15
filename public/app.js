@@ -339,8 +339,22 @@ async function carregarResumo() {
     setText('v-pct-com2', pct(d.com2Contatos, d.total) + ' da base');
     setText('v-so1', fmt(d.soSoPrincipal));
     setText('v-pct-so1', pct(d.soSoPrincipal, d.total) + ' da base');
-    setText('v-faturas', fmt(d.totalFaturas));
+    setText('v-faturas', fmt(d.totalFaturasPdf));
     setText('v-sem-cruzamento', fmt(d.semCruzamento));
+
+    // Cards dinâmicos por fatura
+    const grid = document.getElementById('kpi-faturas-grid');
+    if (grid && d.faturaStats) {
+      grid.innerHTML = Object.entries(d.faturaStats).map(([key, s]) => {
+        const n = key.replace('f', '');
+        const corPaga = s.pct >= 80 ? 'kpi-verde' : s.pct >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
+        return `<div class="kpi ${corPaga}">
+          <div class="kpi-label">Fatura ${n}</div>
+          <div class="kpi-value">${s.pct}%</div>
+          <div class="kpi-sub">${fmt(s.pagas)} pagas · ${fmt(s.naoPagas)} não pagas · ${fmt(s.total)} clientes</div>
+        </div>`;
+      }).join('');
+    }
   } catch (err) { console.error('Erro resumo:', err); }
 }
 
@@ -482,17 +496,46 @@ async function carregarTabela() {
       document.getElementById('paginacao').innerHTML = '';
       return;
     }
-    tbody.innerHTML = d.dados.map(c => `<tr>
-      <td>${c.nome || '—'}</td>
-      <td class="cpf-col">${c.cpf || '—'}</td>
-      <td class="os-col">${c.os || '—'}</td>
-      <td>${c.vendedor || '—'}</td>
-      <td>${c.uf || '—'}</td>
-      <td>${c.mesGross || '—'}</td>
-      <td><span class="status-tag status-${(c.status || 'SEM_DADOS').replace(' ', '_')}">${STATUS_LABEL[c.status] || c.status || '—'}</span></td>
-      <td>${c.dataVencimento || '—'}</td>
-      <td>${c.churn ? '⚠️ Churn' : '—'}</td>
-    </tr>`).join('');
+    // Descobre número máximo de faturas para gerar colunas dinâmicas
+    const maxF = Math.max(0, ...d.dados.map(c => c.totalFaturas || 0));
+    // Atualiza cabeçalho com colunas de fatura
+    const thead = document.getElementById('tabela-thead');
+    if (thead) {
+      const fCols = Array.from({length: maxF}, (_, i) => `<th>F${i+1}</th>`).join('');
+      thead.innerHTML = `<tr>
+        <th onclick="ordenar('nome')">Cliente ↕</th>
+        <th onclick="ordenar('cpf')">CPF ↕</th>
+        <th onclick="ordenar('os')">OS ↕</th>
+        <th onclick="ordenar('vendedor')">Vendedor ↕</th>
+        <th onclick="ordenar('uf')">UF ↕</th>
+        <th onclick="ordenar('mesGross')">Mês Gross ↕</th>
+        <th onclick="ordenar('totalFaturas')">Faturas ↕</th>
+        <th onclick="ordenar('status')">Status ↕</th>
+        <th>Churn</th>
+        ${fCols}
+      </tr>`;
+    }
+    tbody.innerHTML = d.dados.map(c => {
+      const fCells = Array.from({length: maxF}, (_, i) => {
+        const fat = (c.faturas || []).find(f => f.numero === i + 1);
+        if (!fat) return '<td class="dim">—</td>';
+        const cls = fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
+        const label = fat.detalhamento || fat.statusPagamento || '—';
+        return `<td><span class="status-tag ${cls}" title="${label}">${fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—'} ${fat.dataVencimento || ''}</span></td>`;
+      }).join('');
+      return `<tr>
+        <td>${c.nome || '<em class="dim">Sem match</em>'}</td>
+        <td class="cpf-col">${c.cpf || '—'}</td>
+        <td class="os-col">${c.os || '—'}</td>
+        <td>${c.vendedor || '—'}</td>
+        <td>${c.uf || '—'}</td>
+        <td>${c.mesGross || '—'}</td>
+        <td>${c.totalFaturas || 0} (${c.faturasPagas || 0} pagas)</td>
+        <td><span class="status-tag status-${(c.status||'SEM_DADOS').replace(' ','_')}">${STATUS_LABEL[c.status]||c.status||'—'}</span></td>
+        <td>${c.churn ? '⚠️' : '—'}</td>
+        ${fCells}
+      </tr>`;
+    }).join('');
     setText('tabela-info', `${d.total.toLocaleString('pt-BR')} clientes`);
     renderPag('paginacao', d.pagina, d.totalPaginas, pg => { state.pagina = pg; carregarTabela(); });
   } catch {}

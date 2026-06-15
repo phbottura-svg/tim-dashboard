@@ -135,27 +135,48 @@ function cruzarBases() {
   const sonarRS = lerJSON(BASE_SONAR.RS, []);
   const sonarTotal = [...sonarPR, ...sonarSC, ...sonarRS];
 
-  // Índice de clientes por OS para enriquecimento
+  // Índice de clientes por OS
   const indiceClientes = {};
   clientes.forEach(c => { if (c.os) indiceClientes[c.os] = c; });
 
-  // Sonar é a base primária — cada registro Sonar é uma linha
-  const baseCruzada = sonarTotal.map(sonar => {
-    const cliente = indiceClientes[sonar.os] || null;
+  // Agrupar faturas por OS
+  const grupos = {};
+  sonarTotal.forEach(s => {
+    if (!s.os) return;
+    if (!grupos[s.os]) grupos[s.os] = [];
+    grupos[s.os].push(s);
+  });
+
+  // 1 registro por OS (cliente único)
+  const baseCruzada = Object.entries(grupos).map(([os, faturas]) => {
+    faturas.sort((a, b) => (Number(a.numeroFatura) || 0) - (Number(b.numeroFatura) || 0));
+    const ref = faturas[0];
+    const cliente = indiceClientes[os] || null;
+
+    const faturasProc = faturas.map(f => ({
+      numero: Number(f.numeroFatura) || 0,
+      statusPagamento: f.statusPagamento || null,
+      detalhamento: f.detalhamento || null,
+      mesVencimento: f.mesVencimento || null,
+      dataVencimento: f.dataVencimento || null,
+      dataPagamento: f.dataPagamento || null,
+      opcaoPagamento: f.opcaoPagamento || null,
+      insucessoDacc: f.insucessoDacc || null,
+      nomeBanco: f.nomeBanco || null,
+      suspensaoFraude: f.suspensaoFraude || null,
+      status: calcularStatus(f.statusPagamento, f.dataVencimento),
+    }));
+
+    const faturasPagas = faturasProc.filter(f => f.status === 'ADIMPLENTE').length;
+    const algumaNaoPaga = faturasProc.some(f => f.status === 'INADIMPLENTE');
+    const statusGeral = algumaNaoPaga ? 'INADIMPLENTE' : (faturasPagas > 0 ? 'ADIMPLENTE' : 'SEM DADOS');
+
     return {
-      os: sonar.os,
-      mesGross: sonar.mesGross || null,
-      mesVencimento: sonar.mesVencimento || null,
-      dataVencimento: sonar.dataVencimento || null,
-      dataPagamento: sonar.dataPagamento || null,
-      statusPagamento: sonar.statusPagamento || null,
-      detalhamento: sonar.detalhamento || null,
-      numeroFatura: sonar.numeroFatura || null,
-      uf: sonar.uf || null,
-      churn: sonar.churn === 'Sim',
-      loginVendedor: sonar.loginVendedor || null,
-      status: calcularStatus(sonar.statusPagamento, sonar.dataVencimento),
-      // Dados do cliente (quando existe match)
+      os,
+      mesGross: ref.mesGross || null,
+      uf: ref.uf || null,
+      churn: faturas.some(f => f.churn === 'Sim'),
+      loginVendedor: ref.loginVendedor || null,
       nome: cliente?.nome || null,
       cpf: cliente?.cpf || null,
       vendedor: cliente?.vendedor || null,
@@ -164,17 +185,21 @@ function cruzarBases() {
       mesGrossManual: cliente?.mesGrossManual || null,
       contatos: cliente ? [cliente.contatoPrincipal, cliente.contatoResponsavel].filter(Boolean) : [],
       cruzado: cliente !== null,
+      faturas: faturasProc,
+      totalFaturas: faturasProc.length,
+      faturasPagas,
+      status: statusGeral,
     };
   });
 
   salvarJSON(BASE_CRUZADA_PATH, baseCruzada);
   const meta = lerJSON(SONAR_META_PATH, {});
   meta.ultimaAtualizacao = new Date().toISOString();
-  meta.totalSonar = sonarTotal.length;
+  meta.totalOSs = baseCruzada.length;
   meta.totalCruzados = baseCruzada.filter(c => c.cruzado).length;
   salvarJSON(SONAR_META_PATH, meta);
 
-  emitirEvento('cache', { msg: `Base cruzada: ${meta.totalCruzados}/${sonarTotal.length} registros Sonar`, ts: meta.ultimaAtualizacao });
+  emitirEvento('cache', { msg: `Base cruzada: ${meta.totalCruzados}/${baseCruzada.length} clientes`, ts: meta.ultimaAtualizacao });
   return baseCruzada;
 }
 
@@ -375,20 +400,31 @@ app.get('/api/resumo', (req, res) => {
     const f = aplicarFiltros(todos, req.query);
     const total = f.length;
 
-    const adimplentes = f.filter(c => c.status === 'ADIMPLENTE' && !c.churn).length;
-    const inadimplentes = f.filter(c => c.status === 'INADIMPLENTE' && !c.churn).length;
-    const semDados = f.filter(c => c.status === 'SEM DADOS').length;
     const churn = f.filter(c => c.churn).length;
     const com2Contatos = f.filter(c => (c.contatos?.length || 0) >= 2).length;
     const soSoPrincipal = f.filter(c => (c.contatos?.length || 0) === 1).length;
     const semCruzamento = f.filter(c => !c.cruzado).length;
-    const totalFaturas = fs.existsSync(PDFS_PATH) ? fs.readdirSync(PDFS_PATH).filter(f => f.endsWith('.pdf')).length : 0;
+    const totalFaturasPdf = fs.existsSync(PDFS_PATH) ? fs.readdirSync(PDFS_PATH).filter(f => f.endsWith('.pdf')).length : 0;
+
+    // Métricas por número de fatura (F1 a F10)
+    const faturaStats = {};
+    for (let n = 1; n <= 10; n++) {
+      const comFatura = f.filter(c => c.faturas?.some(fat => fat.numero === n));
+      if (!comFatura.length) continue;
+      const pagas = comFatura.filter(c => c.faturas.find(fat => fat.numero === n)?.status === 'ADIMPLENTE').length;
+      const naoPagas = comFatura.filter(c => c.faturas.find(fat => fat.numero === n)?.status === 'INADIMPLENTE').length;
+      faturaStats[`f${n}`] = { total: comFatura.length, pagas, naoPagas, pct: +(pagas / comFatura.length * 100).toFixed(1) };
+    }
+
+    const inadimplentes = f.filter(c => c.status === 'INADIMPLENTE' && !c.churn).length;
+    const adimplentes = f.filter(c => c.status === 'ADIMPLENTE' && !c.churn).length;
 
     res.json({
-      total, adimplentes, inadimplentes, semDados, churn,
-      com2Contatos, soSoPrincipal, semCruzamento, totalFaturas,
+      total, adimplentes, inadimplentes, churn,
+      com2Contatos, soSoPrincipal, semCruzamento, totalFaturasPdf,
       pctAdimplentes: total > 0 ? +(adimplentes / total * 100).toFixed(1) : 0,
       pctInadimplentes: total > 0 ? +(inadimplentes / total * 100).toFixed(1) : 0,
+      faturaStats,
       ultimaAtualizacao: meta.ultimaAtualizacao || null,
     });
   } catch (err) { res.status(500).json({ erro: err.message }); }

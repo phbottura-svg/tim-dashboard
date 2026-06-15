@@ -79,35 +79,38 @@ function limparTelefone(tel) {
 }
 
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+const MESES_MAP = Object.fromEntries(MESES_PT.map((m, i) => [m.toLowerCase(), String(i + 1).padStart(2, '0')]));
 
-function converterDataParaMesAno(val) {
+// Normaliza qualquer formato de mês para MM/YYYY
+function normalizarMes(val) {
   if (!val) return null;
-  // Serial Excel (número)
-  if (!isNaN(val) && val !== '') {
-    const d = new Date(Math.round((Number(val) - 25569) * 86400 * 1000));
-    const mm = String(d.getUTCMonth() + 1).padStart(2, '0');
-    return `${mm}/${d.getUTCFullYear()}`;
-  }
-  // DD/MM/YYYY ou D/M/YYYY
-  const m = String(val).match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-  if (m) return `${m[2].padStart(2, '0')}/${m[3]}`;
-  // Já está no formato MM/YYYY
-  return val;
-}
-
-function excelSerialParaMes(val) {
-  if (!val) return null;
-  // Objeto Date (xlsx com cellDates:true)
+  // Date object
   if (val instanceof Date) {
-    return `${MESES_PT[val.getUTCMonth()]}/${val.getUTCFullYear()}`;
+    return `${String(val.getUTCMonth() + 1).padStart(2, '0')}/${val.getUTCFullYear()}`;
   }
   const s = String(val).trim();
-  // Já está no formato texto (ex: "Janeiro/2026")
-  if (isNaN(s)) return s;
-  // Serial numérico do Excel
-  const d = new Date(Math.round((Number(s) - 25569) * 86400 * 1000));
-  return `${MESES_PT[d.getUTCMonth()]}/${d.getUTCFullYear()}`;
+  if (!s) return null;
+  // Serial Excel numérico
+  if (!isNaN(s)) {
+    const d = new Date(Math.round((Number(s) - 25569) * 86400 * 1000));
+    return `${String(d.getUTCMonth() + 1).padStart(2, '0')}/${d.getUTCFullYear()}`;
+  }
+  // DD/MM/YYYY
+  const mDMY = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if (mDMY) return `${mDMY[2].padStart(2, '0')}/${mDMY[3]}`;
+  // Janeiro/2026 → 01/2026
+  const mNome = s.match(/^([A-Za-zÀ-ú]+)\/(\d{4})$/);
+  if (mNome) {
+    const mm = MESES_MAP[mNome[1].toLowerCase()];
+    if (mm) return `${mm}/${mNome[2]}`;
+  }
+  // Já é MM/YYYY
+  return s;
 }
+
+// Alias para compatibilidade
+const converterDataParaMesAno = normalizarMes;
+const excelSerialParaMes = normalizarMes;
 
 function calcularStatus(statusPagamento, dataVencimento) {
   if (!statusPagamento) return 'SEM DADOS';
@@ -289,7 +292,7 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
     const processados = registros.map(r => ({
       os: String(r['NÚMERO ORDEM'] || '').trim(),
       custcode: String(r['COD CUSTCODE CLIENTE'] || '').replace(/[="]/g, '').trim(),
-      mesGross: excelSerialParaMes(r['MÊS GROSS']),
+      mesGross: normalizarMes(r['MÊS GROSS']),
       numeroFatura: r['NÚMERO FATURA'] || null,
       statusPagamento: r['STATUS PAGAMENTO'] || null,
       detalhamento: r['DETALHAMENTO FATURA'] || null,

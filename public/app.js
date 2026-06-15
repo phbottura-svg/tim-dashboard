@@ -2,9 +2,7 @@
 
 const state = {
   abaAtual: 'dashboard',
-  pagina: 1, ordenarPor: 'cliente', direcao: 'asc',
-  paginaRisco: 1, buscaRisco: '',
-  paginaPg: 1, buscaPg: '',
+  pagina: 1, ordenarPor: 'nome', direcao: 'asc',
   _carregando: false,
 };
 const graficos = {};
@@ -12,15 +10,13 @@ const graficos = {};
 // ─── Cores ───────────────────────────────────────────────────────────────────
 
 const C = {
-  verde:    '#00c853', laranja: '#ff9100',  vermelho: '#ff3d57',
-  amarelo:  '#ffd600', azul:    '#0057ff',  azulC:    '#4da6ff',
-  roxo:     '#7c4dff', cinza:   '#7070a0',
-  n1: '#ffd600', n2: '#ff9100', n3: '#ff6b7a', inadim: '#ff3d57', emDia: '#00c853',
+  verde: '#00c853', laranja: '#ff9100', vermelho: '#ff3d57',
+  amarelo: '#ffd600', azul: '#0057ff', azulC: '#4da6ff',
+  roxo: '#7c4dff', cinza: '#7070a0',
 };
 
-const NIVEL_LABEL = {
-  EM_DIA: 'Em Dia', N1: 'N1 (1-15d)', N2: 'N2 (16-27d)', N3: 'N3 (28-32d)', INADIMPLENTE: 'Inadimplente (33+d)',
-};
+const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
+const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS': C.cinza };
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
@@ -29,7 +25,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   conectarSSE();
   verificarStatusRobo();
   setInterval(verificarStatusRobo, 5000);
-  await esperarCache();
+  await carregarStatusImportacao();
   await carregarOpcoesFiltros();
   await carregarTudo();
 });
@@ -38,31 +34,18 @@ async function aplicarModoVps() {
   try {
     const { modo } = await fetch('/api/modo').then(r => r.json());
     if (modo === 'vps') {
-      document.querySelectorAll('.apenas-local').forEach(el => {
-        el.style.display = 'none';
-      });
+      document.querySelectorAll('.apenas-local').forEach(el => el.style.display = 'none');
       const aviso = document.getElementById('aviso-vps');
       if (aviso) aviso.style.display = '';
     }
   } catch {}
 }
 
-async function esperarCache() {
-  for (let i = 0; i < 30; i++) {
-    try {
-      const r = await fetch('/api/resumo');
-      const d = await r.json();
-      if (d.ultimaAtualizacao) return;
-    } catch {}
-    await new Promise(res => setTimeout(res, 500));
-  }
-}
-
 async function carregarTudo() {
   if (state._carregando) return;
   state._carregando = true;
   try {
-    await Promise.all([carregarResumo(), carregarGraficos(), carregarTabela(), carregarTabelaRisco(), carregarTabelaPg()]);
+    await Promise.all([carregarResumo(), carregarGraficos(), carregarTabela()]);
   } finally {
     state._carregando = false;
   }
@@ -77,29 +60,28 @@ function conectarSSE() {
   _sse.onmessage = e => {
     const d = JSON.parse(e.data);
     adicionarLog(d.msg, d.tipo);
-    if (d.tipo === 'robo')        atualizarBadge('robo', d.status);
-    if (d.tipo === 'disparo')     {
+    if (d.tipo === 'robo') atualizarBadge('robo', d.status);
+    if (d.tipo === 'disparo') {
       atualizarBadge('disparo', d.status);
       if (d.status) {
         atualizarBotoesDisparo(d.status === 'rodando');
         if (d.status === 'parado') {
           carregarRelatoriosDisparo();
-          atualizarInfoRelatorio(); // atualiza contagem de disparados/pendentes
+          atualizarInfoRelatorio();
           setTimeout(() => { const w = document.getElementById('disparo-progresso-wrap'); if (w) w.style.display = 'none'; }, 5000);
         }
       }
     }
-    if (d.tipo === 'progresso')   atualizarProgresso(d.atual, d.total);
+    if (d.tipo === 'progresso') atualizarProgresso(d.atual, d.total);
     if (d.tipo === 'robo-estado') atualizarCardEstado(d.estado, d.status);
     if (d.tipo === 'token-request') { adicionarLog(d.msg || `⏳ Robô ${d.estado} aguardando token!`, 'aviso'); abrirModalTokenRequest(d.estado); }
-    if (d.tipo === 'cache')       { if (!state._carregando) carregarTudo(); }
+    if (d.tipo === 'cache') { carregarStatusImportacao(); if (!state._carregando) carregarTudo(); }
   };
   _sse.onerror = () => { if (_sse) { _sse.close(); _sse = null; } setTimeout(conectarSSE, 5000); };
 }
 
 function adicionarLog(msg, tipo = 'info') {
   if (!msg) return;
-  // Logs de disparo vão para o painel esquerdo; o resto para o painel do robô
   const ehDisparo = tipo === 'disparo' || tipo === 'disparo-log';
   const el = document.getElementById(ehDisparo ? 'console-disparo' : 'console-log');
   if (!el) return;
@@ -112,7 +94,6 @@ function adicionarLog(msg, tipo = 'info') {
   l.className = `console-linha ${cls}`;
   l.textContent = `[${ts}] ${msg}`;
   el.appendChild(l);
-  // Mantém máximo 200 linhas no console
   while (el.children.length > 200) el.removeChild(el.firstChild);
   el.scrollTop = el.scrollHeight;
 }
@@ -124,10 +105,6 @@ function atualizarBadge(tipo, status) {
   if (b) {
     b.textContent = status === 'rodando' ? `${emoji} ${label}: rodando` : `⏹ ${label}: parado`;
     b.className = `badge ${status === 'rodando' ? 'rodando' : ''}`;
-  }
-  if (tipo === 'robo') {
-    document.getElementById('btn-robo-iniciar').disabled = status === 'rodando';
-    document.getElementById('btn-robo-parar').disabled   = status !== 'rodando';
   }
 }
 
@@ -141,11 +118,14 @@ function mudarAba(btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   const el = document.getElementById(`tab-${aba}`);
   if (el) el.classList.add('active');
-  // Tabela analítica aparece em dashboard, risco e pg-atraso
-  const extra = document.getElementById('tab-dashboard-tabela');
-  if (extra) extra.style.display = (aba === 'dashboard' || aba === 'risco' || aba === 'pg-atraso') ? 'block' : 'none';
   if (aba === 'comandos') { carregarRelatorios(); carregarRelatoriosDisparo(); }
-  if (aba === 'faturas') { carregarFaturas(1); }
+  if (aba === 'faturas') carregarFaturas(1);
+  if (aba === 'ajustes') carregarAjustes();
+}
+
+function mudarAbaBtn(aba) {
+  const btn = document.querySelector(`.nav-btn[data-tab="${aba}"]`);
+  if (btn) mudarAba(btn);
 }
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
@@ -153,19 +133,16 @@ function mudarAba(btn) {
 async function carregarOpcoesFiltros() {
   try {
     const d = await fetch('/api/filtros/opcoes').then(r => r.json());
-
-    const selSafra = document.getElementById('filtro-safra');
-    d.safras?.forEach(s => {
+    const selMes = document.getElementById('filtro-mesGross');
+    d.mesesGross?.forEach(s => {
       const o = document.createElement('option');
-      o.value = s; o.textContent = s; selSafra.appendChild(o);
+      o.value = s; o.textContent = s; selMes.appendChild(o);
     });
-
     const selVend = document.getElementById('filtro-vendedor');
     d.vendedores?.forEach(v => {
       const o = document.createElement('option');
       o.value = v; o.textContent = v; selVend.appendChild(o);
     });
-
     const selEst = document.getElementById('filtro-estado');
     d.estados?.forEach(e => {
       const o = document.createElement('option');
@@ -176,20 +153,163 @@ async function carregarOpcoesFiltros() {
 
 function coletarFiltros() {
   const p = new URLSearchParams();
-  const safra   = document.getElementById('filtro-safra')?.value;
+  const mesGross = document.getElementById('filtro-mesGross')?.value;
   const vendedor = document.getElementById('filtro-vendedor')?.value;
   const estado   = document.getElementById('filtro-estado')?.value;
-  const nivel    = document.getElementById('filtro-nivel')?.value;
-  if (safra)   p.set('safra', safra);
+  const status   = document.getElementById('filtro-status')?.value;
+  const contatos = document.getElementById('filtro-contatos')?.value;
+  if (mesGross) p.set('mesGross', mesGross);
   if (vendedor) p.set('vendedor', vendedor);
   if (estado)   p.set('estado', estado);
-  if (nivel)    p.set('nivel', nivel);
+  if (status)   p.set('status', status);
+  if (contatos) p.set('contatos', contatos);
   return p;
 }
 
 async function aplicarFiltros() {
-  state.pagina = 1; state.paginaRisco = 1; state.paginaPg = 1;
+  state.pagina = 1;
   await carregarTudo();
+}
+
+// ─── Importação ───────────────────────────────────────────────────────────────
+
+function mostrarMsg(msg, tipo = 'info') {
+  const el = document.getElementById('importar-msg');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = 'block';
+  el.className = `importar-msg importar-msg-${tipo}`;
+  setTimeout(() => { el.style.display = 'none'; }, 8000);
+}
+
+async function importarClientes(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = document.getElementById('btn-importar-clientes');
+  btn.textContent = '⏳ Importando...';
+  btn.style.opacity = '0.7';
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', file);
+    const r = await fetch('/api/importar-clientes', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.erro) { mostrarMsg('❌ Erro: ' + d.erro, 'erro'); }
+    else {
+      let msg = `✅ ${d.total} clientes importados · ${d.cruzados} cruzados`;
+      if (d.warnings?.length) msg += ' · ⚠️ ' + d.warnings.join(' · ');
+      mostrarMsg(msg, 'ok');
+      await carregarStatusImportacao();
+      await carregarOpcoesFiltrosReset();
+      await carregarTudo();
+    }
+  } catch (err) { mostrarMsg('❌ ' + err.message, 'erro'); }
+  finally {
+    btn.textContent = '📥 Importar Base Clientes (.xlsx)';
+    btn.style.opacity = '';
+    input.value = '';
+  }
+}
+
+async function importarSonar(input, estado) {
+  const file = input.files[0];
+  if (!file) return;
+  mostrarMsg(`⏳ Importando ${estado}...`, 'info');
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', file);
+    const r = await fetch(`/api/importar-sonar?estado=${estado}`, { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.erro) mostrarMsg(`❌ Erro ${estado}: ` + d.erro, 'erro');
+    else {
+      mostrarMsg(`✅ ${estado}: ${d.total} registros importados · ${d.cruzados} cruzamentos`, 'ok');
+      await carregarStatusImportacao();
+      await carregarOpcoesFiltrosReset();
+      await carregarTudo();
+    }
+  } catch (err) { mostrarMsg('❌ ' + err.message, 'erro'); }
+  finally { input.value = ''; }
+}
+
+async function carregarStatusImportacao() {
+  try {
+    const d = await fetch('/api/importacao/status').then(r => r.json());
+
+    // Status clientes
+    const elC = document.getElementById('status-clientes');
+    if (elC) {
+      const emoji = badgeEmoji(d.clientes.status);
+      const ts = d.clientes.importadoEm ? fmtTs(d.clientes.importadoEm) : '';
+      elC.textContent = `${emoji} ${ts ? 'Atualizado ' + ts + ' · ' : ''}${d.clientes.total} clientes`;
+      elC.className = `importar-status status-${d.clientes.status}`;
+    }
+
+    // Status Sonar por estado
+    ['PR', 'SC', 'RS'].forEach(est => {
+      const el = document.getElementById(`status-sonar-${est}`);
+      if (el) {
+        const s = d.sonar[est];
+        const emoji = badgeEmoji(s.status);
+        const ts = s.importadoEm ? fmtTs(s.importadoEm) : '';
+        el.textContent = `${emoji} ${est} ${ts ? '— ' + ts + ' · ' : '— '}${s.total} reg`;
+        el.className = `importar-status status-${s.status}`;
+      }
+    });
+
+    // Cruzamento
+    const elCruz = document.getElementById('status-cruzamento');
+    if (elCruz) {
+      const { total, cruzados, semMatch } = d.cruzamento;
+      if (total === 0) {
+        elCruz.textContent = '— Nenhum dado importado';
+      } else {
+        elCruz.textContent = `✅ ${cruzados} clientes cruzados · ⚠️ ${semMatch} sem match`;
+      }
+    }
+
+    // Última atualização
+    const elTs = document.getElementById('importar-ultima-ts');
+    if (elTs && d.ultimaAtualizacao) {
+      elTs.textContent = '🕐 Última atualização: ' + fmtTs(d.ultimaAtualizacao, true);
+    }
+
+    // Última atualização no header
+    if (d.ultimaAtualizacao) {
+      setText('ultima-atualizacao', 'Cruzado: ' + fmtTs(d.ultimaAtualizacao));
+    }
+
+    // Badge Ajustes
+    const badgeAj = document.getElementById('badge-ajustes');
+    if (badgeAj) {
+      if (d.cruzamento.semMatch > 0) {
+        badgeAj.textContent = d.cruzamento.semMatch;
+        badgeAj.style.display = '';
+      } else {
+        badgeAj.style.display = 'none';
+      }
+    }
+  } catch {}
+}
+
+function badgeEmoji(status) {
+  if (status === 'hoje') return '🟢';
+  if (status === 'ontem') return '🟡';
+  return '🔴';
+}
+
+function fmtTs(iso, completo = false) {
+  const d = new Date(iso);
+  const data = d.toLocaleDateString('pt-BR');
+  if (completo) return data + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  return data;
+}
+
+async function carregarOpcoesFiltrosReset() {
+  // Recria os selects de filtros com novas opções
+  ['filtro-mesGross', 'filtro-vendedor', 'filtro-estado'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.innerHTML = '<option value="">Todos</option>';
+  });
+  await carregarOpcoesFiltros();
 }
 
 // ─── Resumo / KPIs ───────────────────────────────────────────────────────────
@@ -198,49 +318,21 @@ async function carregarResumo() {
   try {
     const p = coletarFiltros();
     const d = await fetch('/api/resumo?' + p).then(r => r.json());
-
     const fmt = n => (n ?? 0).toLocaleString('pt-BR');
-    const pct = (v, t) => t > 0 ? (v/t*100).toFixed(1) + '%' : '0%';
+    const pct = (v, t) => t > 0 ? (v / t * 100).toFixed(1) + '%' : '0%';
 
-    setText('v-iq',         d.iq + '%');
-    setText('v-total',      fmt(d.total));
-    setText('v-f4pagas',    fmt(d.f4Pagas));
-    setText('v-com-atraso', fmt(d.comAtraso));
-    setText('v-com-atraso-pct', pct(d.comAtraso, d.total) + ' do total');
-    setText('v-pg-atraso',  fmt(d.pgAtrasoCount));
-    setText('v-pg-atraso-pct', pct(d.pgAtrasoCount, d.total) + ' do total');
-    setText('v-em-andamento', fmt(d.emAndamento));
-    setText('v-em-risco',   fmt(d.emRisco));
-    setText('v-em-risco-sub', `Leve: ${fmt(d.leve)} · Médio: ${fmt(d.medio)} · Alto: ${fmt(d.alto)}`);
-
-    setText('v-pct-f1', d.pctF1 + '%');
-    setText('v-sub-f1', `${fmt(d.f1p)} de ${fmt(d.total)} clientes`);
-    setText('v-pct-f2', d.pctF2 + '%');
-    setText('v-sub-f2', `${fmt(d.f2p)} de ${fmt(d.total)} clientes`);
-    setText('v-pct-f3', d.pctF3 + '%');
-    setText('v-sub-f3', `${fmt(d.f3p)} de ${fmt(d.total)} clientes`);
-    setText('v-pct-f4', d.pctF4 + '%');
-    setText('v-sub-f4', `${fmt(d.f4p)} de ${fmt(d.total)} clientes`);
-
-    setText('v-em-dia',   fmt(d.emDia));
-    setText('v-n1',       fmt(d.n1));
-    setText('v-n2',       fmt(d.n2));
-    setText('v-n3',       fmt(d.n3));
-    setText('v-inadim',   fmt(d.inadimplentes));
-    setText('v-completo', fmt(d.completo));
-    setText('v-parcial',  fmt(d.parcial));
-    setText('v-quebra',   fmt(d.quebra));
-
-    // Badges de abas
-    setText('badge-risco',     fmt(d.inadimplentes));
-    setText('badge-pg-atraso', fmt(d.pgAtrasoCount));
-
-    if (d.ultimaAtualizacao) {
-      const ts = new Date(d.ultimaAtualizacao);
-      setText('v-hora', ts.toLocaleTimeString('pt-BR', { hour12: false }));
-      setText('v-data', ts.toLocaleDateString('pt-BR'));
-      setText('ultima-atualizacao', 'Atualizado: ' + ts.toLocaleTimeString('pt-BR'));
-    }
+    setText('v-total', fmt(d.total));
+    setText('v-adimplentes', fmt(d.adimplentes));
+    setText('v-pct-adim', pct(d.adimplentes, d.total) + ' do total');
+    setText('v-inadimplentes', fmt(d.inadimplentes));
+    setText('v-pct-inadim', pct(d.inadimplentes, d.total) + ' do total');
+    setText('v-churn', fmt(d.churn));
+    setText('v-com2', fmt(d.com2Contatos));
+    setText('v-pct-com2', pct(d.com2Contatos, d.total) + ' da base');
+    setText('v-so1', fmt(d.soSoPrincipal));
+    setText('v-pct-so1', pct(d.soSoPrincipal, d.total) + ' da base');
+    setText('v-faturas', fmt(d.totalFaturas));
+    setText('v-sem-cruzamento', fmt(d.semCruzamento));
   } catch (err) { console.error('Erro resumo:', err); }
 }
 
@@ -266,26 +358,20 @@ async function carregarGraficos() {
   const p = coletarFiltros();
   await Promise.all([
     carregarStatusGeral(p),
-    carregarRiscoDist(p),
-    carregarIqSafra(p),
-    carregarStatusSafra(p),
-    carregarCompFaturas(p),
-    carregarRiscoSafra(p),
-    carregarRankVendedores(p),
-    carregarAtrasosVendedores(p),
     carregarEstados(p),
-    carregarCidades(p),
-    carregarFunil(p),
+    carregarEvolucao(p),
+    carregarVendedores(p),
+    carregarDisparos(p),
+    carregarRobo(p),
   ]);
 }
 
 async function carregarStatusGeral(p) {
   try {
     const d = await fetch('/api/graficos/status-geral?' + p).then(r => r.json());
-    const cores = [C.verde, C.amarelo, C.laranja, '#ff6b7a', C.vermelho];
+    const cores = [C.verde, C.vermelho, C.cinza, C.laranja];
     const ctx = document.getElementById('g-status-geral')?.getContext('2d');
     if (!ctx) return;
-
     if (graficos['g-status-geral']) {
       graficos['g-status-geral'].data.datasets[0].data = d.valores;
       graficos['g-status-geral'].update();
@@ -296,14 +382,14 @@ async function carregarStatusGeral(p) {
         options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } },
       });
     }
-
-    setText('donut-iq', d.iq + '%');
-
+    const total = d.total || 1;
+    const pctAdim = d.valores[0] ? (d.valores[0] / total * 100).toFixed(1) : 0;
+    setText('donut-pct', pctAdim + '%');
     const legEl = document.getElementById('donut-legenda');
     if (legEl) {
       legEl.innerHTML = d.labels.map((l, i) => {
         const v = d.valores[i];
-        const pct = d.total > 0 ? (v/d.total*100).toFixed(1) : 0;
+        const pct = total > 0 ? (v / total * 100).toFixed(1) : 0;
         return `<div class="donut-leg-item">
           <div class="donut-leg-cor" style="background:${cores[i]}"></div>
           <div class="donut-leg-txt">${l}</div>
@@ -315,156 +401,56 @@ async function carregarStatusGeral(p) {
   } catch {}
 }
 
-async function carregarRiscoDist(p) {
-  try {
-    const d = await fetch('/api/graficos/status-geral?' + p).then(r => r.json());
-    // Usa só N1-N3-Inadimplente para distribuição de risco
-    const vals = d.valores.slice(1);
-    const labels = d.labels.slice(1);
-    const cores = [C.amarelo, C.laranja, '#ff6b7a', C.vermelho];
-    criarOuAtualizar('g-risco', 'bar', {
-      labels,
-      datasets: [{ label: 'Clientes', data: vals, backgroundColor: cores, borderRadius: 6 }],
-    }, { plugins: { legend: { display: false } }, scales: defOpts.scales });
-  } catch {}
-}
-
-async function carregarIqSafra(p) {
-  try {
-    const d = await fetch('/api/graficos/iq-safra?' + p).then(r => r.json());
-    const melhorIdx = d.valores.indexOf(d.melhor);
-    const piorIdx   = d.valores.indexOf(d.pior);
-    setText('g-iq-safra-sub', `🏆 Melhor: ${d.labels[melhorIdx]} (${d.melhor}%)   ⚠ Pior: ${d.labels[piorIdx]} (${d.pior}%)   Média: ${d.media}%`);
-    criarOuAtualizar('g-iq-safra', 'line', {
-      labels: d.labels,
-      datasets: [{
-        label: 'IQ %', data: d.valores,
-        borderColor: C.azulC, backgroundColor: 'rgba(77,166,255,0.1)',
-        fill: true, tension: 0.4, pointRadius: 4, pointBackgroundColor: C.azulC,
-      }, {
-        label: 'Média', data: d.labels.map(() => d.media),
-        borderColor: 'rgba(255,255,255,0.2)', borderDash: [6,4],
-        pointRadius: 0, fill: false,
-      }],
-    }, { plugins: { legend: { labels: { color: '#7070a0' } } }, scales: { ...defOpts.scales, y: { ...defOpts.scales.y, min: 50, max: 100 } } });
-  } catch {}
-}
-
-async function carregarStatusSafra(p) {
-  try {
-    const d = await fetch('/api/graficos/status-safra?' + p).then(r => r.json());
-    criarOuAtualizar('g-status-safra', 'bar', {
-      labels: d.labels,
-      datasets: [
-        { label: 'Em Dia',            data: d.emDia,  backgroundColor: 'rgba(0,200,83,0.7)',   borderRadius: 2 },
-        { label: 'N1 (1-15d)',        data: d.n1,     backgroundColor: 'rgba(255,214,0,0.7)',  borderRadius: 2 },
-        { label: 'N2 (16-27d)',       data: d.n2,     backgroundColor: 'rgba(255,145,0,0.7)', borderRadius: 2 },
-        { label: 'N3 (28-32d)',       data: d.n3,     backgroundColor: 'rgba(255,107,122,0.7)', borderRadius: 2 },
-        { label: 'Inadimplente (33+d)', data: d.inadim, backgroundColor: 'rgba(255,61,87,0.8)', borderRadius: 2 },
-      ],
-    }, { plugins: { legend: { labels: { color: '#7070a0' } } }, scales: { x: { stacked: true, ticks: { color: '#7070a0', maxRotation: 45 }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { stacked: true, ticks: { color: '#7070a0' }, grid: { color: 'rgba(30,30,74,0.8)' } } } });
-  } catch {}
-}
-
-async function carregarCompFaturas(p) {
-  try {
-    const d = await fetch('/api/graficos/comparativo-faturas?' + p).then(r => r.json());
-    criarOuAtualizar('g-comp-faturas', 'line', {
-      labels: d.labels,
-      datasets: [
-        { label: 'F1 %', data: d.f1, borderColor: C.verde,   backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 },
-        { label: 'F2 %', data: d.f2, borderColor: C.azulC,   backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 },
-        { label: 'F3 %', data: d.f3, borderColor: C.laranja, backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 },
-        { label: 'F4 %', data: d.f4, borderColor: C.vermelho, backgroundColor: 'transparent', tension: 0.4, pointRadius: 3 },
-      ],
-    }, { plugins: { legend: { labels: { color: '#7070a0' } } }, scales: { ...defOpts.scales, y: { ...defOpts.scales.y, min: 0, max: 100 } } });
-  } catch {}
-}
-
-async function carregarRiscoSafra(p) {
-  try {
-    const d = await fetch('/api/graficos/risco-safra?' + p).then(r => r.json());
-    criarOuAtualizar('g-risco-safra', 'bar', {
-      labels: d.labels,
-      datasets: [
-        { label: 'N1 (1-15d)',        data: d.n1,     backgroundColor: 'rgba(255,214,0,0.7)',  borderRadius: 2 },
-        { label: 'N2 (16-27d)',       data: d.n2,     backgroundColor: 'rgba(255,145,0,0.7)', borderRadius: 2 },
-        { label: 'N3 (28-32d)',       data: d.n3,     backgroundColor: 'rgba(255,107,122,0.7)', borderRadius: 2 },
-        { label: 'Inadimplente (33+d)', data: d.inadim, backgroundColor: 'rgba(255,61,87,0.8)', borderRadius: 2 },
-      ],
-    }, { plugins: { legend: { labels: { color: '#7070a0' } } }, scales: { x: { stacked: true, ticks: { color: '#7070a0', maxRotation: 45 }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { stacked: true, ticks: { color: '#7070a0' }, grid: { color: 'rgba(30,30,74,0.8)' } } } });
-  } catch {}
-}
-
-async function carregarRankVendedores(p) {
-  try {
-    const d = await fetch('/api/graficos/ranking-vendedores?' + p).then(r => r.json());
-    const cores = d.labels.map((_, i) => i === 0 ? '#ffd700' : i === 1 ? '#c0c0c0' : i === 2 ? '#cd7f32' : 'rgba(77,166,255,0.7)');
-    criarOuAtualizar('g-rank-vendedores', 'bar', {
-      labels: d.labels,
-      datasets: [{ label: 'IQ %', data: d.valores, backgroundColor: cores, borderRadius: 4 }],
-    }, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ...defOpts.scales.x, min: 0, max: 100 }, y: { ticks: { color: '#7070a0', font: { size: 10 } }, grid: { display: false } } } });
-  } catch {}
-}
-
-async function carregarAtrasosVendedores(p) {
-  try {
-    const d = await fetch('/api/graficos/atrasos-vendedores?' + p).then(r => r.json());
-    criarOuAtualizar('g-atrasos-vendedores', 'bar', {
-      labels: d.labels,
-      datasets: [
-        { label: 'N1 (1-15d)',        data: d.n1,     backgroundColor: 'rgba(255,214,0,0.7)' },
-        { label: 'N2 (16-27d)',       data: d.n2,     backgroundColor: 'rgba(255,145,0,0.7)' },
-        { label: 'N3 (28-32d)',       data: d.n3,     backgroundColor: 'rgba(255,107,122,0.7)' },
-        { label: 'Inadimplente (33+d)', data: d.inadim, backgroundColor: 'rgba(255,61,87,0.8)' },
-      ],
-    }, { indexAxis: 'y', plugins: { legend: { labels: { color: '#7070a0', font: { size: 10 } } } }, scales: { x: { stacked: true, ticks: { color: '#7070a0' }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { stacked: true, ticks: { color: '#7070a0', font: { size: 10 } }, grid: { display: false } } } });
-  } catch {}
-}
-
 async function carregarEstados(p) {
   try {
     const d = await fetch('/api/graficos/estados?' + p).then(r => r.json());
-    criarOuAtualizar('g-estados', 'bar', {
+    criarOuAtualizar('g-estados', 'doughnut', {
       labels: d.labels,
-      datasets: [{ label: 'Clientes', data: d.valores, backgroundColor: 'rgba(0,87,255,0.7)', borderRadius: 4 }],
-    }, { plugins: { legend: { display: false } }, scales: defOpts.scales });
+      datasets: [{ data: d.valores, backgroundColor: [C.azulC, C.verde, C.laranja, C.roxo, C.vermelho], borderWidth: 0 }],
+    }, { maintainAspectRatio: false, plugins: { legend: { labels: { color: '#7070a0' } } }, scales: {} });
   } catch {}
 }
 
-async function carregarCidades(p) {
+async function carregarEvolucao(p) {
   try {
-    const d = await fetch('/api/graficos/cidades?' + p).then(r => r.json());
-    criarOuAtualizar('g-cidades', 'bar', {
+    const d = await fetch('/api/graficos/evolucao?' + p).then(r => r.json());
+    criarOuAtualizar('g-evolucao', 'line', {
       labels: d.labels,
-      datasets: [{ label: 'Clientes', data: d.valores, backgroundColor: 'rgba(77,166,255,0.7)', borderRadius: 4 }],
+      datasets: [
+        { label: 'Adimplentes', data: d.adimplentes, borderColor: C.verde, backgroundColor: 'rgba(0,200,83,0.1)', fill: true, tension: 0.4, pointRadius: 4 },
+        { label: 'Inadimplentes', data: d.inadimplentes, borderColor: C.vermelho, backgroundColor: 'rgba(255,61,87,0.1)', fill: true, tension: 0.4, pointRadius: 4 },
+      ],
+    }, { plugins: { legend: { labels: { color: '#7070a0' } } }, scales: defOpts.scales });
+  } catch {}
+}
+
+async function carregarVendedores(p) {
+  try {
+    const d = await fetch('/api/graficos/vendedores?' + p).then(r => r.json());
+    criarOuAtualizar('g-vendedores', 'bar', {
+      labels: d.labels,
+      datasets: [{ label: 'Inadimplentes', data: d.valores, backgroundColor: 'rgba(255,61,87,0.8)', borderRadius: 4 }],
     }, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#7070a0' }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { ticks: { color: '#7070a0', font: { size: 10 } }, grid: { display: false } } } });
   } catch {}
 }
 
-async function carregarFunil(p) {
+async function carregarDisparos(p) {
   try {
-    const d = await fetch('/api/graficos/funil?' + p).then(r => r.json());
-    const cores = ['rgba(0,87,255,0.8)', 'rgba(0,200,83,0.8)', 'rgba(77,166,255,0.8)', 'rgba(255,145,0,0.8)', 'rgba(124,77,255,0.8)'];
-    criarOuAtualizar('g-funil', 'bar', {
+    const d = await fetch('/api/graficos/disparos').then(r => r.json());
+    criarOuAtualizar('g-disparos', 'bar', {
       labels: d.labels,
-      datasets: [{ label: 'Clientes', data: d.valores, backgroundColor: cores, borderRadius: 6 }],
+      datasets: [{ label: 'Faturas Enviadas', data: d.valores, backgroundColor: 'rgba(77,166,255,0.7)', borderRadius: 4 }],
     }, { plugins: { legend: { display: false } }, scales: defOpts.scales });
+  } catch {}
+}
 
-    const tbl = document.getElementById('funil-tabela');
-    if (tbl && d.retencao) {
-      tbl.innerHTML = d.retencao.map((r, i) => `
-        <div class="funil-row">
-          <div>
-            <div class="funil-etapa">${r.label}</div>
-            <div class="funil-sub">${i === 0 ? 'base' : `−${r.perda.toLocaleString('pt-BR')} nesta etapa`}</div>
-          </div>
-          <div class="funil-nums">
-            <div class="funil-val">${r.valor.toLocaleString('pt-BR')}</div>
-            <div class="${i === 0 ? '' : r.pct >= 80 ? 'funil-pct' : 'funil-perda'}">${r.pct}%</div>
-          </div>
-        </div>`).join('');
-    }
+async function carregarRobo(p) {
+  try {
+    const d = await fetch('/api/graficos/robo').then(r => r.json());
+    criarOuAtualizar('g-robo', 'line', {
+      labels: d.labels,
+      datasets: [{ label: 'Faturas Baixadas', data: d.valores, borderColor: C.amarelo, backgroundColor: 'rgba(255,214,0,0.1)', fill: true, tension: 0.4, pointRadius: 3 }],
+    }, { plugins: { legend: { display: false } }, scales: defOpts.scales });
   } catch {}
 }
 
@@ -483,21 +469,24 @@ async function carregarTabela() {
     const d = await fetch('/api/clientes?' + p).then(r => r.json());
     const tbody = document.getElementById('tabela-body');
     if (!d.dados?.length) {
-      tbody.innerHTML = '<tr><td colspan="6" class="loading">Nenhum cliente encontrado</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="loading">Nenhum cliente encontrado</td></tr>';
       setText('tabela-info', '0 clientes');
       document.getElementById('paginacao').innerHTML = '';
       return;
     }
     tbody.innerHTML = d.dados.map(c => `<tr>
-      <td>${c.cliente || '—'}</td>
+      <td>${c.nome || '—'}</td>
+      <td class="cpf-col">${c.cpf || '—'}</td>
+      <td class="os-col">${c.os || '—'}</td>
       <td>${c.vendedor || '—'}</td>
-      <td>${c.safra || '—'}</td>
-      <td>${c.plano || '—'}</td>
-      <td>${c.estado || '—'}</td>
-      <td><span class="nivel-tag nivel-${c.nivelAlerta}">${NIVEL_LABEL[c.nivelAlerta] || c.nivelAlerta}</span></td>
+      <td>${c.uf || '—'}</td>
+      <td>${c.mesGross || '—'}</td>
+      <td><span class="status-tag status-${(c.status || 'SEM_DADOS').replace(' ', '_')}">${STATUS_LABEL[c.status] || c.status || '—'}</span></td>
+      <td>${c.dataVencimento || '—'}</td>
+      <td>${c.churn ? '⚠️ Churn' : '—'}</td>
     </tr>`).join('');
     setText('tabela-info', `${d.total.toLocaleString('pt-BR')} clientes`);
-    renderPag('paginacao', d.pagina, d.totalPaginas, p => { state.pagina = p; carregarTabela(); });
+    renderPag('paginacao', d.pagina, d.totalPaginas, pg => { state.pagina = pg; carregarTabela(); });
   } catch {}
 }
 
@@ -507,107 +496,190 @@ function ordenar(col) {
   carregarTabela();
 }
 
-// ─── Tabela Risco ─────────────────────────────────────────────────────────────
-
-async function carregarTabelaRisco() {
-  const p = coletarFiltros();
-  p.set('nivelAlerta', 'N1,N2,N3,INADIMPLENTE');
-  p.set('pagina', state.paginaRisco);
-  p.set('porPagina', 50);
-  if (state.buscaRisco) p.set('busca', state.buscaRisco);
-
-  try {
-    const d = await fetch('/api/clientes?' + p).then(r => r.json());
-    const tbody = document.getElementById('tbody-risco');
-    if (!d.dados?.length) {
-      tbody.innerHTML = '<tr><td colspan="7" class="loading">Nenhum cliente em risco</td></tr>';
-      setText('tabela-risco-info', '0 clientes');
-      document.getElementById('pag-risco').innerHTML = '';
-      return;
-    }
-    tbody.innerHTML = d.dados.map(c => {
-      const maxDias = Math.max(0, ...c.faturas.filter(f => f.status === 'ATRASADO').map(f => f.diasAtraso));
-      return `<tr>
-        <td>${c.cliente || '—'}</td>
-        <td>${c.vendedor || '—'}</td>
-        <td>${c.safra || '—'}</td>
-        <td>${c.plano || '—'}</td>
-        <td>${c.estado || '—'}</td>
-        <td><span class="nivel-tag nivel-${c.nivelAlerta}">${NIVEL_LABEL[c.nivelAlerta]}</span></td>
-        <td>${maxDias > 0 ? maxDias + ' dias' : '—'}</td>
-      </tr>`;
-    }).join('');
-    setText('tabela-risco-info', `${d.total.toLocaleString('pt-BR')} clientes`);
-    renderPag('pag-risco', d.pagina, d.totalPaginas, p => { state.paginaRisco = p; carregarTabelaRisco(); });
-  } catch {}
-}
-
-// ─── Tabela Pago em Atraso ────────────────────────────────────────────────────
-
-async function carregarTabelaPg() {
-  const p = coletarFiltros();
-  p.set('pagina', state.paginaPg);
-  p.set('porPagina', 50);
-  if (state.buscaPg) p.set('busca', state.buscaPg);
-
-  try {
-    const d = await fetch('/api/clientes?' + p).then(r => r.json());
-    const pgClientes = d.dados?.filter(c => c.pgAtraso) || [];
-    const tbody = document.getElementById('tbody-pg');
-    if (!pgClientes.length) {
-      tbody.innerHTML = '<tr><td colspan="5" class="loading">Nenhum cliente com pagamento em atraso</td></tr>';
-      setText('tabela-pg-info', '0 clientes');
-      return;
-    }
-    tbody.innerHTML = pgClientes.map(c => `<tr>
-      <td>${c.cliente || '—'}</td>
-      <td>${c.vendedor || '—'}</td>
-      <td>${c.safra || '—'}</td>
-      <td>${c.plano || '—'}</td>
-      <td>${c.estado || '—'}</td>
-    </tr>`).join('');
-    setText('tabela-pg-info', `${pgClientes.length.toLocaleString('pt-BR')} clientes`);
-  } catch {}
-}
-
-function buscarTabela(tipo) {
-  if (tipo === 'main') { state.pagina = 1; carregarTabela(); }
-  else if (tipo === 'risco') { state.buscaRisco = document.getElementById('busca-risco').value; state.paginaRisco = 1; carregarTabelaRisco(); }
-  else if (tipo === 'pg') { state.buscaPg = document.getElementById('busca-pg').value; state.paginaPg = 1; carregarTabelaPg(); }
+function buscarTabela() {
+  state.pagina = 1;
+  carregarTabela();
 }
 
 // ─── Paginação ────────────────────────────────────────────────────────────────
 
 function renderPag(elId, pagAtual, totalPag, onPag) {
   const el = document.getElementById(elId);
-  if (!el || totalPag <= 1) { if(el) el.innerHTML = ''; return; }
+  if (!el || totalPag <= 1) { if (el) el.innerHTML = ''; return; }
   const pages = [];
-  pages.push(`<button onclick="(${onPag.toString()})(${pagAtual-1})" ${pagAtual===1?'disabled':''}>‹</button>`);
-  const ini = Math.max(1, pagAtual-2), fim = Math.min(totalPag, pagAtual+2);
+  pages.push(`<button onclick="(${onPag.toString()})(${pagAtual - 1})" ${pagAtual === 1 ? 'disabled' : ''}>‹</button>`);
+  const ini = Math.max(1, pagAtual - 2), fim = Math.min(totalPag, pagAtual + 2);
   if (ini > 1) pages.push(`<button onclick="(${onPag.toString()})(1)">1</button>`);
   if (ini > 2) pages.push(`<span>…</span>`);
-  for (let i = ini; i <= fim; i++) pages.push(`<button onclick="(${onPag.toString()})(${i})" class="${i===pagAtual?'ativa':''}">${i}</button>`);
-  if (fim < totalPag-1) pages.push(`<span>…</span>`);
+  for (let i = ini; i <= fim; i++) pages.push(`<button onclick="(${onPag.toString()})(${i})" class="${i === pagAtual ? 'ativa' : ''}">${i}</button>`);
+  if (fim < totalPag - 1) pages.push(`<span>…</span>`);
   if (fim < totalPag) pages.push(`<button onclick="(${onPag.toString()})(${totalPag})">${totalPag}</button>`);
-  pages.push(`<button onclick="(${onPag.toString()})(${pagAtual+1})" ${pagAtual===totalPag?'disabled':''}>›</button>`);
+  pages.push(`<button onclick="(${onPag.toString()})(${pagAtual + 1})" ${pagAtual === totalPag ? 'disabled' : ''}>›</button>`);
   el.innerHTML = pages.join('');
+}
+
+// ─── Aba Ajustes ──────────────────────────────────────────────────────────────
+
+let ajusteMesAtual = null;
+let ajusteClientesAtual = [];
+
+async function carregarAjustes() {
+  document.getElementById('ajustes-detalhe').style.display = 'none';
+  const lista = document.getElementById('ajustes-lista-meses');
+  lista.innerHTML = '<div class="loading">Carregando...</div>';
+  try {
+    const d = await fetch('/api/ajustes/resumo').then(r => r.json());
+    setText('ajustes-total-label', `Total sem cruzamento: ${d.total}`);
+
+    if (!d.grupos?.length) {
+      lista.innerHTML = '<div class="ajustes-vazio">✅ Todos os clientes estão cruzados!</div>';
+      return;
+    }
+
+    lista.innerHTML = d.grupos.map(g => {
+      const barFill = g.total > 0 ? 0 : 100;
+      return `<div class="ajuste-mes-card ${g.concluido ? 'concluido' : ''}">
+        <div class="ajuste-mes-info">
+          <span class="ajuste-mes-nome">📅 ${g.mes}</span>
+          <span class="ajuste-mes-count">${g.total} pendentes</span>
+          ${g.concluido ? `<span class="ajuste-concluido-badge">✅ Concluído</span>` : ''}
+        </div>
+        <div class="ajuste-mes-acoes">
+          <button class="btn btn-secondary btn-sm" onclick="verMes('${encodeURIComponent(g.mes)}', '${g.mes}')">Ver</button>
+          <a class="btn btn-secondary btn-sm" href="/api/ajustes/exportar/${encodeURIComponent(g.mes)}" download>📥 Exportar</a>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (err) {
+    lista.innerHTML = `<div class="ajustes-vazio">Erro: ${err.message}</div>`;
+  }
+}
+
+async function verMes(mesEnc, mesLabel) {
+  ajusteMesAtual = decodeURIComponent(mesEnc);
+  document.getElementById('ajustes-lista-meses').style.display = 'none';
+  const detalhe = document.getElementById('ajustes-detalhe');
+  detalhe.style.display = 'block';
+  setText('ajustes-detalhe-titulo', `${mesLabel} — clientes sem cruzamento`);
+  const btnExportar = document.getElementById('btn-exportar-mes');
+  if (btnExportar) btnExportar.href = `/api/ajustes/exportar/${mesEnc}`;
+
+  try {
+    const d = await fetch(`/api/ajustes/mes/${mesEnc}`).then(r => r.json());
+    ajusteClientesAtual = d.clientes || [];
+    renderTabelaAjustes(ajusteClientesAtual);
+  } catch (err) {
+    document.getElementById('ajustes-tbody').innerHTML = `<tr><td colspan="5">Erro: ${err.message}</td></tr>`;
+  }
+}
+
+function renderTabelaAjustes(clientes) {
+  const tbody = document.getElementById('ajustes-tbody');
+  if (!clientes.length) {
+    tbody.innerHTML = '<tr><td colspan="5" class="loading">Nenhum cliente neste mês</td></tr>';
+    return;
+  }
+  tbody.innerHTML = clientes.map((c, i) => `
+    <tr id="ajuste-row-${i}">
+      <td>${i + 1}</td>
+      <td>${c.nome || '—'}</td>
+      <td class="cpf-col">${c.cpf || '—'}</td>
+      <td id="os-cell-${i}" class="os-edit-cell">
+        <span class="os-valor">${c.os || '<em class="dim">vazio</em>'}</span>
+        <button class="btn-edit-os" onclick="editarOS(${i})" title="Editar OS">✏️</button>
+      </td>
+      <td id="status-cell-${i}">
+        <span class="ajuste-pendente">Pendente</span>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function filtrarTabelaAjustes() {
+  const busca = document.getElementById('busca-ajustes')?.value.toLowerCase() || '';
+  const filtrados = ajusteClientesAtual.filter(c =>
+    (c.nome || '').toLowerCase().includes(busca) ||
+    (c.cpf || '').includes(busca) ||
+    (c.os || '').includes(busca)
+  );
+  renderTabelaAjustes(filtrados);
+}
+
+function editarOS(idx) {
+  const cell = document.getElementById(`os-cell-${idx}`);
+  const c = ajusteClientesAtual[idx];
+  if (!cell) return;
+  cell.innerHTML = `
+    <input type="text" class="os-input" id="os-input-${idx}" value="${c.os || ''}" placeholder="Digite a OS…" />
+    <button class="btn btn-success btn-sm" onclick="salvarOS(${idx})">✓</button>
+    <button class="btn btn-secondary btn-sm" onclick="cancelarOS(${idx}, '${(c.os || '').replace(/'/g, "\\'")}')">✕</button>
+  `;
+  const inp = document.getElementById(`os-input-${idx}`);
+  inp.focus();
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') salvarOS(idx); if (e.key === 'Escape') cancelarOS(idx, c.os || ''); });
+}
+
+async function salvarOS(idx) {
+  const inp = document.getElementById(`os-input-${idx}`);
+  const c = ajusteClientesAtual[idx];
+  const osNova = inp?.value.trim();
+  if (!osNova) return;
+
+  try {
+    const r = await fetch('/api/corrigir-os', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ nome: c.nome, cpf: c.cpf, osAntiga: c.os || '', osNova }),
+    });
+    const d = await r.json();
+    if (d.erro) { alert('Erro: ' + d.erro); return; }
+
+    ajusteClientesAtual[idx].os = osNova;
+    const cell = document.getElementById(`os-cell-${idx}`);
+    if (cell) cell.innerHTML = `<span class="os-valor">${osNova}</span> <button class="btn-edit-os" onclick="editarOS(${idx})" title="Editar OS">✏️</button>`;
+    const statusCell = document.getElementById(`status-cell-${idx}`);
+    if (statusCell) statusCell.innerHTML = `<span class="ajuste-corrigido">✅ Cruzado</span>`;
+
+    // Atualiza badge
+    await carregarStatusImportacao();
+  } catch (err) { alert('Erro: ' + err.message); }
+}
+
+function cancelarOS(idx, osOriginal) {
+  const cell = document.getElementById(`os-cell-${idx}`);
+  if (cell) cell.innerHTML = `<span class="os-valor">${osOriginal || '<em class="dim">vazio</em>'}</span> <button class="btn-edit-os" onclick="editarOS(${idx})" title="Editar OS">✏️</button>`;
+}
+
+function fecharDetalhe() {
+  document.getElementById('ajustes-detalhe').style.display = 'none';
+  document.getElementById('ajustes-lista-meses').style.display = '';
+  ajusteMesAtual = null;
+}
+
+async function concluirMes() {
+  if (!ajusteMesAtual) return;
+  if (!confirm(`Marcar "${ajusteMesAtual}" como concluído?`)) return;
+  try {
+    await fetch('/api/ajustes/concluir', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ mes: ajusteMesAtual }),
+    });
+    fecharDetalhe();
+    carregarAjustes();
+  } catch (err) { alert('Erro: ' + err.message); }
 }
 
 // ─── Modal Token ──────────────────────────────────────────────────────────────
 
 let _estadoModal = null;
 
-// Abre modal quando robô sinaliza que precisa do token (SSE token-request)
 function abrirModalTokenRequest(estado) {
   _estadoModal = estado;
-  const lbl = document.getElementById('modal-estado-label');
-  if (lbl) lbl.textContent = estado;
-  const subtitulo = document.getElementById('modal-token-subtitulo');
-  if (subtitulo) subtitulo.textContent = '⚡ Robô pronto! Digite o token AGORA (válido por ~30s):';
+  setText('modal-estado-label', estado);
   const inp = document.getElementById('modal-token-input');
   inp.value = '';
   document.getElementById('modal-token').style.display = 'flex';
-  // Pisca a borda para chamar atenção
   inp.style.border = '2px solid #f59e0b';
   setTimeout(() => inp.focus(), 50);
 }
@@ -623,29 +695,26 @@ function fecharModal(e) {
 
 async function confirmarToken() {
   const token = document.getElementById('modal-token-input').value.trim();
-  if (!token || token.length < 4) {
-    document.getElementById('modal-token-input').focus();
-    return;
-  }
+  if (!token || token.length < 4) { document.getElementById('modal-token-input').focus(); return; }
   const estado = _estadoModal;
   fecharModalBtn();
   adicionarLog(`🔑 Enviando token para Robô ${estado}...`, 'robo');
   try {
     const d = await fetch('/api/comando/token-fornecer', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado, token }),
     }).then(r => r.json());
-    if (d.erro) adicionarLog(`Erro: ` + d.erro, 'erro');
+    if (d.erro) adicionarLog('Erro: ' + d.erro, 'erro');
   } catch (e) { adicionarLog('Erro: ' + e.message, 'erro'); }
 }
+
+// ─── Robôs por Estado ────────────────────────────────────────────────────────
 
 async function iniciarEstado(estado) {
   adicionarLog(`🤖 Iniciando Robô ${estado}...`, 'robo');
   try {
     const d = await fetch('/api/comando/robo-estado', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado }),
     }).then(r => r.json());
     if (d.erro) adicionarLog(`Erro Robô ${estado}: ` + d.erro, 'erro');
@@ -657,8 +726,7 @@ async function pararEstado(estado) {
   adicionarLog(`⏹ Parando Robô ${estado}...`, 'aviso');
   try {
     await fetch('/api/comando/robo-estado-parar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ estado }),
     });
     atualizarCardEstado(estado, 'parado');
@@ -666,11 +734,10 @@ async function pararEstado(estado) {
 }
 
 function atualizarCardEstado(estado, status) {
-  const card  = document.getElementById(`card-${estado}`);
+  const card = document.getElementById(`card-${estado}`);
   const badge = document.getElementById(`badge-${estado}`);
   const btnParar = document.getElementById(`parar-${estado}`);
   if (!card || !badge) return;
-
   if (status === 'rodando') {
     card.classList.add('rodando');
     badge.textContent = '🟢 rodando';
@@ -684,27 +751,16 @@ function atualizarCardEstado(estado, status) {
   }
 }
 
-// ─── Comandos ─────────────────────────────────────────────────────────────────
-
 async function verificarStatusRobo() {
   try {
     const d = await fetch('/api/status-robos').then(r => r.json());
     atualizarBadge('robo', d.robo);
     atualizarBadge('disparo', d.disparo);
-    if (d.estados) {
-      ['PR', 'SC', 'RS'].forEach(e => atualizarCardEstado(e, d.estados[e]));
-    }
+    if (d.estados) ['PR', 'SC', 'RS'].forEach(e => atualizarCardEstado(e, d.estados[e]));
   } catch {}
 }
 
-// Robô SGR legado (mantido por compatibilidade)
-async function iniciarRobo() {
-  adicionarLog('Use os botões Robô PR / SC / RS acima.', 'aviso');
-}
-async function pararRobo() {
-  adicionarLog('Parando robô...', 'aviso');
-  await fetch('/api/comando/robo-parar', { method: 'POST' }).catch(() => {});
-}
+// ─── Disparo ──────────────────────────────────────────────────────────────────
 
 async function carregarRelatorios() {
   const sel = document.getElementById('select-relatorio');
@@ -712,40 +768,32 @@ async function carregarRelatorios() {
   try {
     const { arquivos } = await fetch('/api/relatorios').then(r => r.json());
     sel.innerHTML = '<option value="">— Selecione um relatório —</option>';
-    if (!arquivos.length) {
-      info.textContent = 'Nenhum relatório encontrado em relatorios/';
-      return;
-    }
+    if (!arquivos.length) { if (info) info.textContent = 'Nenhum relatório encontrado em relatorios/'; return; }
     arquivos.forEach((f, i) => {
       const opt = document.createElement('option');
-      opt.value = f;
-      opt.textContent = f + (i === 0 ? ' (mais recente)' : '');
+      opt.value = f; opt.textContent = f + (i === 0 ? ' (mais recente)' : '');
       if (i === 0) opt.selected = true;
       sel.appendChild(opt);
     });
-    info.textContent = `${arquivos.length} relatório(s) disponível(is)`;
-    // Carrega info do selecionado
+    if (info) info.textContent = `${arquivos.length} relatório(s) disponível(is)`;
     await atualizarInfoRelatorio();
-  } catch (e) {
-    info.textContent = 'Erro ao carregar lista: ' + e.message;
-  }
+  } catch (e) { if (info) info.textContent = 'Erro ao carregar lista: ' + e.message; }
 }
 
 async function atualizarInfoRelatorio() {
   const sel = document.getElementById('select-relatorio');
   const info = document.getElementById('disparo-relatorio-info');
   const arquivo = sel?.value;
-  if (!arquivo) { info.textContent = ''; return; }
+  if (!arquivo) { if (info) info.textContent = ''; return; }
   try {
     const d = await fetch(`/api/relatorios/info/${encodeURIComponent(arquivo)}`).then(r => r.json());
-    if (d.erro) { info.textContent = d.erro; return; }
-    const disp = d.disparados || 0;
+    if (d.erro) { if (info) info.textContent = d.erro; return; }
     const pend = d.pendentes != null ? d.pendentes : d.total;
-    info.textContent = `📋 ${d.total} cliente(s) no relatório · ✅ ${disp} já disparados · ⏳ ${pend} pendentes`;
-    info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
-  } catch (e) {
-    info.textContent = 'Erro ao ler relatório: ' + e.message;
-  }
+    if (info) {
+      info.textContent = `📋 ${d.total} cliente(s) · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes`;
+      info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
+    }
+  } catch (e) { if (info) info.textContent = 'Erro ao ler relatório: ' + e.message; }
 }
 
 function atualizarProgresso(atual, total) {
@@ -773,20 +821,15 @@ function atualizarBotoesDisparo(rodando) {
 async function dispararFaturas() {
   const sel = document.getElementById('select-relatorio');
   const relatorio = sel ? sel.value : '';
-  if (!relatorio) {
-    adicionarLog('Selecione um relatório antes de disparar.', 'erro');
-    return;
-  }
-  const limite     = parseInt(document.getElementById('disparo-limite')?.value) || 0;
-  const delay      = parseInt(document.getElementById('disparo-delay')?.value) || 30;
-  const lote       = parseInt(document.getElementById('disparo-lote')?.value) || 50;
-  const pausaLote  = parseInt(document.getElementById('disparo-pausa-lote')?.value) || 300;
-  const limiteMsg  = limite > 0 ? ` (teste: ${limite})` : '';
-  adicionarLog(`Iniciando disparo: ${relatorio}${limiteMsg} · ${delay}s/envio · lote ${lote} · pausa ${pausaLote}s`, 'disparo-log');
+  if (!relatorio) { adicionarLog('Selecione um relatório antes de disparar.', 'erro'); return; }
+  const limite = parseInt(document.getElementById('disparo-limite')?.value) || 0;
+  const delay = parseInt(document.getElementById('disparo-delay')?.value) || 30;
+  const lote = parseInt(document.getElementById('disparo-lote')?.value) || 50;
+  const pausaLote = parseInt(document.getElementById('disparo-pausa-lote')?.value) || 300;
+  adicionarLog(`Iniciando disparo: ${relatorio} · ${delay}s/envio`, 'disparo-log');
   try {
     const d = await fetch('/api/comando/disparar', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ relatorio, limite: limite || undefined, delay, lote, pausaLote }),
     }).then(r => r.json());
     if (d.erro) adicionarLog('Erro: ' + d.erro, 'disparo-log');
@@ -798,28 +841,20 @@ async function carregarRelatoriosDisparo() {
   const lista = document.getElementById('rel-disparo-lista');
   try {
     const { arquivos } = await fetch('/api/relatorios-disparo').then(r => r.json());
-    if (!arquivos.length) {
-      lista.innerHTML = '<span class="disparo-info">Nenhum relatório de disparo ainda.</span>';
-      return;
-    }
+    if (!arquivos.length) { lista.innerHTML = '<span class="disparo-info">Nenhum relatório de disparo ainda.</span>'; return; }
     lista.innerHTML = '';
     for (const f of arquivos) {
-      // Extrai contagens do JSON de log correspondente se disponível
       const item = document.createElement('div');
       item.className = 'rel-disparo-item';
-      // Nome formatado: relatorio_disparo_2026-06-12_12-40 → 12/06/2026 12:40
       const m = f.match(/(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})/);
       const label = m ? `${m[3]}/${m[2]}/${m[1]} — ${m[4]}:${m[5]}` : f;
-      item.innerHTML = `
-        <span class="rel-disparo-nome">📊 ${label}</span>
+      item.innerHTML = `<span class="rel-disparo-nome">📊 ${label}</span>
         <div class="rel-disparo-badges">
           <a href="/api/relatorios-disparo/download/${encodeURIComponent(f)}" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
         </div>`;
       lista.appendChild(item);
     }
-  } catch (e) {
-    lista.innerHTML = `<span class="disparo-info">Erro: ${e.message}</span>`;
-  }
+  } catch (e) { lista.innerHTML = `<span class="disparo-info">Erro: ${e.message}</span>`; }
 }
 
 async function pararDisparo() {
@@ -832,11 +867,13 @@ async function pararDisparo() {
 }
 
 async function atualizarDados() {
-  adicionarLog('Atualizando dados...', 'info');
+  adicionarLog('Recruzando dados...', 'info');
   try {
     await fetch('/api/atualizar', { method: 'POST' });
+    await carregarStatusImportacao();
+    await carregarOpcoesFiltrosReset();
     await carregarTudo();
-    adicionarLog('Dados atualizados!', 'sucesso');
+    adicionarLog('Dados recruzados!', 'sucesso');
   } catch (e) { adicionarLog('Erro: ' + e.message, 'erro'); }
 }
 
@@ -860,23 +897,16 @@ async function carregarFaturas(pagina) {
   const lista = document.getElementById('faturas-lista');
   const totalEl = document.getElementById('faturas-total');
   const paginacaoEl = document.getElementById('faturas-paginacao');
-
   lista.innerHTML = '<div class="faturas-loading">Carregando...</div>';
-
   try {
     const params = new URLSearchParams({ busca: faturasBuscaAtual, pagina: faturasPagina });
     const d = await fetch('/api/faturas?' + params).then(r => r.json());
-
     if (d.erro) { lista.innerHTML = `<div class="faturas-vazio">Erro: ${d.erro}</div>`; return; }
-
     totalEl.textContent = d.total > 0 ? `${d.total} fatura${d.total !== 1 ? 's' : ''}` : '';
-
     if (!d.clientes || d.clientes.length === 0) {
       lista.innerHTML = '<div class="faturas-vazio">Nenhuma fatura encontrada</div>';
-      paginacaoEl.innerHTML = '';
-      return;
+      paginacaoEl.innerHTML = ''; return;
     }
-
     lista.innerHTML = d.clientes.map(c => `
       <div class="fatura-card">
         <div class="fatura-cliente-header">
@@ -893,25 +923,19 @@ async function carregarFaturas(pagina) {
         </div>
       </div>
     `).join('');
-
-    // Paginação
     if (d.paginas > 1) {
       const btns = [];
       if (faturasPagina > 1) btns.push(`<button class="pag-btn" onclick="carregarFaturas(${faturasPagina - 1})">‹ Anterior</button>`);
       btns.push(`<span class="pag-info">${faturasPagina} / ${d.paginas}</span>`);
       if (faturasPagina < d.paginas) btns.push(`<button class="pag-btn" onclick="carregarFaturas(${faturasPagina + 1})">Próxima ›</button>`);
       paginacaoEl.innerHTML = btns.join('');
-    } else {
-      paginacaoEl.innerHTML = '';
-    }
-  } catch (e) {
-    lista.innerHTML = `<div class="faturas-vazio">Erro ao carregar: ${e.message}</div>`;
-  }
+    } else { paginacaoEl.innerHTML = ''; }
+  } catch (e) { lista.innerHTML = `<div class="faturas-vazio">Erro ao carregar: ${e.message}</div>`; }
 }
 
 function formatarMesAno(mesAno) {
   if (!mesAno) return '—';
-  const meses = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+  const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
   const [m, a] = mesAno.split('-');
   const idx = parseInt(m) - 1;
   return (idx >= 0 && idx < 12) ? `${meses[idx]} ${a}` : mesAno;

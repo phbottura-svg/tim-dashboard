@@ -577,7 +577,7 @@ function renderTabelaAjustes(clientes) {
       <td>${i + 1}</td>
       <td>${c.nome || '—'}</td>
       <td class="cpf-col">${c.cpf || '—'}</td>
-      <td>${c.mesGross || '<em class="dim">Sem data</em>'}</td>
+      <td>${c.mesGrossManual || '<em class="dim">Sem data</em>'}</td>
       <td id="os-cell-${i}" class="os-edit-cell">
         <span class="os-valor">${c.os || '<em class="dim">vazio</em>'}</span>
         <button class="btn-edit-os" onclick="editarOS(${i})" title="Editar OS">✏️</button>

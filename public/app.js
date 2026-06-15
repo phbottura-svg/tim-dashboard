@@ -492,6 +492,10 @@ async function carregarTabela() {
   if (ufTabela) p.set('uf', ufTabela);
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
+  for (let n = 1; n <= 5; n++) {
+    const v = document.getElementById(`tf-f${n}`)?.value;
+    if (v) p.set(`f${n}`, v);
+  }
 
   try {
     const d = await fetch('/api/clientes?' + p).then(r => r.json());
@@ -556,6 +560,14 @@ function ordenar(col) {
 function buscarTabela() {
   state.pagina = 1;
   carregarTabela();
+}
+
+function limparFiltrosFaturas() {
+  for (let n = 1; n <= 5; n++) {
+    const el = document.getElementById(`tf-f${n}`);
+    if (el) el.value = '';
+  }
+  buscarTabela();
 }
 
 // ─── Paginação ────────────────────────────────────────────────────────────────

@@ -219,6 +219,16 @@ function aplicarFiltros(lista, q) {
   if (q.contatos === '1') l = l.filter(c => (c.contatos?.length || 0) === 1);
   if (q.churn === '1') l = l.filter(c => c.churn);
   if (q.semMatch === '1') l = l.filter(c => !c.cruzado);
+  // Filtros por fatura individual (f1..f5)
+  for (let n = 1; n <= 5; n++) {
+    const val = q[`f${n}`];
+    if (!val) continue;
+    if (val === 'SEM') {
+      l = l.filter(c => !(c.faturas || []).some(f => f.numero === n));
+    } else {
+      l = l.filter(c => (c.faturas || []).find(f => f.numero === n)?.status === val);
+    }
+  }
   return l;
 }
 

@@ -247,6 +247,15 @@
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-churn" onchange="buscarTabela()"> Churn</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-sem-match" onchange="buscarTabela()"> Sem Match</label>
     </div>
+    <div class="tabela-controles tabela-controles-faturas" id="filtros-faturas-row">
+      <span class="filtro-label-faturas">Filtrar por fatura:</span>
+      <select id="tf-f1" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F1 — Todos</option><option value="ADIMPLENTE">F1 Adim.</option><option value="INADIMPLENTE">F1 Inadim.</option><option value="SEM">F1 Sem fatura</option></select>
+      <select id="tf-f2" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F2 — Todos</option><option value="ADIMPLENTE">F2 Adim.</option><option value="INADIMPLENTE">F2 Inadim.</option><option value="SEM">F2 Sem fatura</option></select>
+      <select id="tf-f3" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F3 — Todos</option><option value="ADIMPLENTE">F3 Adim.</option><option value="INADIMPLENTE">F3 Inadim.</option><option value="SEM">F3 Sem fatura</option></select>
+      <select id="tf-f4" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F4 — Todos</option><option value="ADIMPLENTE">F4 Adim.</option><option value="INADIMPLENTE">F4 Inadim.</option><option value="SEM">F4 Sem fatura</option></select>
+      <select id="tf-f5" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F5 — Todos</option><option value="ADIMPLENTE">F5 Adim.</option><option value="INADIMPLENTE">F5 Inadim.</option><option value="SEM">F5 Sem fatura</option></select>
+      <button class="btn btn-sm btn-secondary" onclick="limparFiltrosFaturas()" style="font-size:11px;padding:5px 10px">Limpar</button>
+    </div>
     <div class="tabela-wrapper">
       <table>
         <thead id="tabela-thead">

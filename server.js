@@ -114,9 +114,11 @@ const excelSerialParaMes = normalizarMes;
 
 function calcularStatus(statusPagamento, dataVencimento) {
   if (!statusPagamento) return 'SEM DADOS';
-  const sp = String(statusPagamento);
-  const pagou = sp.startsWith('01') || sp.startsWith('02') || sp.startsWith('03');
-  if (pagou) return 'ADIMPLENTE';
+  const sp = String(statusPagamento).trim();
+  // 01 = pagou no vencimento, 02 = pagou até 30 dias após → ADIMPLENTE
+  if (sp.startsWith('01') || sp.startsWith('02')) return 'ADIMPLENTE';
+  // 03, 04 = pagou com atraso >30 dias, 05 = não pagou → INADIMPLENTE
+  if (sp.startsWith('03') || sp.startsWith('04') || sp.startsWith('05')) return 'INADIMPLENTE';
   if (!dataVencimento) return 'INADIMPLENTE';
   try {
     const partes = String(dataVencimento).split('/');

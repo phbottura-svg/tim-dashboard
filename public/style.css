@@ -942,3 +942,15 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
 
 .ajuste-pendente { font-size: 11px; color: var(--dim); }
 .ajuste-corrigido { font-size: 11px; color: var(--verde); font-weight: 600; }
+
+.btn-limpar {
+  background: transparent;
+  border: 1px solid #e05555;
+  color: #e05555;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+.btn-limpar:hover { background: #e05555; color: #fff; }

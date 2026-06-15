@@ -157,6 +157,17 @@ app.get('/api/modelo-base-clientes', (req, res) => {
   res.download(path.join(__dirname, 'public', 'modelo-base-clientes.xlsx'), 'modelo-base-clientes.xlsx');
 });
 
+// ─── Limpar Base Clientes ─────────────────────────────────────────────────────
+
+app.delete('/api/limpar-base-clientes', (req, res) => {
+  salvarJSON(BASE_CLIENTES_PATH, []);
+  salvarJSON(BASE_CRUZADA_PATH, []);
+  const meta = lerJSON(SONAR_META_PATH, {});
+  delete meta.clientes;
+  salvarJSON(SONAR_META_PATH, meta);
+  res.json({ ok: true });
+});
+
 // ─── Importar Clientes Excel ──────────────────────────────────────────────────
 
 app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) => {

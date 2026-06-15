@@ -182,6 +182,14 @@ function mostrarMsg(msg, tipo = 'info') {
   setTimeout(() => { el.style.display = 'none'; }, 8000);
 }
 
+async function limparBaseClientes() {
+  if (!confirm('Remover toda a base de clientes importada?')) return;
+  const r = await fetch('/api/limpar-base-clientes', { method: 'DELETE' });
+  const d = await r.json();
+  if (d.ok) { await carregarStatusImportacao(); await atualizarTudo(); }
+  else alert('Erro: ' + d.erro);
+}
+
 async function importarClientes(input) {
   const file = input.files[0];
   if (!file) return;

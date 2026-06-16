@@ -372,6 +372,26 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
 
 // ─── Status de importação ─────────────────────────────────────────────────────
 
+function parseDataBr(s) {
+  if (!s) return null;
+  const m = String(s).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})/);
+  if (!m) return null;
+  let [, dd, mm, yyyy] = m;
+  if (yyyy.length === 2) yyyy = '20' + yyyy;
+  const d = new Date(+yyyy, +mm - 1, +dd);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function ultimaAtualizacaoBase(estado) {
+  const registros = lerJSON(BASE_SONAR[estado], []);
+  let max = null;
+  registros.forEach(r => {
+    const d = parseDataBr(r.ultimaAtualizacao);
+    if (d && (!max || d > max)) max = d;
+  });
+  return max ? `${String(max.getDate()).padStart(2,'0')}/${String(max.getMonth()+1).padStart(2,'0')}/${max.getFullYear()}` : null;
+}
+
 app.get('/api/importacao/status', (req, res) => {
   try {
     const meta = lerJSON(SONAR_META_PATH, {});
@@ -393,9 +413,9 @@ app.get('/api/importacao/status', (req, res) => {
         status: statusImport(meta.clientes?.importadoEm),
       },
       sonar: {
-        PR: { total: meta.sonar?.PR?.total || 0, importadoEm: meta.sonar?.PR?.importadoEm || null, status: statusImport(meta.sonar?.PR?.importadoEm) },
-        SC: { total: meta.sonar?.SC?.total || 0, importadoEm: meta.sonar?.SC?.importadoEm || null, status: statusImport(meta.sonar?.SC?.importadoEm) },
-        RS: { total: meta.sonar?.RS?.total || 0, importadoEm: meta.sonar?.RS?.importadoEm || null, status: statusImport(meta.sonar?.RS?.importadoEm) },
+        PR: { total: meta.sonar?.PR?.total || 0, importadoEm: meta.sonar?.PR?.importadoEm || null, status: statusImport(meta.sonar?.PR?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('PR') },
+        SC: { total: meta.sonar?.SC?.total || 0, importadoEm: meta.sonar?.SC?.importadoEm || null, status: statusImport(meta.sonar?.SC?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('SC') },
+        RS: { total: meta.sonar?.RS?.total || 0, importadoEm: meta.sonar?.RS?.importadoEm || null, status: statusImport(meta.sonar?.RS?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('RS') },
       },
       cruzamento: {
         total: baseCruzada.length,

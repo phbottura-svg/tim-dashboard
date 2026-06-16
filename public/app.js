@@ -257,9 +257,10 @@ async function carregarStatusImportacao() {
       if (el) {
         const s = d.sonar[est];
         const emoji = badgeEmoji(s.status);
-        const ts = s.importadoEm ? fmtTs(s.importadoEm) : '';
-        el.textContent = `${emoji} ${est} ${ts ? '— ' + ts + ' · ' : '— '}${s.total} reg`;
+        const baseTs = s.ultimaAtualizacaoBase ? ` · base atualizada em ${s.ultimaAtualizacaoBase}` : '';
+        el.textContent = `${emoji} ${est} — ${s.total} reg${baseTs}`;
         el.className = `importar-status status-${s.status}`;
+        el.title = s.importadoEm ? `Importado em ${fmtTs(s.importadoEm)}` : '';
       }
     });
 

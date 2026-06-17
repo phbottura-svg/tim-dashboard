@@ -398,21 +398,22 @@
           <span class="disparo-limite-tag">limite</span>
         </div>
         <div class="disparo-limite-wrap">
-          <input type="number" id="disparo-delay" class="disparo-limite-input" placeholder="30" min="5" max="300" value="30" />
+          <input type="number" id="disparo-delay" class="disparo-limite-input" placeholder="30" min="5" max="300" value="30" oninput="atualizarInfoRelatorio()" />
           <span class="disparo-limite-tag">seg/envio</span>
         </div>
         <div class="disparo-limite-wrap">
-          <input type="number" id="disparo-lote" class="disparo-limite-input" placeholder="50" min="5" max="500" value="50" />
+          <input type="number" id="disparo-lote" class="disparo-limite-input" placeholder="50" min="5" max="500" value="50" oninput="atualizarInfoRelatorio()" />
           <span class="disparo-limite-tag">por lote</span>
         </div>
         <div class="disparo-limite-wrap">
-          <input type="number" id="disparo-pausa-lote" class="disparo-limite-input" placeholder="300" min="60" max="3600" value="300" />
+          <input type="number" id="disparo-pausa-lote" class="disparo-limite-input" placeholder="300" min="60" max="3600" value="300" oninput="atualizarInfoRelatorio()" />
           <span class="disparo-limite-tag">seg pausa</span>
         </div>
         <button class="btn btn-primary" id="btn-disparar" onclick="dispararFaturas()">📤 Disparar WhatsApp</button>
         <button class="btn btn-danger" id="btn-parar-disparo" onclick="pararDisparo()" style="display:none">⏹ Parar Disparo</button>
       </div>
       <div id="disparo-relatorio-info" class="disparo-info"></div>
+      <div id="disparo-tempo-estimado" style="font-size:12px;color:#94a3b8;margin-top:4px;padding:0 2px"></div>
       <div id="disparo-progresso-wrap" class="progresso-wrap" style="display:none">
         <div class="progresso-header">
           <span class="progresso-label" id="progresso-label">Aguardando...</span>

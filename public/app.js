@@ -849,7 +849,27 @@ async function atualizarInfoRelatorio() {
       info.textContent = `📋 ${d.total} cliente(s) · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes`;
       info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }
+    calcularTempoDisparo(pend);
   } catch (e) { if (info) info.textContent = 'Erro ao ler relatório: ' + e.message; }
+}
+
+function calcularTempoDisparo(pendentes) {
+  const el = document.getElementById('disparo-tempo-estimado');
+  if (!el) return;
+  const qtd     = pendentes || 0;
+  const delay   = parseInt(document.getElementById('disparo-delay')?.value) || 30;
+  const lote    = parseInt(document.getElementById('disparo-lote')?.value)  || 50;
+  const pausa   = parseInt(document.getElementById('disparo-pausa-lote')?.value) || 300;
+  const limite  = parseInt(document.getElementById('disparo-limite')?.value) || qtd;
+  const total   = Math.min(qtd, limite);
+  if (total <= 0) { el.textContent = ''; return; }
+  const lotes   = Math.floor(total / lote);
+  const totalSeg = (total * delay) + (lotes * pausa);
+  const h = Math.floor(totalSeg / 3600);
+  const m = Math.floor((totalSeg % 3600) / 60);
+  const s = totalSeg % 60;
+  const tempo = h > 0 ? `${h}h ${m}min` : m > 0 ? `${m}min ${s}s` : `${s}s`;
+  el.textContent = `⏱ Tempo estimado para ${total} envios: ${tempo} (${delay}s/envio · lote ${lote} · pausa ${pausa}s)`;
 }
 
 function atualizarProgresso(atual, total) {

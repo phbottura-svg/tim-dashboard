@@ -220,7 +220,8 @@ function safraParaMeses(mesInicio) {
 
 function aplicarFiltros(lista, q) {
   let l = lista;
-  if (q.safra)    l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));
+  if (q.safra)         l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));
+  if (q.dataVencimento) l = l.filter(c => (c.faturas || []).some(f => f.dataVencimento === q.dataVencimento));
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));
   if (q.uf)       l = l.filter(c => c.uf === q.uf);
@@ -553,9 +554,15 @@ app.get('/api/filtros/opcoes', (req, res) => {
     const mesesGross = [...new Set(todos.map(c => c.mesGross).filter(Boolean))].sort();
     const vendedores = [...new Set(todos.map(c => c.vendedor).filter(Boolean))].sort();
     const estados = [...new Set(todos.map(c => c.uf).filter(Boolean))].sort();
-    // Safras: cada mês gross único é um início de safra (mesGross + 4 meses)
     const safras = mesesGross;
-    res.json({ mesesGross, vendedores, estados, safras });
+    const datasVencimento = [...new Set(
+      todos.flatMap(c => (c.faturas || []).map(f => f.dataVencimento).filter(Boolean))
+    )].sort((a, b) => {
+      const [da, ma, ya] = a.split('/').map(Number);
+      const [db, mb, yb] = b.split('/').map(Number);
+      return new Date(ya, ma-1, da) - new Date(yb, mb-1, db);
+    });
+    res.json({ mesesGross, vendedores, estados, safras, datasVencimento });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

@@ -156,6 +156,14 @@ async function carregarOpcoesFiltros() {
         selSafra.appendChild(o);
       });
     }
+    const selVenc = document.getElementById('tabela-filtro-vencimento');
+    if (selVenc) {
+      d.datasVencimento?.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; o.textContent = v;
+        selVenc.appendChild(o);
+      });
+    }
   } catch {}
 }
 
@@ -501,6 +509,8 @@ async function carregarTabela() {
   if (ufTabela) p.set('uf', ufTabela);
   const safra = document.getElementById('tabela-filtro-safra')?.value;
   if (safra) p.set('safra', safra);
+  const vencimento = document.getElementById('tabela-filtro-vencimento')?.value;
+  if (vencimento) p.set('dataVencimento', vencimento);
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   for (let n = 1; n <= 5; n++) {
@@ -584,7 +594,7 @@ function limparFiltrosFaturas() {
 }
 
 function limparTodosFiltros() {
-  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra'];
+  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-vencimento'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   ['tabela-filtro-churn', 'tabela-filtro-sem-match'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;

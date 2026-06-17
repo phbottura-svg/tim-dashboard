@@ -943,7 +943,7 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     let disparados = 0;
     for (const r of sucesso) {
       const numeros = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
-      if (numeros.some(n => jaEnviadosPdfs.has(n))) disparados++;
+      if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) disparados++;
     }
     res.json({ total, disparados, pendentes: total - disparados, linhas: rows.length });
   } catch (e) { res.status(500).json({ erro: e.message }); }

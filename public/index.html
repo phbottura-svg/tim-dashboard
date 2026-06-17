@@ -247,8 +247,12 @@
         <option value="SC">SC</option>
         <option value="RS">RS</option>
       </select>
+      <select id="tabela-filtro-safra" class="filtro-select-sm" onchange="buscarTabela()">
+        <option value="">Todas Safras</option>
+      </select>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-churn" onchange="buscarTabela()"> Churn</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-sem-match" onchange="buscarTabela()"> Sem Match</label>
+      <button class="btn btn-sm btn-secondary" onclick="limparTodosFiltros()" style="font-size:11px;padding:5px 12px;margin-left:8px">🧹 Limpar Filtros</button>
     </div>
     <div class="tabela-controles tabela-controles-faturas" id="filtros-faturas-row">
       <span class="filtro-label-faturas">Filtrar por fatura:</span>

@@ -148,6 +148,14 @@ async function carregarOpcoesFiltros() {
       const o = document.createElement('option');
       o.value = e; o.textContent = e; selEst.appendChild(o);
     });
+    const selSafra = document.getElementById('tabela-filtro-safra');
+    if (selSafra) {
+      d.safras?.forEach(s => {
+        const o = document.createElement('option');
+        o.value = s; o.textContent = `Safra ${s}`;
+        selSafra.appendChild(o);
+      });
+    }
   } catch {}
 }
 
@@ -491,6 +499,8 @@ async function carregarTabela() {
   if (statusTabela) p.set('statusTabela', statusTabela);
   const ufTabela = document.getElementById('tabela-filtro-uf')?.value;
   if (ufTabela) p.set('uf', ufTabela);
+  const safra = document.getElementById('tabela-filtro-safra')?.value;
+  if (safra) p.set('safra', safra);
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   for (let n = 1; n <= 5; n++) {
@@ -570,6 +580,16 @@ function limparFiltrosFaturas() {
     const el = document.getElementById(`tf-f${n}`);
     if (el) el.value = '';
   }
+  buscarTabela();
+}
+
+function limparTodosFiltros() {
+  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra'];
+  ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['tabela-filtro-churn', 'tabela-filtro-sem-match'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.checked = false;
+  });
+  for (let n = 1; n <= 5; n++) { const el = document.getElementById(`tf-f${n}`); if (el) el.value = ''; }
   buscarTabela();
 }
 

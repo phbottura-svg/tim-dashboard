@@ -207,8 +207,20 @@ function cruzarBases() {
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 
+function safraParaMeses(mesInicio) {
+  // mesInicio formato "MM/YYYY" → retorna array com mesInicio + 4 meses seguintes
+  const [mm, yyyy] = mesInicio.split('/').map(Number);
+  const meses = [];
+  for (let i = 0; i < 5; i++) {
+    const d = new Date(yyyy, mm - 1 + i, 1);
+    meses.push(`${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`);
+  }
+  return meses;
+}
+
 function aplicarFiltros(lista, q) {
   let l = lista;
+  if (q.safra)    l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));
   if (q.uf)       l = l.filter(c => c.uf === q.uf);
@@ -541,7 +553,9 @@ app.get('/api/filtros/opcoes', (req, res) => {
     const mesesGross = [...new Set(todos.map(c => c.mesGross).filter(Boolean))].sort();
     const vendedores = [...new Set(todos.map(c => c.vendedor).filter(Boolean))].sort();
     const estados = [...new Set(todos.map(c => c.uf).filter(Boolean))].sort();
-    res.json({ mesesGross, vendedores, estados });
+    // Safras: cada mês gross único é um início de safra (mesGross + 4 meses)
+    const safras = mesesGross;
+    res.json({ mesesGross, vendedores, estados, safras });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

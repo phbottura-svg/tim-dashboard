@@ -179,6 +179,7 @@ function cruzarBases() {
       uf: ref.uf || null,
       churn: faturas.some(f => f.churn === 'Sim'),
       loginVendedor: ref.loginVendedor || null,
+      custcode: ref.custcode || null,
       nome: cliente?.nome || null,
       cpf: cliente?.cpf || null,
       vendedor: cliente?.vendedor || null,

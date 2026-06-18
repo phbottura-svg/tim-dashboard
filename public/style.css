@@ -793,8 +793,10 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
 .status-CHURN        { background: rgba(255,145,0,0.15);  color: var(--laranja); border: 1px solid rgba(255,145,0,0.3); }
 
 /* ─── Colunas da tabela ─────────────────────────────────────────────────────── */
-.cpf-col { font-family: 'Consolas', monospace; font-size: 12px; color: var(--dim); }
-.os-col  { font-family: 'Consolas', monospace; font-size: 12px; }
+.cpf-col      { font-family: 'Consolas', monospace; font-size: 12px; color: var(--dim); }
+.os-col       { font-family: 'Consolas', monospace; font-size: 12px; }
+.tel-col      { font-family: 'Consolas', monospace; font-size: 12px; white-space: nowrap; }
+.custcode-col { font-family: 'Consolas', monospace; font-size: 11px; color: var(--dim); white-space: nowrap; }
 
 /* ─── Painel de importação ──────────────────────────────────────────────────── */
 .importar-panel {

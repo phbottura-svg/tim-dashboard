@@ -586,7 +586,7 @@ async function carregarTabela() {
     const d = await fetch('/api/clientes?' + p).then(r => r.json());
     const tbody = document.getElementById('tabela-body');
     if (!d.dados?.length) {
-      tbody.innerHTML = '<tr><td colspan="9" class="loading">Nenhum cliente encontrado</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" class="loading">Nenhum cliente encontrado</td></tr>';
       setText('tabela-info', '0 clientes');
       document.getElementById('paginacao').innerHTML = '';
       return;
@@ -600,6 +600,9 @@ async function carregarTabela() {
       thead.innerHTML = `<tr>
         <th onclick="ordenar('nome')">Cliente ↕</th>
         <th onclick="ordenar('cpf')">CPF ↕</th>
+        <th>Contato 1</th>
+        <th>Contato 2</th>
+        <th>Custcode</th>
         <th onclick="ordenar('os')">OS ↕</th>
         <th onclick="ordenar('vendedor')">Vendedor ↕</th>
         <th onclick="ordenar('uf')">UF ↕</th>
@@ -618,9 +621,13 @@ async function carregarTabela() {
         const label = fat.detalhamento || fat.statusPagamento || '—';
         return `<td><span class="status-tag ${cls}" title="${label}">${fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—'} ${fat.dataVencimento || ''}</span></td>`;
       }).join('');
+      const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
       return `<tr>
         <td>${c.nome || '<em class="dim">Sem match</em>'}</td>
         <td class="cpf-col">${c.cpf || '—'}</td>
+        <td class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
+        <td class="tel-col">${fmtTel(c.contatoResponsavel)}</td>
+        <td class="custcode-col">${c.custcode || '—'}</td>
         <td class="os-col">${c.os || '—'}</td>
         <td>${c.vendedor || '—'}</td>
         <td>${c.uf || '—'}</td>

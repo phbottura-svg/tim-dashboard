@@ -734,21 +734,21 @@ async function carregarAjustes() {
 function renderTabelaAjustes(clientes) {
   const tbody = document.getElementById('ajustes-tbody');
   if (!clientes.length) {
-    tbody.innerHTML = '<tr><td colspan="6" class="loading">✅ Nenhum cliente pendente</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="8" class="loading">✅ Nenhum cliente pendente</td></tr>';
     return;
   }
+  const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
   tbody.innerHTML = clientes.map((c, i) => `
     <tr id="ajuste-row-${i}">
       <td>${i + 1}</td>
-      <td>${c.nome || '—'}</td>
-      <td class="cpf-col">${c.cpf || '—'}</td>
-      <td>${c.mesGrossManual || '<em class="dim">Sem data</em>'}</td>
-      <td id="os-cell-${i}" class="os-edit-cell">
-        <span class="os-valor">${c.os || '<em class="dim">vazio</em>'}</span>
-        <button class="btn-edit-os" onclick="editarOS(${i})" title="Editar OS">✏️</button>
-      </td>
-      <td id="status-cell-${i}">
-        <span class="ajuste-pendente">Pendente</span>
+      <td id="aj-nome-${i}">${c.nome || '<em class="dim">—</em>'}</td>
+      <td id="aj-cpf-${i}" class="cpf-col">${c.cpf || '<em class="dim">—</em>'}</td>
+      <td id="aj-c1-${i}" class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
+      <td id="aj-c2-${i}" class="tel-col">${fmtTel(c.contatoResponsavel)}</td>
+      <td id="aj-mes-${i}">${c.mesGross || c.mesGrossManual || '<em class="dim">Sem data</em>'}</td>
+      <td id="aj-os-${i}" class="os-col">${c.os || '<em class="dim">vazio</em>'}</td>
+      <td id="aj-acao-${i}">
+        <button class="btn-edit-os" onclick="editarCliente(${i})" title="Editar">✏️</button>
       </td>
     </tr>
   `).join('');
@@ -764,47 +764,46 @@ function filtrarTabelaAjustes() {
   renderTabelaAjustes(filtrados);
 }
 
-function editarOS(idx) {
-  const cell = document.getElementById(`os-cell-${idx}`);
+function editarCliente(idx) {
   const c = ajusteClientesAtual[idx];
-  if (!cell) return;
-  cell.innerHTML = `
-    <input type="text" class="os-input" id="os-input-${idx}" value="${c.os || ''}" placeholder="Digite a OS…" />
-    <button class="btn btn-success btn-sm" onclick="salvarOS(${idx})">✓</button>
-    <button class="btn btn-secondary btn-sm" onclick="cancelarOS(${idx}, '${(c.os || '').replace(/'/g, "\\'")}')">✕</button>
+  const fmtTelInput = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '';
+  document.getElementById(`aj-nome-${idx}`).innerHTML = `<input class="input-inline" id="ei-nome-${idx}" value="${(c.nome||'').replace(/"/g,'&quot;')}" placeholder="Nome">`;
+  document.getElementById(`aj-cpf-${idx}`).innerHTML  = `<input class="input-inline" id="ei-cpf-${idx}"  value="${(c.cpf||'').replace(/"/g,'&quot;')}" placeholder="CPF">`;
+  document.getElementById(`aj-c1-${idx}`).innerHTML   = `<input class="input-inline" id="ei-c1-${idx}"   value="${fmtTelInput(c.contatoPrincipal)}" placeholder="(41) 99999-0000">`;
+  document.getElementById(`aj-c2-${idx}`).innerHTML   = `<input class="input-inline" id="ei-c2-${idx}"   value="${fmtTelInput(c.contatoResponsavel)}" placeholder="(41) 99999-0000">`;
+  document.getElementById(`aj-mes-${idx}`).innerHTML  = `<input class="input-inline" id="ei-mes-${idx}"  value="${c.mesGross || c.mesGrossManual || ''}" placeholder="MM/AAAA">`;
+  document.getElementById(`aj-os-${idx}`).innerHTML   = `<input class="input-inline" id="ei-os-${idx}"   value="${(c.os||'').replace(/"/g,'&quot;')}" placeholder="OS">`;
+  document.getElementById(`aj-acao-${idx}`).innerHTML = `
+    <button class="btn btn-primary btn-sm" onclick="salvarCliente(${idx})" title="Salvar">✅</button>
+    <button class="btn btn-secondary btn-sm" onclick="renderTabelaAjustes(ajusteClientesAtual)" title="Cancelar">✖</button>
   `;
-  const inp = document.getElementById(`os-input-${idx}`);
-  inp.focus();
-  inp.addEventListener('keydown', e => { if (e.key === 'Enter') salvarOS(idx); if (e.key === 'Escape') cancelarOS(idx, c.os || ''); });
+  document.getElementById(`ei-nome-${idx}`)?.focus();
 }
 
-async function salvarOS(idx) {
-  const inp = document.getElementById(`os-input-${idx}`);
+async function salvarCliente(idx) {
   const c = ajusteClientesAtual[idx];
-  const osNova = inp?.value.trim();
-  if (!osNova) return;
-
+  const val = id => document.getElementById(id)?.value?.trim() || '';
+  const payload = {
+    osAtual: c.os,
+    nome: val(`ei-nome-${idx}`),
+    cpf: val(`ei-cpf-${idx}`),
+    contatoPrincipal: val(`ei-c1-${idx}`),
+    contatoResponsavel: val(`ei-c2-${idx}`),
+    mesGross: val(`ei-mes-${idx}`),
+  };
   try {
-    const r = await fetch('/api/corrigir-os', {
+    const d = await fetch('/api/ajustes/corrigir-cliente', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ nome: c.nome, cpf: c.cpf, osAntiga: c.os || '', osNova }),
-    });
-    const d = await r.json();
+      body: JSON.stringify(payload),
+    }).then(r => r.json());
     if (d.erro) { alert('Erro: ' + d.erro); return; }
-
-    ajusteClientesAtual[idx].os = osNova;
-    const cell = document.getElementById(`os-cell-${idx}`);
-    if (cell) cell.innerHTML = `<span class="os-valor">${osNova}</span> <button class="btn-edit-os" onclick="editarOS(${idx})" title="Editar OS">✏️</button>`;
-    const statusCell = document.getElementById(`status-cell-${idx}`);
-    if (statusCell) statusCell.innerHTML = `<span class="ajuste-corrigido">✅ Corrigido</span>`;
+    ajusteClientesAtual[idx] = { ...c, nome: payload.nome, cpf: payload.cpf, mesGross: payload.mesGross };
+    renderTabelaAjustes(ajusteClientesAtual);
+    const acao = document.getElementById(`aj-acao-${idx}`);
+    if (acao) acao.innerHTML = `<span class="${d.cruzado ? 'ajuste-corrigido' : 'ajuste-pendente'}">${d.cruzado ? '✅ Cruzado' : '✅ Salvo'}</span>`;
     await carregarStatusImportacao();
   } catch (err) { alert('Erro: ' + err.message); }
-}
-
-function cancelarOS(idx, osOriginal) {
-  const cell = document.getElementById(`os-cell-${idx}`);
-  if (cell) cell.innerHTML = `<span class="os-valor">${osOriginal || '<em class="dim">vazio</em>'}</span> <button class="btn-edit-os" onclick="editarOS(${idx})" title="Editar OS">✏️</button>`;
 }
 
 // ─── Modal Token ──────────────────────────────────────────────────────────────

@@ -792,6 +792,34 @@ app.post('/api/corrigir-os', (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Corrigir qualquer campo de um cliente sem match (cria/atualiza na base de clientes)
+app.post('/api/ajustes/corrigir-cliente', (req, res) => {
+  try {
+    const { osAtual, nome, cpf, contatoPrincipal, contatoResponsavel, mesGross } = req.body;
+    if (!osAtual) return res.status(400).json({ erro: 'osAtual é obrigatório' });
+
+    const clientes = lerJSON(BASE_CLIENTES_PATH, []);
+    // Tenta localizar pelo OS original (sem match não tem cpf/nome na base)
+    const idx = clientes.findIndex(c => c.os === osAtual);
+    const entrada = {
+      os: osAtual,
+      nome: (nome || '').trim(),
+      cpf: (cpf || '').trim(),
+      contatoPrincipal: limparTelefone(contatoPrincipal),
+      contatoResponsavel: limparTelefone(contatoResponsavel) || null,
+      mesGrossManual: converterDataParaMesAno((mesGross || '').trim()),
+      vendedor: idx >= 0 ? (clientes[idx].vendedor || '') : '',
+    };
+    if (idx >= 0) clientes[idx] = { ...clientes[idx], ...entrada };
+    else clientes.push(entrada);
+    salvarJSON(BASE_CLIENTES_PATH, clientes);
+
+    const baseCruzada = cruzarBases();
+    const cruzado = baseCruzada.find(c => c.os === osAtual);
+    res.json({ ok: true, cruzado: cruzado?.cruzado || false });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 app.post('/api/ajustes/concluir', (req, res) => {
   try {
     const { mes } = req.body;

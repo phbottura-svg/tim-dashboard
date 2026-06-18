@@ -974,6 +974,19 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
   width: 200px;
   outline: none;
 }
+.input-inline {
+  background: var(--bg3);
+  border: 1px solid var(--azul);
+  border-radius: 6px;
+  color: var(--texto);
+  padding: 3px 6px;
+  font-size: 12px;
+  width: 100%;
+  min-width: 80px;
+  outline: none;
+  box-sizing: border-box;
+}
+.input-inline:focus { border-color: var(--amarelo); }
 .dim { color: var(--dim); font-style: italic; }
 
 .ajuste-pendente { font-size: 11px; color: var(--dim); }

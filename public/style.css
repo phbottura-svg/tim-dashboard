@@ -350,6 +350,8 @@ header h1 { font-size: 18px; font-weight: 800; color: var(--azul-c); letter-spac
 .busca-input:focus { border-color: var(--azul); }
 
 .tabela-wrapper { overflow-x: auto; }
+.tabela-scroll-top { overflow-x: auto; overflow-y: hidden; height: 12px; margin-bottom: 2px; }
+.tabela-scroll-top-inner { height: 1px; }
 table { width: 100%; border-collapse: collapse; }
 
 thead th {

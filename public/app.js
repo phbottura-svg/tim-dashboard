@@ -22,6 +22,7 @@ const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS':
 
 document.addEventListener('DOMContentLoaded', async () => {
   await aplicarModoVps();
+  iniciarScrollTop();
   conectarSSE();
   verificarStatusRobo();
   setInterval(verificarStatusRobo, 5000);
@@ -29,6 +30,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   await carregarOpcoesFiltros();
   await carregarTudo();
 });
+
+function iniciarScrollTop() {
+  const wrapper = document.getElementById('tabela-wrapper');
+  const scrollTop = document.getElementById('tabela-scroll-top');
+  const inner = document.getElementById('tabela-scroll-top-inner');
+  if (!wrapper || !scrollTop || !inner) return;
+
+  // Sincroniza largura do inner com a tabela
+  const syncWidth = () => { inner.style.width = wrapper.scrollWidth + 'px'; };
+  new ResizeObserver(syncWidth).observe(wrapper);
+  syncWidth();
+
+  // Sincroniza scroll nos dois sentidos
+  let sync = false;
+  scrollTop.addEventListener('scroll', () => { if (!sync) { sync = true; wrapper.scrollLeft = scrollTop.scrollLeft; sync = false; } });
+  wrapper.addEventListener('scroll', () => { if (!sync) { sync = true; scrollTop.scrollLeft = wrapper.scrollLeft; sync = false; } });
+}
 
 async function aplicarModoVps() {
   try {

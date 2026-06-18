@@ -266,7 +266,8 @@
       <select id="tf-f5" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F5 — Todos</option><option value="ADIMPLENTE">F5 Adim.</option><option value="INADIMPLENTE">F5 Inadim.</option><option value="SEM">F5 Sem fatura</option></select>
       <button class="btn btn-sm btn-secondary" onclick="limparFiltrosFaturas()" style="font-size:11px;padding:5px 10px">Limpar</button>
     </div>
-    <div class="tabela-wrapper">
+    <div class="tabela-scroll-top" id="tabela-scroll-top"><div class="tabela-scroll-top-inner" id="tabela-scroll-top-inner"></div></div>
+    <div class="tabela-wrapper" id="tabela-wrapper">
       <table>
         <thead id="tabela-thead">
           <tr>

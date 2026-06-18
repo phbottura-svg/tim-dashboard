@@ -221,7 +221,12 @@ function safraParaMeses(mesInicio) {
 function aplicarFiltros(lista, q) {
   let l = lista;
   if (q.safra)         l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));
-  if (q.dataVencimento) l = l.filter(c => (c.faturas || []).some(f => f.dataVencimento === q.dataVencimento));
+  if (q.dataVencimento) l = l.filter(c => {
+    const faturas = (c.faturas || []).filter(f => f.dataVencimento);
+    if (!faturas.length) return false;
+    const ultima = faturas[faturas.length - 1];
+    return ultima.dataVencimento === q.dataVencimento;
+  });
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));
   if (q.uf)       l = l.filter(c => c.uf === q.uf);

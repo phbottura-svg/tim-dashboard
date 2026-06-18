@@ -75,7 +75,9 @@ function limparTelefone(tel) {
   if (!tel) return null;
   const n = String(tel).replace(/\D/g, '');
   if (!n) return null;
-  return n.startsWith('55') ? n : `55${n}`;
+  // Números com 12+ dígitos começando com 55 já têm código do país
+  // Números com 10-11 dígitos começando com 55 têm DDD 55 (ex: Caxias do Sul)
+  return (n.length >= 12 && n.startsWith('55')) ? n : `55${n}`;
 }
 
 const MESES_PT = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];

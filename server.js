@@ -225,7 +225,12 @@ function aplicarFiltros(lista, q) {
     const faturas = (c.faturas || []).filter(f => f.dataVencimento);
     if (!faturas.length) return false;
     const ultima = faturas[faturas.length - 1];
-    return ultima.dataVencimento === q.dataVencimento;
+    // Última fatura deve ter a data selecionada e estar INADIMPLENTE
+    if (ultima.dataVencimento !== q.dataVencimento) return false;
+    if (ultima.status !== 'INADIMPLENTE') return false;
+    // Todas as faturas anteriores devem estar ADIMPLENTES
+    const anteriores = faturas.slice(0, -1);
+    return anteriores.every(f => f.status === 'ADIMPLENTE');
   });
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));

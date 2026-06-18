@@ -465,10 +465,21 @@
         </div>
       </div>
       <div class="console-painel">
-        <div class="console-titulo">🤖 Log Robô PDF</div>
-        <div class="console" id="console-log">
+        <div class="console-titulo" style="display:flex;align-items:center;gap:6px">
+          🤖 Log Robô PDF
+          <div style="margin-left:auto;display:flex;gap:4px">
+            <button class="btn-log-aba ativa" id="aba-log-todos" onclick="trocarAbaLog('todos')">Todos</button>
+            <button class="btn-log-aba" id="aba-log-PR" onclick="trocarAbaLog('PR')">PR</button>
+            <button class="btn-log-aba" id="aba-log-SC" onclick="trocarAbaLog('SC')">SC</button>
+            <button class="btn-log-aba" id="aba-log-RS" onclick="trocarAbaLog('RS')">RS</button>
+          </div>
+        </div>
+        <div class="console" id="console-log-todos">
           <div class="console-linha console-info">Sistema pronto. Aguardando comandos...</div>
         </div>
+        <div class="console" id="console-log-PR" style="display:none"></div>
+        <div class="console" id="console-log-SC" style="display:none"></div>
+        <div class="console" id="console-log-RS" style="display:none"></div>
       </div>
     </div>
   </div>

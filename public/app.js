@@ -80,22 +80,68 @@ function conectarSSE() {
   _sse.onerror = () => { if (_sse) { _sse.close(); _sse = null; } setTimeout(conectarSSE, 5000); };
 }
 
+let _abaLogAtiva = 'todos';
+
+function trocarAbaLog(aba) {
+  _abaLogAtiva = aba;
+  ['todos', 'PR', 'SC', 'RS'].forEach(a => {
+    const painel = document.getElementById(`console-log-${a}`);
+    const btn = document.getElementById(`aba-log-${a}`);
+    if (painel) painel.style.display = a === aba ? '' : 'none';
+    if (btn) btn.classList.toggle('ativa', a === aba);
+  });
+}
+
 function adicionarLog(msg, tipo = 'info') {
   if (!msg) return;
   const ehDisparo = tipo === 'disparo' || tipo === 'disparo-log';
-  const el = document.getElementById(ehDisparo ? 'console-disparo' : 'console-log');
-  if (!el) return;
-  const l = document.createElement('div');
-  const ts = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+  if (ehDisparo) {
+    const el = document.getElementById('console-disparo');
+    if (!el) return;
+    const l = document.createElement('div');
+    const ts = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+    l.className = 'console-linha console-info';
+    l.textContent = `[${ts}] ${msg}`;
+    el.appendChild(l);
+    while (el.children.length > 200) el.removeChild(el.firstChild);
+    el.scrollTop = el.scrollHeight;
+    return;
+  }
+
+  // Detecta estado da mensagem ([PR], [SC], [RS])
+  const estadoMatch = msg.match(/\[(PR|SC|RS)\]/);
+  const estado = estadoMatch ? estadoMatch[1] : null;
+
   const cls = tipo?.includes('erro') ? 'console-erro'
     : tipo?.includes('sucesso') ? 'console-sucesso'
     : tipo?.includes('robo') ? 'console-robo'
     : tipo?.includes('aviso') ? 'console-aviso' : 'console-info';
-  l.className = `console-linha ${cls}`;
-  l.textContent = `[${ts}] ${msg}`;
-  el.appendChild(l);
-  while (el.children.length > 200) el.removeChild(el.firstChild);
-  el.scrollTop = el.scrollHeight;
+
+  const ts = new Date().toLocaleTimeString('pt-BR', { hour12: false });
+
+  // Adiciona no painel "todos"
+  const elTodos = document.getElementById('console-log-todos');
+  if (elTodos) {
+    const l = document.createElement('div');
+    l.className = `console-linha ${cls}`;
+    l.textContent = `[${ts}] ${msg}`;
+    elTodos.appendChild(l);
+    while (elTodos.children.length > 500) elTodos.removeChild(elTodos.firstChild);
+    if (_abaLogAtiva === 'todos') elTodos.scrollTop = elTodos.scrollHeight;
+  }
+
+  // Adiciona no painel do estado específico
+  if (estado) {
+    const elEstado = document.getElementById(`console-log-${estado}`);
+    if (elEstado) {
+      const l = document.createElement('div');
+      l.className = `console-linha ${cls}`;
+      l.textContent = `[${ts}] ${msg}`;
+      elEstado.appendChild(l);
+      while (elEstado.children.length > 300) elEstado.removeChild(elEstado.firstChild);
+      if (_abaLogAtiva === estado) elEstado.scrollTop = elEstado.scrollHeight;
+    }
+  }
 }
 
 function atualizarBadge(tipo, status) {

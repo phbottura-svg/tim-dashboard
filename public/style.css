@@ -510,6 +510,13 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
   margin-bottom: 6px;
 }
 .console-duplo .console { height: 280px; }
+.btn-log-aba {
+  font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 4px;
+  border: 1px solid var(--borda); background: transparent; color: var(--dim);
+  cursor: pointer; transition: all .15s;
+}
+.btn-log-aba:hover { background: var(--card); color: var(--texto); }
+.btn-log-aba.ativa { background: var(--azul-c); color: #fff; border-color: var(--azul-c); }
 @media (max-width: 900px) { .console-duplo { grid-template-columns: 1fr; } }
 .aviso-vps {
   background: #2a1a00;

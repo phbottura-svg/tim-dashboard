@@ -923,6 +923,14 @@ async function dispararFaturas() {
   } catch (e) { adicionarLog('Erro: ' + e.message, 'disparo-log'); }
 }
 
+async function limparRelatoriosDisparo() {
+  if (!confirm('Apagar todos os relatórios de disparo? Esta ação não pode ser desfeita.')) return;
+  try {
+    const r = await fetch('/api/relatorios-disparo', { method: 'DELETE' }).then(r => r.json());
+    if (r.ok) carregarRelatoriosDisparo();
+  } catch (e) { alert('Erro ao limpar: ' + e.message); }
+}
+
 async function carregarRelatoriosDisparo() {
   const lista = document.getElementById('rel-disparo-lista');
   try {

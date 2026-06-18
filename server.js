@@ -964,6 +964,15 @@ app.get('/api/relatorios-disparo', (req, res) => {
   res.json({ arquivos });
 });
 
+app.delete('/api/relatorios-disparo', (req, res) => {
+  try {
+    if (!fs.existsSync(RELATORIOS_DISPARO_PATH)) return res.json({ ok: true });
+    const arquivos = fs.readdirSync(RELATORIOS_DISPARO_PATH).filter(f => f.endsWith('.xlsx'));
+    arquivos.forEach(f => fs.unlinkSync(path.join(RELATORIOS_DISPARO_PATH, f)));
+    res.json({ ok: true, removidos: arquivos.length });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 app.get('/api/relatorios-disparo/download/:arquivo', (req, res) => {
   const arquivo = path.basename(req.params.arquivo);
   const filePath = path.join(RELATORIOS_DISPARO_PATH, arquivo);

@@ -598,6 +598,7 @@ async function carregarTabela() {
     if (thead) {
       const fCols = Array.from({length: maxF}, (_, i) => `<th>F${i+1}</th>`).join('');
       thead.innerHTML = `<tr>
+        <th>Ação</th>
         <th onclick="ordenar('nome')">Cliente ↕</th>
         <th onclick="ordenar('cpf')">CPF ↕</th>
         <th>Contato 1</th>
@@ -611,7 +612,6 @@ async function carregarTabela() {
         <th onclick="ordenar('status')">Status ↕</th>
         <th>Churn</th>
         ${fCols}
-        <th>Ação</th>
       </tr>`;
     }
     tabelaClientesAtual = d.dados;
@@ -625,6 +625,7 @@ async function carregarTabela() {
       }).join('');
       const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
       return `<tr id="tb-row-${idx}">
+        <td id="tb-acao-${idx}"><button class="btn-edit-os" onclick="editarClienteTabela(${idx})" title="Editar">✏️</button></td>
         <td id="tb-nome-${idx}">${c.nome || '<em class="dim">Sem match</em>'}</td>
         <td id="tb-cpf-${idx}" class="cpf-col">${c.cpf || '—'}</td>
         <td id="tb-c1-${idx}" class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
@@ -638,7 +639,6 @@ async function carregarTabela() {
         <td><span class="status-tag status-${(c.status||'SEM_DADOS').replace(' ','_')}">${STATUS_LABEL[c.status]||c.status||'—'}</span></td>
         <td>${c.churn ? '⚠️' : '—'}</td>
         ${fCells}
-        <td id="tb-acao-${idx}"><button class="btn-edit-os" onclick="editarClienteTabela(${idx})" title="Editar">✏️</button></td>
       </tr>`;
     }).join('');
     setText('tabela-info', `${d.total.toLocaleString('pt-BR')} clientes`);

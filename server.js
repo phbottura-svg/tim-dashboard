@@ -541,9 +541,9 @@ app.get('/api/clientes/exportar', (req, res) => {
     // Descobre max faturas
     const maxF = Math.max(0, ...lista.map(c => c.totalFaturas || 0));
     const fHeaders = Array.from({length: maxF}, (_, i) => [`F${i+1} Status`, `F${i+1} Vencimento`, `F${i+1} Pagamento`]).flat();
-    const headers = ['Cliente', 'CPF', 'OS', 'Vendedor', 'UF', 'Mês Gross', 'Total Faturas', 'Faturas Pagas', 'Status', 'Churn', ...fHeaders];
+    const headers = ['Cliente', 'CPF', 'Contato 1', 'Contato 2', 'CustCode', 'OS', 'Vendedor', 'UF', 'Mês Gross', 'Total Faturas', 'Faturas Pagas', 'Status', 'Churn', ...fHeaders];
     const linhas = lista.map(c => {
-      const base = [c.nome||'', c.cpf||'', c.os||'', c.vendedor||'', c.uf||'', c.mesGross||'', c.totalFaturas||0, c.faturasPagas||0, c.status||'', c.churn ? 'Sim' : 'Não'];
+      const base = [c.nome||'', c.cpf||'', c.contatoPrincipal||'', c.contatoResponsavel||'', c.custcode||'', c.os||'', c.vendedor||'', c.uf||'', c.mesGross||'', c.totalFaturas||0, c.faturasPagas||0, c.status||'', c.churn ? 'Sim' : 'Não'];
       const fCols = Array.from({length: maxF}, (_, i) => {
         const fat = (c.faturas||[]).find(f => f.numero === i+1);
         return fat ? [fat.status||'', fat.dataVencimento||'', fat.dataPagamento||''] : ['','',''];

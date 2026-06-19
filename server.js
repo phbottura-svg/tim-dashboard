@@ -318,15 +318,31 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
     clientes.forEach(c => { if (osSet.has(c.os)) osDups.push(c.os); else osSet.add(c.os); });
     if (osDups.length) warnings.push(`${osDups.length} OS duplicadas encontradas`);
 
-    salvarJSON(BASE_CLIENTES_PATH, clientes);
+    // Mescla com base existente por CPF — atualiza quem já existe, adiciona quem é novo
+    const baseExistente = lerJSON(BASE_CLIENTES_PATH, []);
+    const mapaExistente = {};
+    baseExistente.forEach(c => { if (c.cpf) mapaExistente[c.cpf] = c; });
+    let adicionados = 0, atualizados = 0;
+    clientes.forEach(novo => {
+      if (novo.cpf && mapaExistente[novo.cpf]) {
+        mapaExistente[novo.cpf] = { ...mapaExistente[novo.cpf], ...novo };
+        atualizados++;
+      } else {
+        mapaExistente[novo.cpf || novo.os] = novo;
+        adicionados++;
+      }
+    });
+    const clientesMesclados = Object.values(mapaExistente);
+
+    salvarJSON(BASE_CLIENTES_PATH, clientesMesclados);
     const meta = lerJSON(SONAR_META_PATH, {});
     if (!meta.clientes) meta.clientes = {};
-    meta.clientes.total = clientes.length;
+    meta.clientes.total = clientesMesclados.length;
     meta.clientes.importadoEm = new Date().toISOString();
     salvarJSON(SONAR_META_PATH, meta);
 
     const baseCruzada = cruzarBases();
-    res.json({ ok: true, total: clientes.length, cruzados: baseCruzada.filter(c => c.cruzado).length, warnings });
+    res.json({ ok: true, total: clientesMesclados.length, adicionados, atualizados, cruzados: baseCruzada.filter(c => c.cruzado).length, warnings });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }

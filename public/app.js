@@ -611,9 +611,11 @@ async function carregarTabela() {
         <th onclick="ordenar('status')">Status ↕</th>
         <th>Churn</th>
         ${fCols}
+        <th>Ação</th>
       </tr>`;
     }
-    tbody.innerHTML = d.dados.map(c => {
+    tabelaClientesAtual = d.dados;
+    tbody.innerHTML = d.dados.map((c, idx) => {
       const fCells = Array.from({length: maxF}, (_, i) => {
         const fat = (c.faturas || []).find(f => f.numero === i + 1);
         if (!fat) return '<td class="dim">—</td>';
@@ -622,13 +624,13 @@ async function carregarTabela() {
         return `<td><span class="status-tag ${cls}" title="${label}">${fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—'} ${fat.dataVencimento || ''}</span></td>`;
       }).join('');
       const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
-      return `<tr>
-        <td>${c.nome || '<em class="dim">Sem match</em>'}</td>
-        <td class="cpf-col">${c.cpf || '—'}</td>
-        <td class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
-        <td class="tel-col">${fmtTel(c.contatoResponsavel)}</td>
+      return `<tr id="tb-row-${idx}">
+        <td id="tb-nome-${idx}">${c.nome || '<em class="dim">Sem match</em>'}</td>
+        <td id="tb-cpf-${idx}" class="cpf-col">${c.cpf || '—'}</td>
+        <td id="tb-c1-${idx}" class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
+        <td id="tb-c2-${idx}" class="tel-col">${fmtTel(c.contatoResponsavel)}</td>
         <td class="custcode-col">${c.custcode || '—'}</td>
-        <td class="os-col">${c.os || '—'}</td>
+        <td id="tb-os-${idx}" class="os-col">${c.os || '—'}</td>
         <td>${c.vendedor || '—'}</td>
         <td>${c.uf || '—'}</td>
         <td>${c.mesGross || '—'}</td>
@@ -636,6 +638,7 @@ async function carregarTabela() {
         <td><span class="status-tag status-${(c.status||'SEM_DADOS').replace(' ','_')}">${STATUS_LABEL[c.status]||c.status||'—'}</span></td>
         <td>${c.churn ? '⚠️' : '—'}</td>
         ${fCells}
+        <td id="tb-acao-${idx}"><button class="btn-edit-os" onclick="editarClienteTabela(${idx})" title="Editar">✏️</button></td>
       </tr>`;
     }).join('');
     setText('tabela-info', `${d.total.toLocaleString('pt-BR')} clientes`);
@@ -694,6 +697,7 @@ function renderPag(elId, pagAtual, totalPag, onPag) {
 // ─── Aba Ajustes ──────────────────────────────────────────────────────────────
 
 let ajusteClientesAtual = [];
+let tabelaClientesAtual = [];
 
 async function carregarAjustes() {
   const mesSel = document.getElementById('ajustes-filtro-mes')?.value || '';
@@ -803,6 +807,43 @@ async function salvarCliente(idx) {
     const acao = document.getElementById(`aj-acao-${idx}`);
     if (acao) acao.innerHTML = `<span class="${d.cruzado ? 'ajuste-corrigido' : 'ajuste-pendente'}">${d.cruzado ? '✅ Cruzado' : '✅ Salvo'}</span>`;
     await carregarStatusImportacao();
+  } catch (err) { alert('Erro: ' + err.message); }
+}
+
+function editarClienteTabela(idx) {
+  const c = tabelaClientesAtual[idx];
+  const fmtTelInput = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '';
+  document.getElementById(`tb-nome-${idx}`).innerHTML = `<input class="input-inline" id="tei-nome-${idx}" value="${(c.nome||'').replace(/"/g,'&quot;')}" placeholder="Nome">`;
+  document.getElementById(`tb-cpf-${idx}`).innerHTML  = `<input class="input-inline" id="tei-cpf-${idx}"  value="${(c.cpf||'').replace(/"/g,'&quot;')}" placeholder="CPF">`;
+  document.getElementById(`tb-c1-${idx}`).innerHTML   = `<input class="input-inline" id="tei-c1-${idx}"   value="${fmtTelInput(c.contatoPrincipal)}" placeholder="(41) 99999-0000">`;
+  document.getElementById(`tb-c2-${idx}`).innerHTML   = `<input class="input-inline" id="tei-c2-${idx}"   value="${fmtTelInput(c.contatoResponsavel)}" placeholder="(41) 99999-0000">`;
+  document.getElementById(`tb-os-${idx}`).innerHTML   = `<input class="input-inline" id="tei-os-${idx}"   value="${(c.os||'').replace(/"/g,'&quot;')}" placeholder="OS">`;
+  document.getElementById(`tb-acao-${idx}`).innerHTML = `
+    <button class="btn btn-primary btn-sm" onclick="salvarClienteTabela(${idx})" title="Salvar">✅</button>
+    <button class="btn btn-secondary btn-sm" onclick="carregarTabela()" title="Cancelar">✖</button>
+  `;
+  document.getElementById(`tei-nome-${idx}`)?.focus();
+}
+
+async function salvarClienteTabela(idx) {
+  const c = tabelaClientesAtual[idx];
+  const val = id => document.getElementById(id)?.value?.trim() || '';
+  const payload = {
+    osAtual: c.os,
+    nome: val(`tei-nome-${idx}`),
+    cpf: val(`tei-cpf-${idx}`),
+    contatoPrincipal: val(`tei-c1-${idx}`),
+    contatoResponsavel: val(`tei-c2-${idx}`),
+    mesGross: c.mesGross,
+  };
+  try {
+    const d = await fetch('/api/ajustes/corrigir-cliente', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then(r => r.json());
+    if (d.erro) { alert('Erro: ' + d.erro); return; }
+    await carregarTabela();
   } catch (err) { alert('Erro: ' + err.message); }
 }
 

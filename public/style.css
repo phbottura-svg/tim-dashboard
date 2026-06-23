@@ -333,6 +333,9 @@ header h1 { font-size: 18px; font-weight: 800; color: var(--azul-c); letter-spac
 }
 .filtro-toggle:hover { border-color: var(--azul); }
 .filtro-toggle input[type=checkbox] { accent-color: var(--azul); cursor: pointer; }
+.filtro-acionaveis { border-color: var(--amarelo) !important; color: var(--amarelo); }
+.filtro-acionaveis:hover { border-color: var(--amarelo) !important; }
+.filtro-acionaveis input[type=checkbox] { accent-color: var(--amarelo); }
 .tabela-controles-faturas { border-top: none; background: rgba(255,255,255,0.02); }
 .filtro-label-faturas { font-size: 11px; color: var(--texto-sec); white-space: nowrap; margin-right: 4px; }
 .busca-input {

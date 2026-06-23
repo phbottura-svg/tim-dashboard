@@ -881,15 +881,12 @@ app.get('/api/gerar-fila-dados', (req, res) => {
         (c.os || '').includes(b)
       );
     }
-    lista = lista.filter(c => c.os && c.nome);
+    lista = lista.filter(c => c.os && c.nome && c.custcode);
     const clientes = lista.map(c => ({
-      vendedor: c.vendedor || '',
       nome: c.nome || '',
       cpf: c.cpf || '',
-      contatoPrincipal: c.contatoPrincipal || '',
-      contatoResponsavel: c.contatoResponsavel || '',
-      os: c.os || '',
-      mesGross: c.mesGross || c.mesGrossManual || '',
+      custcode: c.custcode || '',
+      contato: c.contatoPrincipal || '',
     }));
     res.json({ total: clientes.length, clientes });
   } catch (err) { res.status(500).json({ erro: err.message }); }
@@ -900,8 +897,9 @@ app.post('/api/receber-fila', apenasLocal, (req, res) => {
   try {
     const { clientes } = req.body;
     if (!Array.isArray(clientes)) return res.status(400).json({ erro: 'clientes inválido' });
-    const headers = ['Vendedor', 'Cliente', 'CPF', 'Contato Principal WhatsApp', 'Contato Responsável', 'Número Ordem/OS', 'Mês Gross'];
-    const linhas = clientes.map(c => [c.vendedor, c.nome, c.cpf, c.contatoPrincipal, c.contatoResponsavel, c.os, c.mesGross]);
+    // Formato que o robo-estado.js espera: col0=Nome, col1=CPF, col2=Custcode, col3=Contato
+    const headers = ['Nome', 'CPF', 'Custcode', 'Contato'];
+    const linhas = clientes.map(c => [c.nome, c.cpf, c.custcode, c.contato]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Base Clientes');
     const destino = path.join(PLAYWRIGHT_PATH, 'clientes.xlsx');
@@ -924,19 +922,16 @@ app.post('/api/gerar-fila-robo', apenasLocal, (req, res) => {
         (c.os || '').includes(b)
       );
     }
-    // Remove sem match (sem OS não servem para o robô)
-    lista = lista.filter(c => c.os && c.nome);
+    // Remove sem custcode/nome (sem esses dados o robô não consegue processar)
+    lista = lista.filter(c => c.custcode && c.nome);
 
-    // Gera Excel no formato do modelo (mesmo que a planilha de entrada do robô)
-    const headers = ['Vendedor', 'Cliente', 'CPF', 'Contato Principal WhatsApp', 'Contato Responsável', 'Número Ordem/OS', 'Mês Gross'];
+    // Formato que o robo-estado.js espera: col0=Nome, col1=CPF, col2=Custcode, col3=Contato
+    const headers = ['Nome', 'CPF', 'Custcode', 'Contato'];
     const linhas = lista.map(c => [
-      c.vendedor || '',
       c.nome || '',
       c.cpf || '',
+      c.custcode || '',
       c.contatoPrincipal || '',
-      c.contatoResponsavel || '',
-      c.os || '',
-      c.mesGross || c.mesGrossManual || '',
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Base Clientes');

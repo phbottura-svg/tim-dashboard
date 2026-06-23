@@ -55,6 +55,13 @@ async function aplicarModoVps() {
       document.querySelectorAll('.apenas-local').forEach(el => el.style.display = 'none');
       const aviso = document.getElementById('aviso-vps');
       if (aviso) aviso.style.display = '';
+    } else {
+      // Modo local: remove abas Dashboard, Faturas e Ajustes — só Comandos
+      ['dashboard', 'faturas', 'ajustes'].forEach(aba => {
+        document.querySelector(`.nav-btn[data-tab="${aba}"]`)?.remove();
+        document.getElementById(`tab-${aba}`)?.remove();
+      });
+      mudarAbaBtn('comandos');
     }
   } catch {}
 }

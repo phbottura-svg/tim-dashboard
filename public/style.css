@@ -628,7 +628,8 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
 }
 .robo-card.rodando { border-color: var(--verde); background: rgba(0,200,83,0.06); }
 
-.robo-estado-label { font-size: 15px; font-weight: 700; color: var(--texto); margin-bottom: 6px; }
+.robo-estado-label { font-size: 15px; font-weight: 700; color: var(--texto); margin-bottom: 2px; }
+.robo-user-code { font-size: 11px; font-family: 'Consolas', monospace; color: var(--dim); margin-bottom: 6px; }
 
 .robo-badge {
   font-size: 11px;

@@ -851,6 +851,47 @@ app.post('/api/ajustes/concluir', (req, res) => {
 
 app.get('/api/modo', (req, res) => res.json({ modo: MODO }));
 
+// ─── Gerar fila do robô a partir dos filtros atuais ──────────────────────────
+
+app.post('/api/gerar-fila-robo', apenasLocal, (req, res) => {
+  try {
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    let lista = aplicarFiltros(todos, req.body || {});
+    if (req.body?.busca) {
+      const b = req.body.busca.toLowerCase();
+      lista = lista.filter(c =>
+        (c.nome || '').toLowerCase().includes(b) ||
+        (c.cpf || '').includes(b) ||
+        (c.os || '').includes(b)
+      );
+    }
+    // Remove sem match (sem OS não servem para o robô)
+    lista = lista.filter(c => c.os && c.nome);
+
+    // Gera Excel no formato do modelo (mesmo que a planilha de entrada do robô)
+    const headers = ['Vendedor', 'Cliente', 'CPF', 'Contato Principal WhatsApp', 'Contato Responsável', 'Número Ordem/OS', 'Mês Gross'];
+    const linhas = lista.map(c => [
+      c.vendedor || '',
+      c.nome || '',
+      c.cpf || '',
+      c.contatoPrincipal || '',
+      c.contatoResponsavel || '',
+      c.os || '',
+      c.mesGross || c.mesGrossManual || '',
+    ]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Base Clientes');
+    const destino = path.join(PLAYWRIGHT_PATH, 'clientes.xlsx');
+    XLSX.writeFile(wb, destino);
+
+    // Reseta fila para que o robô recomece do zero
+    const filaPath = path.join(PLAYWRIGHT_PATH, 'fila_clientes.json');
+    try { fs.unlinkSync(filaPath); } catch {}
+
+    res.json({ ok: true, total: lista.length, arquivo: destino });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // ─── Status da Fila do Robô ───────────────────────────────────────────────────
 
 app.get('/api/fila-status', apenasLocal, (req, res) => {

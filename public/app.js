@@ -50,6 +50,34 @@ function iniciarScrollTop() {
   wrapper.addEventListener('scroll', () => { if (!sync) { sync = true; scrollTop.scrollLeft = wrapper.scrollLeft; sync = false; } });
 }
 
+async function gerarFilaRobo() {
+  const btn = document.getElementById('btn-fila-robo');
+  const p = coletarFiltros();
+  const busca = document.getElementById('busca-tabela')?.value;
+  if (busca) p.set('busca', busca);
+  const params = Object.fromEntries(p.entries());
+
+  if (!confirm(`Gerar fila do robô com os filtros atuais?\n\nIsso vai sobrescrever o clientes.xlsx na pasta do robô e resetar a fila.`)) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Gerando...';
+  try {
+    const d = await fetch('/api/gerar-fila-robo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    }).then(r => r.json());
+    if (d.erro) { alert('Erro: ' + d.erro); return; }
+    alert(`✅ Fila gerada com ${d.total} clientes!\n\nO robô usará essa base na próxima execução.`);
+    atualizarFilaStatus();
+  } catch (err) {
+    alert('Erro: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🤖 Usar como fila do robô';
+  }
+}
+
 async function atualizarFilaStatus() {
   try {
     const d = await fetch('/api/fila-status').then(r => r.json());
@@ -75,6 +103,9 @@ async function aplicarModoVps() {
         document.querySelector(`.nav-btn[data-tab="${aba}"]`)?.remove();
         document.getElementById(`tab-${aba}`)?.remove();
       });
+      // Mostra botão "Usar como fila do robô" só no localhost
+      const btnFila = document.getElementById('btn-fila-robo');
+      if (btnFila) btnFila.style.display = '';
       mudarAbaBtn('comandos');
     }
   } catch {}

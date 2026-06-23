@@ -52,9 +52,24 @@ function iniciarScrollTop() {
 
 async function enviarFilaParaRobo() {
   const btn = document.getElementById('btn-enviar-robo');
+  // Coleta os mesmos filtros que a tabela usa
   const p = coletarFiltros();
   const busca = document.getElementById('busca-tabela')?.value;
   if (busca) p.set('busca', busca);
+  const statusTabela = document.getElementById('tabela-filtro-status')?.value;
+  if (statusTabela) p.set('statusTabela', statusTabela);
+  const ufTabela = document.getElementById('tabela-filtro-uf')?.value;
+  if (ufTabela) p.set('uf', ufTabela);
+  const safra = document.getElementById('tabela-filtro-safra')?.value;
+  if (safra) p.set('safra', safra);
+  const vencimento = document.getElementById('tabela-filtro-vencimento')?.value;
+  if (vencimento) p.set('dataVencimento', vencimento);
+  if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
+  if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
+  for (let n = 1; n <= 5; n++) {
+    const v = document.getElementById(`tf-f${n}`)?.value;
+    if (v) p.set(`f${n}`, v);
+  }
 
   if (!confirm(`Gerar base do robô com os filtros atuais?\n\nIsso vai sobrescrever o clientes.xlsx no localhost e resetar a fila.`)) return;
 

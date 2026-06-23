@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await carregarStatusImportacao();
   await carregarOpcoesFiltros();
   await carregarTudo();
+  atualizarFilaStatus();
+  setInterval(atualizarFilaStatus, 10000);
 });
 
 function iniciarScrollTop() {
@@ -46,6 +48,18 @@ function iniciarScrollTop() {
   let sync = false;
   scrollTop.addEventListener('scroll', () => { if (!sync) { sync = true; wrapper.scrollLeft = scrollTop.scrollLeft; sync = false; } });
   wrapper.addEventListener('scroll', () => { if (!sync) { sync = true; scrollTop.scrollLeft = wrapper.scrollLeft; sync = false; } });
+}
+
+async function atualizarFilaStatus() {
+  try {
+    const d = await fetch('/api/fila-status').then(r => r.json());
+    if (d.erro) return;
+    const box = document.getElementById('fila-status-box');
+    if (box) box.style.display = '';
+    setText('fila-total', d.total);
+    setText('fila-processados', d.processados);
+    setText('fila-pendentes', d.pendentes);
+  } catch {}
 }
 
 async function aplicarModoVps() {

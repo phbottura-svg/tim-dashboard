@@ -851,6 +851,26 @@ app.post('/api/ajustes/concluir', (req, res) => {
 
 app.get('/api/modo', (req, res) => res.json({ modo: MODO }));
 
+// ─── Status da Fila do Robô ───────────────────────────────────────────────────
+
+app.get('/api/fila-status', apenasLocal, (req, res) => {
+  try {
+    const filaPath = path.join(PLAYWRIGHT_PATH, 'fila_clientes.json');
+    const excelPath = path.join(PLAYWRIGHT_PATH, process.env.ARQUIVO_CLIENTES || 'clientes.xlsx');
+    const fila = lerJSON(filaPath, { proximoIndice: 0 });
+    let total = 0;
+    if (fs.existsSync(excelPath)) {
+      const wb = XLSX.readFile(excelPath);
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+      total = rows.slice(1).filter(r => String(r[1] || '').trim()).length;
+    }
+    const processados = Math.min(fila.proximoIndice || 0, total);
+    const pendentes = Math.max(0, total - processados);
+    res.json({ total, processados, pendentes });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 function apenasLocal(req, res, next) {
   if (MODO === 'vps') return res.status(403).json({ erro: 'Disponível apenas localmente. No VPS, o robô SGR roda no PC com Chrome.' });
   next();

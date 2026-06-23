@@ -48,7 +48,8 @@ const stripAnsi = s => s.replace(/\x1B\[[0-9;]*[mGKHF]/g, '');
 let processoRobo = null;
 let processoDisparo = null;
 let sseClients = [];
-const processoEstado = { PR: null, SC: null, RS: null };
+const processoEstado = { PR: null, SC: null, RS: null, PR2: null, SC2: null, RS2: null };
+const ESTADOS_VALIDOS = ['PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'];
 
 // ─── JSON helpers ─────────────────────────────────────────────────────────────
 
@@ -361,7 +362,7 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
 
 app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
   const estado = (req.query.estado || '').toUpperCase();
-  if (!['PR', 'SC', 'RS'].includes(estado)) return res.status(400).json({ erro: 'Estado inválido. Use PR, SC ou RS' });
+  if (!ESTADOS_VALIDOS.includes(estado)) return res.status(400).json({ erro: 'Estado inválido. Use PR, SC ou RS' });
   if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
   try {
     const mime = req.file.mimetype || '';
@@ -978,7 +979,7 @@ app.get('/api/status-robo', (req, res) => {
 
 app.get('/api/status-robos', (req, res) => {
   const status = {};
-  ['PR', 'SC', 'RS'].forEach(e => { status[e] = processoEstado[e] ? 'rodando' : 'parado'; });
+  ESTADOS_VALIDOS.forEach(e => { status[e] = processoEstado[e] ? 'rodando' : 'parado'; });
   res.json({ estados: status, robo: processoRobo ? 'rodando' : 'parado', disparo: processoDisparo ? 'rodando' : 'parado' });
 });
 
@@ -1012,7 +1013,7 @@ app.post('/api/comando/token-fornecer', apenasLocal, (req, res) => {
 
 app.post('/api/comando/robo-estado', apenasLocal, (req, res) => {
   const { estado } = req.body;
-  if (!estado || !['PR', 'SC', 'RS'].includes(estado)) return res.status(400).json({ erro: 'Estado inválido' });
+  if (!estado || !ESTADOS_VALIDOS.includes(estado)) return res.status(400).json({ erro: 'Estado inválido' });
   if (processoEstado[estado]) return res.status(400).json({ erro: `Robô ${estado} já está rodando` });
 
   emitirEvento('robo-estado', { msg: `🤖 Iniciando Robô ${estado}...`, estado, status: 'rodando' });
@@ -1050,7 +1051,7 @@ app.post('/api/comando/robo-estado-parar', apenasLocal, (req, res) => {
 app.get('/api/relatorio-parcial', (req, res) => {
   try {
     const resultados = [];
-    for (const est of ['PR', 'SC', 'RS']) {
+    for (const est of ESTADOS_VALIDOS) {
       const arq = path.join(PLAYWRIGHT_PATH, `progresso_${est}.json`);
       if (fs.existsSync(arq)) {
         try {

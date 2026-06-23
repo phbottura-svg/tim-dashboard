@@ -205,7 +205,7 @@ let _abaLogAtiva = 'todos';
 
 function trocarAbaLog(aba) {
   _abaLogAtiva = aba;
-  ['todos', 'PR', 'SC', 'RS'].forEach(a => {
+  ['todos', 'PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'].forEach(a => {
     const painel = document.getElementById(`console-log-${a}`);
     const btn = document.getElementById(`aba-log-${a}`);
     if (painel) painel.style.display = a === aba ? '' : 'none';
@@ -230,7 +230,7 @@ function adicionarLog(msg, tipo = 'info') {
   }
 
   // Detecta estado da mensagem ([PR], [SC], [RS])
-  const estadoMatch = msg.match(/\[(PR|SC|RS)\]/);
+  const estadoMatch = msg.match(/\[(PR2?|SC2?|RS2?)\]/);
   const estado = estadoMatch ? estadoMatch[1] : null;
 
   const cls = tipo?.includes('erro') ? 'console-erro'
@@ -435,7 +435,7 @@ async function carregarStatusImportacao() {
     }
 
     // Status Sonar por estado
-    ['PR', 'SC', 'RS'].forEach(est => {
+    ['PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'].forEach(est => {
       const el = document.getElementById(`status-sonar-${est}`);
       if (el) {
         const s = d.sonar[est];
@@ -1036,7 +1036,7 @@ async function verificarStatusRobo() {
     const d = await fetch('/api/status-robos').then(r => r.json());
     atualizarBadge('robo', d.robo);
     atualizarBadge('disparo', d.disparo);
-    if (d.estados) ['PR', 'SC', 'RS'].forEach(e => atualizarCardEstado(e, d.estados[e]));
+    if (d.estados) ['PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'].forEach(e => atualizarCardEstado(e, d.estados[e]));
   } catch {}
 }
 

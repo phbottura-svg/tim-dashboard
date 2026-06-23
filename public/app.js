@@ -152,6 +152,8 @@ async function aplicarModoVps() {
         document.querySelector(`.nav-btn[data-tab="${aba}"]`)?.remove();
         document.getElementById(`tab-${aba}`)?.remove();
       });
+      // Esconde elementos exclusivos do VPS
+      document.querySelectorAll('.apenas-vps').forEach(el => el.style.display = 'none');
       // Mostra botão "Usar como fila do robô" só no localhost
       const btnFila = document.getElementById('btn-fila-robo');
       if (btnFila) btnFila.style.display = '';

@@ -50,6 +50,40 @@ function iniciarScrollTop() {
   wrapper.addEventListener('scroll', () => { if (!sync) { sync = true; scrollTop.scrollLeft = wrapper.scrollLeft; sync = false; } });
 }
 
+async function enviarFilaParaRobo() {
+  const btn = document.getElementById('btn-enviar-robo');
+  const p = coletarFiltros();
+  const busca = document.getElementById('busca-tabela')?.value;
+  if (busca) p.set('busca', busca);
+
+  if (!confirm(`Gerar base do robô com os filtros atuais?\n\nIsso vai sobrescrever o clientes.xlsx no localhost e resetar a fila.`)) return;
+
+  btn.disabled = true;
+  btn.textContent = '⏳ Buscando clientes...';
+  try {
+    // 1. Busca clientes filtrados do VPS
+    const d = await fetch('/api/gerar-fila-dados?' + p).then(r => r.json());
+    if (d.erro) { alert('Erro: ' + d.erro); return; }
+
+    btn.textContent = '⏳ Enviando para robô...';
+
+    // 2. Envia para o localhost salvar como clientes.xlsx
+    const r = await fetch('http://localhost:3000/api/receber-fila', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientes: d.clientes }),
+    }).then(r => r.json()).catch(() => ({ erro: 'Localhost não respondeu. Verifique se o iniciar.bat está aberto.' }));
+
+    if (r.erro) { alert('❌ ' + r.erro); return; }
+    alert(`✅ Base gerada com ${r.total} clientes!\n\nO robô já pode ser iniciado.`);
+  } catch (err) {
+    alert('Erro: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 Gerar Base Robô';
+  }
+}
+
 async function gerarFilaRobo() {
   const btn = document.getElementById('btn-fila-robo');
   const p = coletarFiltros();

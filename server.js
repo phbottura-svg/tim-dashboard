@@ -31,8 +31,17 @@ const AJUSTES_META_PATH = path.join(DATA_PATH, 'ajustes-meta.json');
 
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
 
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
+
+// CORS para o localhost aceitar chamadas do browser vindo do VPS
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
+  next();
+});
 
 const stripAnsi = s => s.replace(/\x1B\[[0-9;]*[mGKHF]/g, '');
 
@@ -852,6 +861,50 @@ app.post('/api/ajustes/concluir', (req, res) => {
 app.get('/api/modo', (req, res) => res.json({ modo: MODO }));
 
 // ─── Gerar fila do robô a partir dos filtros atuais ──────────────────────────
+
+// Retorna os clientes filtrados como JSON (chamado pelo VPS, usado pelo browser)
+app.get('/api/gerar-fila-dados', (req, res) => {
+  try {
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    let lista = aplicarFiltros(todos, req.query);
+    if (req.query.busca) {
+      const b = req.query.busca.toLowerCase();
+      lista = lista.filter(c =>
+        (c.nome || '').toLowerCase().includes(b) ||
+        (c.cpf || '').includes(b) ||
+        (c.os || '').includes(b)
+      );
+    }
+    lista = lista.filter(c => c.os && c.nome);
+    const clientes = lista.map(c => ({
+      vendedor: c.vendedor || '',
+      nome: c.nome || '',
+      cpf: c.cpf || '',
+      contatoPrincipal: c.contatoPrincipal || '',
+      contatoResponsavel: c.contatoResponsavel || '',
+      os: c.os || '',
+      mesGross: c.mesGross || c.mesGrossManual || '',
+    }));
+    res.json({ total: clientes.length, clientes });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Recebe clientes do browser (vindos do VPS), gera clientes.xlsx e reseta fila
+app.post('/api/receber-fila', apenasLocal, (req, res) => {
+  try {
+    const { clientes } = req.body;
+    if (!Array.isArray(clientes)) return res.status(400).json({ erro: 'clientes inválido' });
+    const headers = ['Vendedor', 'Cliente', 'CPF', 'Contato Principal WhatsApp', 'Contato Responsável', 'Número Ordem/OS', 'Mês Gross'];
+    const linhas = clientes.map(c => [c.vendedor, c.nome, c.cpf, c.contatoPrincipal, c.contatoResponsavel, c.os, c.mesGross]);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Base Clientes');
+    const destino = path.join(PLAYWRIGHT_PATH, 'clientes.xlsx');
+    XLSX.writeFile(wb, destino);
+    const filaPath = path.join(PLAYWRIGHT_PATH, 'fila_clientes.json');
+    try { fs.unlinkSync(filaPath); } catch {}
+    res.json({ ok: true, total: clientes.length });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
 
 app.post('/api/gerar-fila-robo', apenasLocal, (req, res) => {
   try {

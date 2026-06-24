@@ -1095,6 +1095,26 @@ async function atualizarInfoRelatorio() {
         + (fatStr ? `<br>📊 ${fatStr}` : '');
       info.style.color = pendMsg > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }
+
+    // Barra de progresso estática
+    const barraWrap = document.getElementById('disparo-barra-static-wrap');
+    const barraFill = document.getElementById('disparo-barra-fill');
+    const barraPct  = document.getElementById('disparo-barra-pct');
+    const barraLbl  = document.getElementById('disparo-barra-label');
+    const barraSub  = document.getElementById('disparo-barra-sub');
+    if (barraWrap && totalMsg > 0) {
+      const base = forcar ? totalMsg : totalMsg;
+      const enviados = forcar ? 0 : dispMsg;
+      const pct = Math.round((enviados / totalMsg) * 100);
+      barraWrap.style.display = 'block';
+      barraFill.style.width = pct + '%';
+      barraPct.textContent = pct + '%';
+      barraLbl.textContent = 'Progresso do disparo';
+      barraSub.textContent = `${enviados} / ${totalMsg} msgs disparadas · ${pendMsg} pendentes${hojeMsg > 0 ? ` · +${hojeMsg} hoje` : ''}`;
+    } else if (barraWrap) {
+      barraWrap.style.display = 'none';
+    }
+
     calcularTempoDisparo(pendMsg);
   } catch (e) { if (info) info.textContent = 'Erro ao ler relatório: ' + e.message; }
 }

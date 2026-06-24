@@ -1087,7 +1087,7 @@ async function atualizarInfoRelatorio() {
     ].filter(Boolean).join(' · ');
 
     const totalMsg = d.totalDisparos || 0;
-    const dispMsg = forcar ? totalMsg : (d.disparadosMsg || 0);
+    const dispMsg = d.disparadosMsg || 0;
     if (info) {
       info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${dispMsg} / ${totalMsg} msgs disparadas · ⏳ ${pendMsg} pendentes`
         + (fatStr ? `<br>📊 ${fatStr}` : '');

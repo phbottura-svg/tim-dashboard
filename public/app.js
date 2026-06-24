@@ -1071,11 +1071,12 @@ async function atualizarInfoRelatorio() {
     const d = await fetch(`/api/relatorios/info/${encodeURIComponent(arquivo)}`).then(r => r.json());
     if (d.erro) { if (info) info.textContent = d.erro; return; }
     const pend = d.pendentes != null ? d.pendentes : d.total;
+    const pendMsg = (d.totalDisparos || 0) - (d.disparadosMsg || 0);
     if (info) {
-      info.textContent = `📋 ${d.total} cliente(s) · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes`;
+      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${d.totalDisparos || 0} disparos · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes (${pendMsg} msgs)`;
       info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }
-    calcularTempoDisparo(pend);
+    calcularTempoDisparo(pendMsg);
   } catch (e) { if (info) info.textContent = 'Erro ao ler relatório: ' + e.message; }
 }
 

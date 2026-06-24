@@ -1105,9 +1105,17 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     const wb = XLSX.readFile(filePath);
     const ws = wb.Sheets[wb.SheetNames[0]];
     const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
-    const statusOk = new Set(['Sucesso', 'Sucesso (2ª tentativa)']);
+    const statusOk = new Set(['Sucesso', 'Sucesso (2ª tentativa)', 'Sucesso (3ª tentativa)']);
     const sucesso = rows.filter(r => statusOk.has(String(r.Status || '').trim()));
-    const total = sucesso.length;
+    const totalClientes = sucesso.length;
+
+    // Conta total de disparos reais (1 por PDF/fatura)
+    let totalDisparos = 0;
+    for (const r of sucesso) {
+      const pdfs = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
+      totalDisparos += pdfs.length;
+    }
+
     const jaEnviadosPdfs = new Set();
     if (fs.existsSync(DISPARO_LOG_PATH)) {
       for (const f of fs.readdirSync(DISPARO_LOG_PATH).filter(f => f.endsWith('.json'))) {
@@ -1120,11 +1128,12 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
       }
     }
     let disparados = 0;
+    let disparadosMsg = 0;
     for (const r of sucesso) {
       const numeros = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
-      if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) disparados++;
+      if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) { disparados++; disparadosMsg += numeros.length; }
     }
-    res.json({ total, disparados, pendentes: total - disparados, linhas: rows.length });
+    res.json({ total: totalClientes, totalDisparos, disparados, disparadosMsg, pendentes: totalClientes - disparados, linhas: rows.length });
   } catch (e) { res.status(500).json({ erro: e.message }); }
 });
 

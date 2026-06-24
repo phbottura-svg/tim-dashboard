@@ -49,6 +49,8 @@ function restaurarEstadoDisparo() {
   }
   const inicio = localStorage.getItem('disparo-inicio');
   if (inicio) _progressoInicio = parseInt(inicio);
+  // Log para debug
+  console.log('[restaurar] disparo-forcar =', localStorage.getItem('disparo-forcar'), '→ checked =', document.getElementById('disparo-forcar')?.checked);
 }
 
 function salvarEstadoDisparo() {

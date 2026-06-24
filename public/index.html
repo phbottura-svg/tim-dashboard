@@ -455,7 +455,7 @@
           <span class="disparo-limite-tag">seg pausa</span>
         </div>
         <label class="filtro-toggle" style="border-color:var(--vermelho); color:var(--vermelho)" title="Reenvia mesmo para quem já recebeu">
-          <input type="checkbox" id="disparo-forcar" style="accent-color:var(--vermelho)" onchange="atualizarInfoRelatorio()"> Reenviar já disparados
+          <input type="checkbox" id="disparo-forcar" style="accent-color:var(--vermelho)" onchange="salvarEstadoDisparo(); atualizarInfoRelatorio()"> Reenviar já disparados
         </label>
         <button class="btn btn-primary" id="btn-disparar" onclick="dispararFaturas()">📤 Disparar WhatsApp</button>
         <button class="btn btn-danger" id="btn-parar-disparo" onclick="pararDisparo()" style="display:none">⏹ Parar Disparo</button>

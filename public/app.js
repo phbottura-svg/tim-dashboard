@@ -1070,8 +1070,9 @@ async function atualizarInfoRelatorio() {
   try {
     const d = await fetch(`/api/relatorios/info/${encodeURIComponent(arquivo)}`).then(r => r.json());
     if (d.erro) { if (info) info.textContent = d.erro; return; }
-    const pend = d.pendentes != null ? d.pendentes : d.total;
-    const pendMsg = (d.totalDisparos || 0) - (d.disparadosMsg || 0);
+    const forcar = document.getElementById('disparo-forcar')?.checked || false;
+    const pend = forcar ? d.total : (d.pendentes != null ? d.pendentes : d.total);
+    const pendMsg = forcar ? (d.totalDisparos || 0) : ((d.totalDisparos || 0) - (d.disparadosMsg || 0));
     if (info) {
       info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${d.totalDisparos || 0} disparos · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes (${pendMsg} msgs)`;
       info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';

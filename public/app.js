@@ -23,6 +23,7 @@ const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS':
 document.addEventListener('DOMContentLoaded', async () => {
   await aplicarModoVps();
   iniciarScrollTop();
+  restaurarEstadoDisparo();
   conectarSSE();
   verificarStatusRobo();
   setInterval(verificarStatusRobo, 5000);
@@ -32,6 +33,25 @@ document.addEventListener('DOMContentLoaded', async () => {
   atualizarFilaStatus();
   setInterval(atualizarFilaStatus, 10000);
   carregarHistoricoRobos();
+});
+
+function restaurarEstadoDisparo() {
+  const forcar = localStorage.getItem('disparo-forcar') === 'true';
+  const el = document.getElementById('disparo-forcar');
+  if (el) el.checked = forcar;
+
+  const inicio = localStorage.getItem('disparo-inicio');
+  if (inicio) _progressoInicio = parseInt(inicio);
+}
+
+function salvarEstadoDisparo() {
+  const forcar = document.getElementById('disparo-forcar')?.checked || false;
+  localStorage.setItem('disparo-forcar', forcar);
+}
+
+// Persiste estado do checkbox ao mudar
+document.addEventListener('change', e => {
+  if (e.target?.id === 'disparo-forcar') salvarEstadoDisparo();
 });
 
 function iniciarScrollTop() {
@@ -1151,7 +1171,10 @@ function atualizarProgresso(atual, total) {
   if (!wrap) return;
   wrap.style.display = 'block';
 
-  if (!_progressoInicio && atual > 0) _progressoInicio = Date.now();
+  if (!_progressoInicio && atual > 0) {
+    _progressoInicio = Date.now();
+    localStorage.setItem('disparo-inicio', _progressoInicio);
+  }
   _progressoUltimoAtual = atual;
 
   const p = total > 0 ? Math.round((atual / total) * 100) : 0;
@@ -1188,6 +1211,8 @@ function atualizarBotoesDisparo(rodando) {
   } else if (!rodando && _autoRefreshBarraInterval) {
     clearInterval(_autoRefreshBarraInterval);
     _autoRefreshBarraInterval = null;
+    _progressoInicio = null;
+    localStorage.removeItem('disparo-inicio');
     atualizarInfoRelatorio(); // atualiza uma última vez ao parar
   }
 }

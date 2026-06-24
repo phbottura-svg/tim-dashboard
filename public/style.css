@@ -508,7 +508,9 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
   grid-template-columns: 1fr 1fr;
   gap: 14px;
 }
-.console-painel { min-width: 0; }
+.console-painel { min-width: 0; display: flex; flex-direction: column; }
+.console-painel .rel-disparo-lista { max-height: 90px; overflow-y: auto; margin-bottom: 8px; }
+.console-painel .console { flex: 1; height: 220px; }
 .console-titulo {
   font-size: 12px;
   font-weight: 600;

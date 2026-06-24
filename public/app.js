@@ -1041,6 +1041,7 @@ async function verificarStatusRobo() {
     atualizarBadge('robo', d.robo);
     atualizarBadge('disparo', d.disparo);
     if (d.estados) ['PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'].forEach(e => atualizarCardEstado(e, d.estados[e]));
+    atualizarBotoesDisparo(d.disparo === 'rodando');
   } catch {}
 }
 

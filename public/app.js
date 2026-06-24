@@ -36,37 +36,34 @@ document.addEventListener('DOMContentLoaded', async () => {
   carregarHistoricoRobos();
 });
 
+const DISPARO_CAMPOS = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
+
 function restaurarEstadoDisparo() {
-  const campos = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
-  for (const id of campos) {
-    const val = localStorage.getItem(`cfg-${id}`);
+  for (const id of DISPARO_CAMPOS) {
+    const val = localStorage.getItem(id);
     if (val === null) continue;
     const el = document.getElementById(id);
     if (!el) continue;
     if (el.type === 'checkbox') el.checked = val === 'true';
-    else if (val) el.value = val;
+    else if (val !== '') el.value = val;
   }
   const inicio = localStorage.getItem('disparo-inicio');
   if (inicio) _progressoInicio = parseInt(inicio);
 }
 
 function salvarEstadoDisparo() {
-  const campos = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
-  for (const id of campos) {
+  for (const id of DISPARO_CAMPOS) {
     const el = document.getElementById(id);
     if (!el) continue;
-    localStorage.setItem(`cfg-${id}`, el.type === 'checkbox' ? el.checked : el.value);
+    localStorage.setItem(id, el.type === 'checkbox' ? el.checked : el.value);
   }
 }
 
-// Persiste estado dos campos ao mudar
 document.addEventListener('change', e => {
-  const ids = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
-  if (ids.includes(e.target?.id)) salvarEstadoDisparo();
+  if (DISPARO_CAMPOS.includes(e.target?.id)) salvarEstadoDisparo();
 });
 document.addEventListener('input', e => {
-  const ids = ['disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
-  if (ids.includes(e.target?.id)) salvarEstadoDisparo();
+  if (DISPARO_CAMPOS.includes(e.target?.id)) salvarEstadoDisparo();
 });
 
 function iniciarScrollTop() {

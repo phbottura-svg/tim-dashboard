@@ -1086,10 +1086,12 @@ async function atualizarInfoRelatorio() {
       fat3 ? `<span style="color:var(--laranja,#f97316);font-weight:600">${fat3} com 3+ fat.</span>` : '',
     ].filter(Boolean).join(' · ');
 
+    const totalMsg = d.totalDisparos || 0;
+    const dispMsg = forcar ? totalMsg : (d.disparadosMsg || 0);
     if (info) {
-      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${d.totalDisparos || 0} disparos · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes (${pendMsg} msgs)`
+      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${dispMsg} / ${totalMsg} msgs disparadas · ⏳ ${pendMsg} pendentes`
         + (fatStr ? `<br>📊 ${fatStr}` : '');
-      info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
+      info.style.color = pendMsg > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }
     calcularTempoDisparo(pendMsg);
   } catch (e) { if (info) info.textContent = 'Erro ao ler relatório: ' + e.message; }

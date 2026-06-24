@@ -30,28 +30,43 @@ document.addEventListener('DOMContentLoaded', async () => {
   await carregarStatusImportacao();
   await carregarOpcoesFiltros();
   await carregarTudo();
+  atualizarInfoRelatorio();
   atualizarFilaStatus();
   setInterval(atualizarFilaStatus, 10000);
   carregarHistoricoRobos();
 });
 
 function restaurarEstadoDisparo() {
-  const forcar = localStorage.getItem('disparo-forcar') === 'true';
-  const el = document.getElementById('disparo-forcar');
-  if (el) el.checked = forcar;
-
+  const campos = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
+  for (const id of campos) {
+    const val = localStorage.getItem(`cfg-${id}`);
+    if (val === null) continue;
+    const el = document.getElementById(id);
+    if (!el) continue;
+    if (el.type === 'checkbox') el.checked = val === 'true';
+    else if (val) el.value = val;
+  }
   const inicio = localStorage.getItem('disparo-inicio');
   if (inicio) _progressoInicio = parseInt(inicio);
 }
 
 function salvarEstadoDisparo() {
-  const forcar = document.getElementById('disparo-forcar')?.checked || false;
-  localStorage.setItem('disparo-forcar', forcar);
+  const campos = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
+  for (const id of campos) {
+    const el = document.getElementById(id);
+    if (!el) continue;
+    localStorage.setItem(`cfg-${id}`, el.type === 'checkbox' ? el.checked : el.value);
+  }
 }
 
-// Persiste estado do checkbox ao mudar
+// Persiste estado dos campos ao mudar
 document.addEventListener('change', e => {
-  if (e.target?.id === 'disparo-forcar') salvarEstadoDisparo();
+  const ids = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
+  if (ids.includes(e.target?.id)) salvarEstadoDisparo();
+});
+document.addEventListener('input', e => {
+  const ids = ['disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
+  if (ids.includes(e.target?.id)) salvarEstadoDisparo();
 });
 
 function iniciarScrollTop() {
@@ -1218,6 +1233,7 @@ function atualizarBotoesDisparo(rodando) {
 }
 
 async function dispararFaturas() {
+  salvarEstadoDisparo();
   const sel = document.getElementById('select-relatorio');
   const relatorio = sel ? sel.value : '';
   if (!relatorio) { adicionarLog('Selecione um relatório antes de disparar.', 'erro'); return; }

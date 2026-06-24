@@ -503,29 +503,26 @@
     <div class="console-duplo">
       <!-- Coluna Disparo: relatório + log -->
       <div class="console-painel">
-        <div class="disparo-header" style="margin-bottom:6px">
-          <span class="disparo-label">📊 Relatórios de Disparo</span>
-          <a href="/api/relatorio-parcial-disparo" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
-          <button class="btn btn-secondary btn-sm" onclick="carregarRelatoriosDisparo()">🔄 Atualizar</button>
-          <button class="btn btn-sm" style="background:#7f1d1d;color:#fff;margin-left:6px" onclick="limparRelatoriosDisparo()">🗑 Limpar</button>
+        <div class="console-titulo" style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
+          📤 Log de Disparo
+          <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+            <span id="rel-disparo-lista-inline" style="font-size:10px;color:var(--dim)"></span>
+            <a href="/api/relatorio-parcial-disparo" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
+            <button class="btn btn-secondary btn-sm" onclick="carregarRelatoriosDisparo()">🔄</button>
+            <button class="btn btn-sm" style="background:#7f1d1d;color:#fff" onclick="limparRelatoriosDisparo()">🗑</button>
+          </div>
         </div>
-        <div id="rel-disparo-lista" class="rel-disparo-lista" style="margin-bottom:8px">
-          <span class="disparo-info">Nenhum disparo realizado ainda.</span>
-        </div>
-        <div class="console-titulo">📤 Log de Disparo</div>
+        <div id="rel-disparo-lista" style="display:none"></div>
         <div class="console" id="console-disparo">
           <div class="console-linha console-info">Aguardando disparo...</div>
         </div>
       </div>
       <!-- Coluna Robô: relatório + log -->
       <div class="console-painel">
-        <div class="disparo-header" style="margin-bottom:6px">
-          <span class="disparo-label">📊 Relatório Parcial dos Robôs</span>
-          <a href="/api/relatorio-parcial" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
-        </div>
-        <div class="console-titulo" style="display:flex;align-items:center;gap:6px">
+        <div class="console-titulo" style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
           🤖 Log Robô PDF
-          <div style="margin-left:auto;display:flex;gap:4px">
+          <div style="margin-left:auto;display:flex;gap:4px;align-items:center">
+            <a href="/api/relatorio-parcial" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
             <button class="btn-log-aba ativa" id="aba-log-todos" onclick="trocarAbaLog('todos')">Todos</button>
             <button class="btn-log-aba" id="aba-log-PR" onclick="trocarAbaLog('PR')">PR</button>
             <button class="btn-log-aba" id="aba-log-SC" onclick="trocarAbaLog('SC')">SC</button>

@@ -1245,23 +1245,18 @@ async function limparRelatoriosDisparo() {
 }
 
 async function carregarRelatoriosDisparo() {
-  const lista = document.getElementById('rel-disparo-lista');
+  const inline = document.getElementById('rel-disparo-lista-inline');
   try {
     const { arquivos } = await fetch('/api/relatorios-disparo').then(r => r.json());
-    if (!arquivos.length) { lista.innerHTML = '<span class="disparo-info">Nenhum relatório de disparo ainda.</span>'; return; }
-    lista.innerHTML = '';
-    for (const f of arquivos) {
-      const item = document.createElement('div');
-      item.className = 'rel-disparo-item';
+    if (!inline) return;
+    if (!arquivos.length) { inline.textContent = 'nenhum relatório'; return; }
+    // Mostra os arquivos como links inline, separados por ·
+    inline.innerHTML = arquivos.map(f => {
       const m = f.match(/(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})/);
-      const label = m ? `${m[3]}/${m[2]}/${m[1]} — ${m[4]}:${m[5]}` : f;
-      item.innerHTML = `<span class="rel-disparo-nome">📊 ${label}</span>
-        <div class="rel-disparo-badges">
-          <a href="/api/relatorios-disparo/download/${encodeURIComponent(f)}" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
-        </div>`;
-      lista.appendChild(item);
-    }
-  } catch (e) { lista.innerHTML = `<span class="disparo-info">Erro: ${e.message}</span>`; }
+      const label = m ? `${m[3]}/${m[2]} ${m[4]}:${m[5]}` : f;
+      return `<a href="/api/relatorios-disparo/download/${encodeURIComponent(f)}" style="color:var(--azul-c);text-decoration:none;font-size:10px" download>📊 ${label}</a>`;
+    }).join(' · ');
+  } catch (e) { if (inline) inline.textContent = 'erro'; }
 }
 
 async function pararDisparo() {

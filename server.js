@@ -1200,6 +1200,44 @@ app.get('/api/relatorios-disparo/download/:arquivo', (req, res) => {
   res.download(filePath);
 });
 
+app.get('/api/relatorio-parcial-disparo', (req, res) => {
+  try {
+    const XLSX = require('xlsx');
+    const parcialPath = path.join(DISPARO_LOG_PATH, 'disparo_parcial.json');
+    // Usa parcial (sessão ativa) se existir, senão o log mais recente
+    let entries = [];
+    let fonte = 'parcial';
+    if (fs.existsSync(parcialPath)) {
+      entries = JSON.parse(fs.readFileSync(parcialPath, 'utf8') || '[]');
+    } else {
+      const logs = fs.existsSync(DISPARO_LOG_PATH)
+        ? fs.readdirSync(DISPARO_LOG_PATH).filter(f => f.endsWith('.json') && !f.startsWith('.')).sort().reverse()
+        : [];
+      if (logs.length === 0) return res.status(404).json({ erro: 'Nenhum log de disparo encontrado' });
+      entries = JSON.parse(fs.readFileSync(path.join(DISPARO_LOG_PATH, logs[0]), 'utf8') || '[]');
+      fonte = logs[0].replace('.json', '');
+    }
+    const rows = entries.map(e => ({
+      Nome: e.nome || '',
+      CPF: e.cpf || '',
+      Número: e.numero || '',
+      PDF: e.pdf || '',
+      Valor: e.valor || '',
+      Vencimento: e.dataVencimento || '',
+      Status: e.status || '',
+      Erro: e.erro || '',
+      Timestamp: e.timestamp || '',
+    }));
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.json_to_sheet(rows);
+    XLSX.utils.book_append_sheet(wb, ws, 'Disparo');
+    const buf = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
+    res.setHeader('Content-Disposition', `attachment; filename="relatorio_disparo_${fonte}.xlsx"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // ─── Disparo WhatsApp ─────────────────────────────────────────────────────────
 
 app.post('/api/comando/disparar', apenasLocal, (req, res) => {

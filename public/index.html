@@ -501,35 +501,31 @@
     <div class="separador"></div>
 
     <div class="console-duplo">
-      <div class="rel-disparo-section">
-        <div class="disparo-header">
-          <span class="disparo-label">📊 Relatório Parcial dos Robôs</span>
-          <a href="/api/relatorio-parcial" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
-        </div>
-        <div class="rel-disparo-lista">
-          <span class="disparo-info">Baixe o relatório consolidado (PR + SC + RS) a qualquer momento, mesmo com os robôs ativos.</span>
-        </div>
-      </div>
-      <div class="rel-disparo-section">
-        <div class="disparo-header">
+      <!-- Coluna Disparo: relatório + log -->
+      <div class="console-painel">
+        <div class="disparo-header" style="margin-bottom:6px">
           <span class="disparo-label">📊 Relatórios de Disparo</span>
+          <a href="/api/relatorio-parcial-disparo" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
           <button class="btn btn-secondary btn-sm" onclick="carregarRelatoriosDisparo()">🔄 Atualizar</button>
           <button class="btn btn-sm" style="background:#7f1d1d;color:#fff;margin-left:6px" onclick="limparRelatoriosDisparo()">🗑 Limpar</button>
         </div>
-        <div id="rel-disparo-lista" class="rel-disparo-lista">
+        <div id="rel-disparo-lista" class="rel-disparo-lista" style="margin-bottom:8px">
           <span class="disparo-info">Nenhum disparo realizado ainda.</span>
         </div>
-      </div>
-    </div>
-
-    <div class="console-duplo">
-      <div class="console-painel">
         <div class="console-titulo">📤 Log de Disparo</div>
         <div class="console" id="console-disparo">
           <div class="console-linha console-info">Aguardando disparo...</div>
         </div>
       </div>
+      <!-- Coluna Robô: relatório + log -->
       <div class="console-painel">
+        <div class="disparo-header" style="margin-bottom:6px">
+          <span class="disparo-label">📊 Relatório Parcial dos Robôs</span>
+          <a href="/api/relatorio-parcial" class="btn btn-secondary btn-sm" download>⬇ Baixar</a>
+        </div>
+        <div class="rel-disparo-lista" style="margin-bottom:8px">
+          <span class="disparo-info">Baixe o relatório consolidado (PR + SC + RS) a qualquer momento, mesmo com os robôs ativos.</span>
+        </div>
         <div class="console-titulo" style="display:flex;align-items:center;gap:6px">
           🤖 Log Robô PDF
           <div style="margin-left:auto;display:flex;gap:4px">

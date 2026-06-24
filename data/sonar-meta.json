@@ -1,0 +1,24 @@
+{
+  "ultimaAtualizacao": "2026-06-23T15:28:34.785Z",
+  "totalClientes": 0,
+  "totalCruzados": 4874,
+  "sonar": {
+    "PR": {
+      "total": 19321,
+      "importadoEm": "2026-06-23T12:58:33.918Z"
+    },
+    "SC": {
+      "total": 2183,
+      "importadoEm": "2026-06-23T12:58:38.536Z"
+    },
+    "RS": {
+      "total": 2675,
+      "importadoEm": "2026-06-23T12:58:42.801Z"
+    }
+  },
+  "totalOSs": 5042,
+  "clientes": {
+    "total": 5514,
+    "importadoEm": "2026-06-23T13:04:07.793Z"
+  }
+}

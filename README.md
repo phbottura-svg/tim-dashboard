@@ -16,6 +16,13 @@ Acesse: **http://localhost:3000**
 
 ---
 
+## Iniciar com um clique (Windows)
+
+- Dê **duplo clique em `iniciar.bat`** para iniciar o dashboard manualmente. Ele reinicia o servidor automaticamente se ele cair.
+- Dê **duplo clique em `instalar-startup.bat` uma única vez** para configurar o início automático junto com o Windows (toda vez que você fizer login, o dashboard sobe sozinho).
+
+---
+
 ## Configuração do `.env`
 
 ```env

@@ -1,5 +1,6 @@
 node_modules/
 .env
-credentials/*.json
+credentials/
 data/pdfs/*
 !data/pdfs/.gitkeep
+data_backup_*/

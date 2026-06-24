@@ -1134,18 +1134,26 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     }
 
     const jaEnviadosPdfs = new Set();
+    const hoje = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+    const hojePdfs = new Set();
     if (fs.existsSync(DISPARO_LOG_PATH)) {
-      for (const f of fs.readdirSync(DISPARO_LOG_PATH).filter(f => f.endsWith('.json'))) {
+      const logFiles = fs.readdirSync(DISPARO_LOG_PATH).filter(f => f.endsWith('.json')).sort();
+      for (const f of logFiles) {
         try {
           const entries = JSON.parse(fs.readFileSync(path.join(DISPARO_LOG_PATH, f), 'utf8'));
+          const eHoje = f.startsWith(`disparo_${hoje}`);
           for (const e of (Array.isArray(entries) ? entries : [])) {
-            if (e.status === 'enviado' && e.pdf) jaEnviadosPdfs.add(e.pdf);
+            if (e.status === 'enviado' && e.pdf) {
+              jaEnviadosPdfs.add(e.pdf);
+              if (eHoje) hojePdfs.add(e.pdf);
+            }
           }
         } catch {}
       }
     }
     let disparados = 0;
     let disparadosMsg = 0;
+    let disparadosHojeMsg = 0;
     let clientesUmaFatura = 0;
     let clientesDuasFaturas = 0;
     let clientesTresMaisFaturas = 0;
@@ -1153,6 +1161,7 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     for (const r of sucesso) {
       const numeros = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
       if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) { disparados++; disparadosMsg += numeros.length; }
+      disparadosHojeMsg += numeros.filter(n => hojePdfs.has(n)).length;
 
       if (numeros.length === 1) clientesUmaFatura++;
       else if (numeros.length === 2) clientesDuasFaturas++;
@@ -1160,7 +1169,7 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     }
 
     res.json({
-      total: totalClientes, totalDisparos, disparados, disparadosMsg,
+      total: totalClientes, totalDisparos, disparados, disparadosMsg, disparadosHojeMsg,
       pendentes: totalClientes - disparados, linhas: rows.length,
       clientesUmaFatura, clientesDuasFaturas, clientesTresMaisFaturas,
     });

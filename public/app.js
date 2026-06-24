@@ -1088,8 +1088,10 @@ async function atualizarInfoRelatorio() {
 
     const totalMsg = d.totalDisparos || 0;
     const dispMsg = d.disparadosMsg || 0;
+    const hojeMsg = d.disparadosHojeMsg || 0;
+    const hojeStr = hojeMsg > 0 ? ` <span style="color:var(--verde);font-size:11px">(+${hojeMsg} hoje)</span>` : '';
     if (info) {
-      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${dispMsg} / ${totalMsg} msgs disparadas · ⏳ ${pendMsg} pendentes`
+      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${dispMsg} / ${totalMsg} msgs disparadas${hojeStr} · ⏳ ${pendMsg} pendentes`
         + (fatStr ? `<br>📊 ${fatStr}` : '');
       info.style.color = pendMsg > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }

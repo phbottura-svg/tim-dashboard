@@ -1174,11 +1174,21 @@ function atualizarProgresso(atual, total) {
   }
 }
 
+let _autoRefreshBarraInterval = null;
+
 function atualizarBotoesDisparo(rodando) {
   const btnDisparar = document.getElementById('btn-disparar');
   const btnParar = document.getElementById('btn-parar-disparo');
   if (btnDisparar) btnDisparar.style.display = rodando ? 'none' : '';
   if (btnParar) btnParar.style.display = rodando ? '' : 'none';
+
+  if (rodando && !_autoRefreshBarraInterval) {
+    _autoRefreshBarraInterval = setInterval(() => atualizarInfoRelatorio(), 30000);
+  } else if (!rodando && _autoRefreshBarraInterval) {
+    clearInterval(_autoRefreshBarraInterval);
+    _autoRefreshBarraInterval = null;
+    atualizarInfoRelatorio(); // atualiza uma última vez ao parar
+  }
 }
 
 async function dispararFaturas() {

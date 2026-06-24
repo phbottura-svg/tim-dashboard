@@ -28,8 +28,20 @@ const BASE_CRUZADA_PATH = path.join(DATA_PATH, 'base-cruzada.json');
 const SONAR_META_PATH = path.join(DATA_PATH, 'sonar-meta.json');
 const CORRECOES_OS_PATH = path.join(DATA_PATH, 'correcoes-os.json');
 const AJUSTES_META_PATH = path.join(DATA_PATH, 'ajustes-meta.json');
+const HISTORICO_ROBOS_PATH = path.join(DATA_PATH, 'historico-robos.json');
 
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
+
+function salvarHistoricoRobo(estado) {
+  try {
+    const prog = lerJSON(path.join(PLAYWRIGHT_PATH, `progresso_${estado}.json`), {});
+    const resultados = prog.resultados || [];
+    const sucesso = resultados.filter(r => /^Sucesso/.test(r.status || '')).length;
+    const hist = lerJSON(HISTORICO_ROBOS_PATH, {});
+    hist[estado] = { ultimoRun: new Date().toISOString(), total: resultados.length, sucesso };
+    fs.writeFileSync(HISTORICO_ROBOS_PATH, JSON.stringify(hist, null, 2));
+  } catch {}
+}
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -1031,6 +1043,7 @@ app.post('/api/comando/robo-estado', apenasLocal, (req, res) => {
   });
   proc.stderr.on('data', d => emitirEvento('robo-log', { msg: `[${estado}] ⚠️ ` + stripAnsi(d.toString().trim()), estado }));
   proc.on('close', code => {
+    salvarHistoricoRobo(estado);
     emitirEvento('robo-estado', { msg: `🏁 Robô ${estado} finalizado (código ${code})`, estado, status: 'parado' });
     processoEstado[estado] = null;
   });
@@ -1044,6 +1057,10 @@ app.post('/api/comando/robo-estado-parar', apenasLocal, (req, res) => {
   processoEstado[estado] = null;
   emitirEvento('robo-estado', { msg: `⏹ Robô ${estado} interrompido`, estado, status: 'parado' });
   res.json({ ok: true });
+});
+
+app.get('/api/historico-robos', (req, res) => {
+  res.json(lerJSON(HISTORICO_ROBOS_PATH, {}));
 });
 
 // ─── Relatórios ───────────────────────────────────────────────────────────────
@@ -1129,11 +1146,38 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     }
     let disparados = 0;
     let disparadosMsg = 0;
+    const porEstado = {};
+    let valorTotal = 0;
+    let clientesDuasFaturas = 0;
+    let clientesTresMaisFaturas = 0;
+
     for (const r of sucesso) {
       const numeros = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
       if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) { disparados++; disparadosMsg += numeros.length; }
+
+      // Breakdown por robô
+      const robo = String(r['Robô'] || r.Robo || '').trim();
+      if (robo) porEstado[robo] = (porEstado[robo] || 0) + 1;
+
+      // Valor total em aberto (soma todos os valores)
+      const valCols = Object.keys(r).filter(k => /^Valor \d+$/i.test(k));
+      for (const col of valCols) {
+        const raw = String(r[col] || '').replace(/[R$\s]/g, '').replace(',', '.');
+        const num = parseFloat(raw);
+        if (!isNaN(num)) valorTotal += num;
+      }
+
+      // Distribuição de faturas por cliente
+      if (numeros.length === 2) clientesDuasFaturas++;
+      if (numeros.length >= 3) clientesTresMaisFaturas++;
     }
-    res.json({ total: totalClientes, totalDisparos, disparados, disparadosMsg, pendentes: totalClientes - disparados, linhas: rows.length });
+
+    res.json({
+      total: totalClientes, totalDisparos, disparados, disparadosMsg,
+      pendentes: totalClientes - disparados, linhas: rows.length,
+      porEstado, valorTotal: Math.round(valorTotal * 100) / 100,
+      clientesDuasFaturas, clientesTresMaisFaturas,
+    });
   } catch (e) { res.status(500).json({ erro: e.message }); }
 });
 

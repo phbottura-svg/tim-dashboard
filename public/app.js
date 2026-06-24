@@ -31,6 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   await carregarTudo();
   atualizarFilaStatus();
   setInterval(atualizarFilaStatus, 10000);
+  carregarHistoricoRobos();
 });
 
 function iniciarScrollTop() {
@@ -1030,6 +1031,7 @@ function atualizarCardEstado(estado, status) {
     badge.textContent = '⏹ parado';
     badge.className = 'robo-badge';
     if (btnParar) btnParar.disabled = true;
+    carregarHistoricoRobos();
   }
 }
 
@@ -1073,8 +1075,25 @@ async function atualizarInfoRelatorio() {
     const forcar = document.getElementById('disparo-forcar')?.checked || false;
     const pend = forcar ? d.total : (d.pendentes != null ? d.pendentes : d.total);
     const pendMsg = forcar ? (d.totalDisparos || 0) : ((d.totalDisparos || 0) - (d.disparadosMsg || 0));
+
+    // Breakdown por estado
+    const estadoStr = Object.entries(d.porEstado || {})
+      .sort((a, b) => b[1] - a[1])
+      .map(([e, n]) => `${e}:${n}`).join(' · ');
+
+    // Valor total formatado
+    const valorFmt = d.valorTotal ? `R$ ${d.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '';
+
+    // Destaque clientes com múltiplas faturas
+    const multiFat = [];
+    if (d.clientesDuasFaturas) multiFat.push(`${d.clientesDuasFaturas} com 2 fat.`);
+    if (d.clientesTresMaisFaturas) multiFat.push(`<span style="color:var(--laranja,#f97316);font-weight:600">${d.clientesTresMaisFaturas} com 3+ fat.</span>`);
+
     if (info) {
-      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${d.totalDisparos || 0} disparos · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes (${pendMsg} msgs)`;
+      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${d.totalDisparos || 0} disparos · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes (${pendMsg} msgs)`
+        + (valorFmt ? `<br>💰 Valor total em aberto: <strong>${valorFmt}</strong>` : '')
+        + (estadoStr ? `<br>🗺 Por robô: ${estadoStr}` : '')
+        + (multiFat.length ? `<br>⚠️ ${multiFat.join(' · ')}` : '');
       info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }
     calcularTempoDisparo(pendMsg);
@@ -1100,19 +1119,41 @@ function calcularTempoDisparo(pendentes) {
   el.textContent = `⏱ Tempo estimado para ${total} envios: ${tempo} (${delay}s/envio · lote ${lote} · pausa ${pausa}s)`;
 }
 
+let _progressoInicio = null;
+let _progressoUltimoAtual = 0;
+
 function atualizarProgresso(atual, total) {
   const wrap = document.getElementById('disparo-progresso-wrap');
   const bar  = document.getElementById('progresso-bar-fill');
   const pct  = document.getElementById('progresso-pct');
   const lbl  = document.getElementById('progresso-label');
   const sub  = document.getElementById('progresso-sub');
+  const vel  = document.getElementById('progresso-velocidade');
   if (!wrap) return;
   wrap.style.display = 'block';
+
+  if (!_progressoInicio && atual > 0) _progressoInicio = Date.now();
+  _progressoUltimoAtual = atual;
+
   const p = total > 0 ? Math.round((atual / total) * 100) : 0;
   bar.style.width = p + '%';
   pct.textContent = p + '%';
   lbl.textContent = atual >= total ? '✅ Disparo concluído!' : '📤 Disparando...';
-  sub.textContent = `${atual} / ${total} clientes`;
+  sub.textContent = `${atual} / ${total} msgs`;
+
+  if (vel && _progressoInicio && atual > 0) {
+    const minutos = (Date.now() - _progressoInicio) / 60000;
+    const ritmo = atual / minutos; // msgs/min
+    const restantes = total - atual;
+    const minRestantes = restantes / ritmo;
+    const horasR = Math.floor(minRestantes / 60);
+    const minR = Math.round(minRestantes % 60);
+    const tempoStr = horasR > 0 ? `${horasR}h${minR}min` : `${Math.round(minRestantes)}min`;
+    vel.textContent = atual >= total
+      ? `✅ Concluído em ${Math.round(minutos)}min`
+      : `⚡ ${ritmo.toFixed(1)} msgs/min · resta ~${tempoStr}`;
+    if (atual >= total) { _progressoInicio = null; _progressoUltimoAtual = 0; }
+  }
 }
 
 function atualizarBotoesDisparo(rodando) {
@@ -1256,3 +1297,27 @@ function formatarMesAno(mesAno) {
 // ─── Utilitários ──────────────────────────────────────────────────────────────
 
 function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+
+
+// ─── Histórico de Robôs ───────────────────────────────────────────────────────
+
+async function carregarHistoricoRobos() {
+  try {
+    const hist = await fetch('/api/historico-robos').then(r => r.json());
+    const estados = ['PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'];
+    const agora = Date.now();
+    for (const est of estados) {
+      const el = document.getElementById(`robo-historico-${est}`);
+      if (!el) continue;
+      const h = hist[est];
+      if (!h) { el.textContent = ''; continue; }
+      const dt = new Date(h.ultimoRun);
+      const diffH = (agora - dt.getTime()) / 3600000;
+      const dataStr = dt.toLocaleDateString('pt-BR') + ' ' + dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+      const taxaSucesso = h.total > 0 ? Math.round((h.sucesso / h.total) * 100) : 0;
+      let html = `🕐 ${dataStr} · ${h.sucesso}/${h.total} (${taxaSucesso}%)`;
+      if (diffH > 8) html += `<br><span class="aviso-sessao">⚠️ Sessão pode ter expirado</span>`;
+      el.innerHTML = html;
+    }
+  } catch {}
+}

@@ -373,6 +373,7 @@
           <button class="btn btn-success btn-sm" onclick="iniciarEstado('PR')">▶ Iniciar</button>
           <button class="btn btn-danger btn-sm" id="parar-PR" onclick="pararEstado('PR')" disabled>⏹ Parar</button>
         </div>
+        <div class="robo-historico" id="robo-historico-PR"></div>
       </div>
       <div class="robo-card" id="card-SC">
         <div class="robo-estado-label">🤖 Robô SC</div>
@@ -382,6 +383,7 @@
           <button class="btn btn-success btn-sm" onclick="iniciarEstado('SC')">▶ Iniciar</button>
           <button class="btn btn-danger btn-sm" id="parar-SC" onclick="pararEstado('SC')" disabled>⏹ Parar</button>
         </div>
+        <div class="robo-historico" id="robo-historico-SC"></div>
       </div>
       <div class="robo-card" id="card-RS">
         <div class="robo-estado-label">🤖 Robô RS</div>
@@ -391,6 +393,7 @@
           <button class="btn btn-success btn-sm" onclick="iniciarEstado('RS')">▶ Iniciar</button>
           <button class="btn btn-danger btn-sm" id="parar-RS" onclick="pararEstado('RS')" disabled>⏹ Parar</button>
         </div>
+        <div class="robo-historico" id="robo-historico-RS"></div>
       </div>
       <div class="robo-card" id="card-PR2">
         <div class="robo-estado-label">🤖 Robô PR2</div>
@@ -400,6 +403,7 @@
           <button class="btn btn-success btn-sm" onclick="iniciarEstado('PR2')">▶ Iniciar</button>
           <button class="btn btn-danger btn-sm" id="parar-PR2" onclick="pararEstado('PR2')" disabled>⏹ Parar</button>
         </div>
+        <div class="robo-historico" id="robo-historico-PR2"></div>
       </div>
       <div class="robo-card" id="card-SC2">
         <div class="robo-estado-label">🤖 Robô SC2</div>
@@ -409,6 +413,7 @@
           <button class="btn btn-success btn-sm" onclick="iniciarEstado('SC2')">▶ Iniciar</button>
           <button class="btn btn-danger btn-sm" id="parar-SC2" onclick="pararEstado('SC2')" disabled>⏹ Parar</button>
         </div>
+        <div class="robo-historico" id="robo-historico-SC2"></div>
       </div>
       <div class="robo-card" id="card-RS2">
         <div class="robo-estado-label">🤖 Robô RS2</div>
@@ -418,6 +423,7 @@
           <button class="btn btn-success btn-sm" onclick="iniciarEstado('RS2')">▶ Iniciar</button>
           <button class="btn btn-danger btn-sm" id="parar-RS2" onclick="pararEstado('RS2')" disabled>⏹ Parar</button>
         </div>
+        <div class="robo-historico" id="robo-historico-RS2"></div>
       </div>
     </div>
 
@@ -464,7 +470,8 @@
         <div class="progresso-bar-bg">
           <div class="progresso-bar-fill" id="progresso-bar-fill" style="width:0%"></div>
         </div>
-        <div class="progresso-sub" id="progresso-sub">0 / 0 clientes</div>
+        <div class="progresso-sub" id="progresso-sub">0 / 0 msgs</div>
+        <div class="progresso-velocidade" id="progresso-velocidade"></div>
       </div>
     </div>
 

@@ -449,6 +449,7 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
 .progresso-bar-bg { background: var(--bg3); border-radius: 99px; height: 10px; overflow: hidden; border: 1px solid var(--border); }
 .progresso-bar-fill { height: 100%; border-radius: 99px; background: linear-gradient(90deg, var(--azul), var(--azul-c)); transition: width 0.4s ease; }
 .progresso-sub { font-size: 11px; color: var(--dim); margin-top: 5px; }
+.progresso-velocidade { font-size: 11px; color: var(--azul-c); margin-top: 3px; }
 
 .rel-disparo-section { background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
 .rel-disparo-lista { display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
@@ -633,6 +634,8 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
 
 .robo-estado-label { font-size: 15px; font-weight: 700; color: var(--texto); margin-bottom: 2px; }
 .robo-user-code { font-size: 11px; font-family: 'Consolas', monospace; color: var(--dim); margin-bottom: 6px; }
+.robo-historico { font-size: 10px; color: var(--dim); margin-top: 6px; line-height: 1.4; }
+.robo-historico .aviso-sessao { color: #f59e0b; font-weight: 600; }
 
 .robo-badge {
   font-size: 11px;

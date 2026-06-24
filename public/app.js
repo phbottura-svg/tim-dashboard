@@ -1132,7 +1132,7 @@ async function dispararFaturas() {
   try {
     const d = await fetch('/api/comando/disparar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ relatorio, limite: limite || undefined, delay, lote, pausaLote }),
+      body: JSON.stringify({ relatorio, limite: limite || undefined, delay, lote, pausaLote, forcar: document.getElementById('disparo-forcar')?.checked || false }),
     }).then(r => r.json());
     if (d.erro) adicionarLog('Erro: ' + d.erro, 'disparo-log');
     else { adicionarLog('Disparando: ' + d.relatorio, 'disparo-log'); atualizarBotoesDisparo(true); }

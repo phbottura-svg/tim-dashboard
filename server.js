@@ -1175,6 +1175,7 @@ app.post('/api/comando/disparar', apenasLocal, (req, res) => {
   const pausaLote = parseInt(req.body?.pausaLote) || 300;
   const args = ['disparar-faturas.js', relatorio, `--delay=${delay}`, `--lote=${lote}`, `--pausa-lote=${pausaLote}`];
   if (limite > 0) args.push(`--limit=${limite}`);
+  if (req.body?.forcar) args.push('--forcar');
   emitirEvento('disparo', { msg: `📤 Iniciando disparo: ${escolhido}${limite > 0 ? ` (limite: ${limite})` : ''}`, status: 'rodando' });
   processoDisparo = spawn('node', args, { cwd: PLAYWRIGHT_PATH });
   processoDisparo.stdout.on('data', d => {

@@ -1103,14 +1103,13 @@ async function atualizarInfoRelatorio() {
     const barraLbl  = document.getElementById('disparo-barra-label');
     const barraSub  = document.getElementById('disparo-barra-sub');
     if (barraWrap && totalMsg > 0) {
-      const base = forcar ? totalMsg : totalMsg;
-      const enviados = forcar ? 0 : dispMsg;
+      const enviados = forcar ? 0 : hojeMsg;
       const pct = Math.round((enviados / totalMsg) * 100);
       barraWrap.style.display = 'block';
       barraFill.style.width = pct + '%';
       barraPct.textContent = pct + '%';
-      barraLbl.textContent = 'Progresso do disparo';
-      barraSub.textContent = `${enviados} / ${totalMsg} msgs disparadas · ${pendMsg} pendentes${hojeMsg > 0 ? ` · +${hojeMsg} hoje` : ''}`;
+      barraLbl.textContent = 'Disparados hoje';
+      barraSub.textContent = `${enviados} / ${totalMsg} msgs · ${totalMsg - enviados} pendentes`;
     } else if (barraWrap) {
       barraWrap.style.display = 'none';
     }

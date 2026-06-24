@@ -1146,8 +1146,7 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     }
     let disparados = 0;
     let disparadosMsg = 0;
-    const porEstado = {};
-    let valorTotal = 0;
+    let clientesUmaFatura = 0;
     let clientesDuasFaturas = 0;
     let clientesTresMaisFaturas = 0;
 
@@ -1155,28 +1154,15 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
       const numeros = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
       if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) { disparados++; disparadosMsg += numeros.length; }
 
-      // Breakdown por robô
-      const robo = String(r['Robô'] || r.Robo || '').trim();
-      if (robo) porEstado[robo] = (porEstado[robo] || 0) + 1;
-
-      // Valor total em aberto (soma todos os valores)
-      const valCols = Object.keys(r).filter(k => /^Valor \d+$/i.test(k));
-      for (const col of valCols) {
-        const raw = String(r[col] || '').replace(/[R$\s]/g, '').replace(',', '.');
-        const num = parseFloat(raw);
-        if (!isNaN(num)) valorTotal += num;
-      }
-
-      // Distribuição de faturas por cliente
-      if (numeros.length === 2) clientesDuasFaturas++;
-      if (numeros.length >= 3) clientesTresMaisFaturas++;
+      if (numeros.length === 1) clientesUmaFatura++;
+      else if (numeros.length === 2) clientesDuasFaturas++;
+      else if (numeros.length >= 3) clientesTresMaisFaturas++;
     }
 
     res.json({
       total: totalClientes, totalDisparos, disparados, disparadosMsg,
       pendentes: totalClientes - disparados, linhas: rows.length,
-      porEstado, valorTotal: Math.round(valorTotal * 100) / 100,
-      clientesDuasFaturas, clientesTresMaisFaturas,
+      clientesUmaFatura, clientesDuasFaturas, clientesTresMaisFaturas,
     });
   } catch (e) { res.status(500).json({ erro: e.message }); }
 });

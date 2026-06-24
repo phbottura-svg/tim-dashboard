@@ -1076,24 +1076,19 @@ async function atualizarInfoRelatorio() {
     const pend = forcar ? d.total : (d.pendentes != null ? d.pendentes : d.total);
     const pendMsg = forcar ? (d.totalDisparos || 0) : ((d.totalDisparos || 0) - (d.disparadosMsg || 0));
 
-    // Breakdown por estado
-    const estadoStr = Object.entries(d.porEstado || {})
-      .sort((a, b) => b[1] - a[1])
-      .map(([e, n]) => `${e}:${n}`).join(' · ');
-
-    // Valor total formatado
-    const valorFmt = d.valorTotal ? `R$ ${d.valorTotal.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}` : '';
-
-    // Destaque clientes com múltiplas faturas
-    const multiFat = [];
-    if (d.clientesDuasFaturas) multiFat.push(`${d.clientesDuasFaturas} com 2 fat.`);
-    if (d.clientesTresMaisFaturas) multiFat.push(`<span style="color:var(--laranja,#f97316);font-weight:600">${d.clientesTresMaisFaturas} com 3+ fat.</span>`);
+    // Distribuição por número de faturas
+    const fat1 = d.clientesUmaFatura || 0;
+    const fat2 = d.clientesDuasFaturas || 0;
+    const fat3 = d.clientesTresMaisFaturas || 0;
+    const fatStr = [
+      fat1 ? `${fat1} com 1 fat.` : '',
+      fat2 ? `${fat2} com 2 fat.` : '',
+      fat3 ? `<span style="color:var(--laranja,#f97316);font-weight:600">${fat3} com 3+ fat.</span>` : '',
+    ].filter(Boolean).join(' · ');
 
     if (info) {
       info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${d.totalDisparos || 0} disparos · ✅ ${d.disparados || 0} já disparados · ⏳ ${pend} pendentes (${pendMsg} msgs)`
-        + (valorFmt ? `<br>💰 Valor total em aberto: <strong>${valorFmt}</strong>` : '')
-        + (estadoStr ? `<br>🗺 Por robô: ${estadoStr}` : '')
-        + (multiFat.length ? `<br>⚠️ ${multiFat.join(' · ')}` : '');
+        + (fatStr ? `<br>📊 ${fatStr}` : '');
       info.style.color = pend > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }
     calcularTempoDisparo(pendMsg);

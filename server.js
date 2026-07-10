@@ -909,9 +909,10 @@ app.post('/api/receber-fila', apenasLocal, (req, res) => {
   try {
     const { clientes } = req.body;
     if (!Array.isArray(clientes)) return res.status(400).json({ erro: 'clientes inválido' });
-    // Formato que o robo-estado.js espera: col0=Nome, col1=CPF, col2=Custcode, col3=Contato
-    const headers = ['Nome', 'CPF', 'Custcode', 'Contato'];
-    const linhas = clientes.map(c => [c.nome, c.cpf, c.custcode, c.contato]);
+    // Formato que o robo-estado.js espera: col0=Nome, col1=CPF, col2=Custcode, col3=Contato.
+    // Col4 "Mês Gross" é extra (o robô ignora, mas o relatório usa como referência).
+    const headers = ['Nome', 'CPF', 'Custcode', 'Contato', 'Mês Gross'];
+    const linhas = clientes.map(c => [c.nome, c.cpf, c.custcode, c.contato, c.mesGross || c.mesGrossManual || '']);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Base Clientes');
     const destino = path.join(PLAYWRIGHT_PATH, 'clientes.xlsx');
@@ -937,13 +938,15 @@ app.post('/api/gerar-fila-robo', apenasLocal, (req, res) => {
     // Remove sem custcode/nome (sem esses dados o robô não consegue processar)
     lista = lista.filter(c => c.custcode && c.nome);
 
-    // Formato que o robo-estado.js espera: col0=Nome, col1=CPF, col2=Custcode, col3=Contato
-    const headers = ['Nome', 'CPF', 'Custcode', 'Contato'];
+    // Formato que o robo-estado.js espera: col0=Nome, col1=CPF, col2=Custcode, col3=Contato.
+    // Col4 "Mês Gross" é extra (o robô ignora, mas o relatório usa como referência).
+    const headers = ['Nome', 'CPF', 'Custcode', 'Contato', 'Mês Gross'];
     const linhas = lista.map(c => [
       c.nome || '',
       c.cpf || '',
       c.custcode || '',
       c.contatoPrincipal || '',
+      c.mesGross || c.mesGrossManual || '',
     ]);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([headers, ...linhas]), 'Base Clientes');
@@ -1059,6 +1062,118 @@ app.post('/api/comando/robo-estado-parar', apenasLocal, (req, res) => {
   res.json({ ok: true });
 });
 
+// Reconstrói a fila de reprocessamento com os erros atuais (para os robôs pegarem ao iniciar)
+app.post('/api/comando/reprocessar-erros', apenasLocal, (req, res) => {
+  try {
+    const { reconstruirFilaErros } = require(path.join(PLAYWRIGHT_PATH, 'utils', 'filaErros'));
+    const planilha = path.join(PLAYWRIGHT_PATH, 'clientes.xlsx');
+    if (!fs.existsSync(planilha)) return res.status(400).json({ erro: 'clientes.xlsx não encontrado' });
+    const mtime = String(fs.statSync(planilha).mtimeMs);
+    Promise.resolve(reconstruirFilaErros(mtime)).then(fila => {
+      emitirEvento('robo-estado', { msg: `🔄 Fila de reprocessamento criada: ${fila.clientes.length} erro(s). Inicie os robôs para reprocessar.`, status: 'parado' });
+      res.json({ ok: true, total: fila.clientes.length });
+    }).catch(err => res.status(500).json({ erro: err.message }));
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Baixa uma planilha só com os clientes que continuam com erro
+app.get('/api/comando/planilha-erros', (req, res) => {
+  try {
+    const { coletarErros } = require(path.join(PLAYWRIGHT_PATH, 'utils', 'filaErros'));
+    const resultados = [];
+    for (const est of ESTADOS_VALIDOS) {
+      const arq = path.join(PLAYWRIGHT_PATH, `progresso_${est}.json`);
+      if (!fs.existsSync(arq)) continue;
+      try {
+        const p = JSON.parse(fs.readFileSync(arq, 'utf8'));
+        for (const r of (p.resultados || [])) resultados.push({ ...r, robo: est });
+      } catch {}
+    }
+    // Aplica reprocessamento (erro recuperado não aparece)
+    try {
+      const rp = JSON.parse(fs.readFileSync(path.join(PLAYWRIGHT_PATH, 'reprocessamento.json'), 'utf8'));
+      for (const r of (rp.resultados || [])) {
+        const idx = resultados.findIndex(x => String(x.custcode) === String(r.custcode));
+        if (idx !== -1) resultados[idx] = { ...r, robo: r.robo };
+        else resultados.push(r);
+      }
+    } catch {}
+
+    const erros = resultados.filter(r => {
+      const s = r.status || '';
+      return s.startsWith('Erro') || s === 'Cliente não encontrado' || s === 'Custcode inválido';
+    });
+
+    const headers = ['Robô', 'Nome', 'CPF', 'Custcode', 'Contato', 'Status'];
+    const linhas = [headers];
+    for (const r of erros) linhas.push([r.robo || '', r.nome, r.cpf, r.custcode, r.contato, r.status || 'Erro']);
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(linhas), 'Erros');
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+    const ts = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
+    res.setHeader('Content-Disposition', `attachment; filename="ERROS_${ts}.xlsx"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Gera uma base SÓ com os clientes reprocessados com sucesso (para disparo isolado)
+app.post('/api/comando/base-reprocessados', apenasLocal, (req, res) => {
+  try {
+    let reproc;
+    try { reproc = JSON.parse(fs.readFileSync(path.join(PLAYWRIGHT_PATH, 'reprocessamento.json'), 'utf8')); }
+    catch { return res.status(400).json({ erro: 'Nenhum reprocessamento encontrado' }); }
+
+    const okStatus = s => String(s || '').startsWith('Sucesso');
+    const resultados = (reproc.resultados || []).filter(r => okStatus(r.status));
+    if (resultados.length === 0) return res.status(404).json({ erro: 'Nenhum reprocessado com sucesso ainda' });
+
+    const maxFat = Math.max(...resultados.map(r => (r.numerosFaturas || []).length), 1);
+    const headers = ['Robô', 'Nome', 'CPF', 'Custcode', 'Contato', 'Faturas Baixadas'];
+    for (let i = 1; i <= maxFat; i++) headers.push(`Número ${i}`, `Valor ${i}`, `Vencimento ${i}`);
+    headers.push('Status');
+
+    const linhas = [headers];
+    for (const r of resultados) {
+      const row = [r.robo || '', r.nome, r.cpf, r.custcode, r.contato, r.faturasBaixadas || 0];
+      for (let i = 0; i < maxFat; i++) {
+        row.push((r.numerosFaturas || [])[i] || '');
+        row.push((r.valores || [])[i] || '');
+        row.push((r.vencimentos || [])[i] || '');
+      }
+      row.push(r.status || '');
+      linhas.push(row);
+    }
+
+    const data = new Date().toISOString().split('T')[0];
+    const hora = new Date().toTimeString().slice(0, 5).replace(':', '-');
+    const nome = `relatorio_${data}_${hora}_REPROCESSADOS.xlsx`;
+    if (!fs.existsSync(RELATORIOS_PATH)) fs.mkdirSync(RELATORIOS_PATH, { recursive: true });
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(linhas), 'Relatório');
+    XLSX.writeFile(wb, path.join(RELATORIOS_PATH, nome));
+
+    emitirEvento('robo-estado', { msg: `📤 Base dos reprocessados gerada: ${resultados.length} cliente(s) — ${nome}`, status: 'parado' });
+    res.json({ ok: true, total: resultados.length, arquivo: nome });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Status da fila de reprocessamento (para o painel ao vivo)
+app.get('/api/reprocessamento-status', (req, res) => {
+  try {
+    const arq = path.join(PLAYWRIGHT_PATH, 'reprocessamento.json');
+    if (!fs.existsSync(arq)) return res.json({ ativo: false });
+    const r = JSON.parse(fs.readFileSync(arq, 'utf8'));
+    const total = (r.clientes || []).length;
+    const feitos = (r.resultados || []).length;
+    const recuperados = (r.resultados || []).filter(x => String(x.status || '').startsWith('Sucesso')).length;
+    const aindaErro = feitos - recuperados;
+    const pendentes = Math.max(total - feitos, 0);
+    res.json({ ativo: total > 0, total, feitos, pendentes, recuperados, aindaErro });
+  } catch (err) { res.status(500).json({ ativo: false, erro: err.message }); }
+});
+
 app.get('/api/historico-robos', (req, res) => {
   res.json(lerJSON(HISTORICO_ROBOS_PATH, {}));
 });
@@ -1141,7 +1256,7 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
       for (const f of logFiles) {
         try {
           const entries = JSON.parse(fs.readFileSync(path.join(DISPARO_LOG_PATH, f), 'utf8'));
-          const eHoje = f.startsWith(`disparo_${hoje}`);
+          const eHoje = f.startsWith(`disparo_${hoje}`) || f === 'disparo_parcial.json';
           for (const e of (Array.isArray(entries) ? entries : [])) {
             if (e.status === 'enviado' && e.pdf) {
               jaEnviadosPdfs.add(e.pdf);
@@ -1240,9 +1355,37 @@ app.get('/api/relatorio-parcial-disparo', (req, res) => {
 
 // ─── Disparo WhatsApp ─────────────────────────────────────────────────────────
 
+const DISPARO_PID_FILE = path.join(DISPARO_LOG_PATH, '.disparo.pid');
+
+function salvarParcialComData(prefixo) {
+  try {
+    const parcialPath = path.join(DISPARO_LOG_PATH, 'disparo_parcial.json');
+    if (!fs.existsSync(parcialPath)) return;
+    const entries = JSON.parse(fs.readFileSync(parcialPath, 'utf8') || '[]');
+    if (!Array.isArray(entries) || entries.length === 0) return;
+    const now = new Date();
+    const stamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}_${String(now.getHours()).padStart(2,'0')}-${String(now.getMinutes()).padStart(2,'0')}`;
+    const dest = path.join(DISPARO_LOG_PATH, `disparo_${stamp}${prefixo ? '_'+prefixo : ''}.json`);
+    if (!fs.existsSync(dest)) {
+      fs.writeFileSync(dest, JSON.stringify(entries, null, 2));
+      console.log(`💾 Parcial salvo automaticamente: ${path.basename(dest)} (${entries.length} entradas)`);
+    }
+  } catch (e) { console.error('⚠️ Erro ao salvar parcial:', e.message); }
+}
+
 app.post('/api/comando/disparar', apenasLocal, (req, res) => {
   const lockFile = path.join(PLAYWRIGHT_PATH, 'disparo_log', '.disparo.lock');
   if (processoDisparo) return res.status(400).json({ erro: 'Disparo já está rodando pelo dashboard' });
+
+  // Verificar via PID file se há processo ativo
+  if (fs.existsSync(DISPARO_PID_FILE)) {
+    try {
+      const pid = parseInt(fs.readFileSync(DISPARO_PID_FILE, 'utf8').trim());
+      process.kill(pid, 0);
+      return res.status(400).json({ erro: `Disparo já está rodando (PID ${pid}). Pare antes de iniciar outro.` });
+    } catch { fs.unlinkSync(DISPARO_PID_FILE); }
+  }
+
   if (fs.existsSync(lockFile)) {
     try {
       const pid = parseInt(fs.readFileSync(lockFile, 'utf8').trim());
@@ -1250,6 +1393,9 @@ app.post('/api/comando/disparar', apenasLocal, (req, res) => {
       return res.status(400).json({ erro: `Disparo já está rodando (PID ${pid}). Pare antes de iniciar outro.` });
     } catch { fs.unlinkSync(lockFile); }
   }
+
+  // Salvar parcial anterior automaticamente antes de sobrescrever
+  salvarParcialComData('auto');
   if (!fs.existsSync(RELATORIOS_PATH)) return res.status(400).json({ erro: 'Pasta de relatórios não encontrada' });
   const arquivos = fs.readdirSync(RELATORIOS_PATH).filter(f => f.endsWith('.xlsx') && !f.startsWith('~$')).sort().reverse();
   if (!arquivos.length) return res.status(400).json({ erro: 'Nenhum relatório encontrado' });
@@ -1264,6 +1410,8 @@ app.post('/api/comando/disparar', apenasLocal, (req, res) => {
   if (req.body?.forcar) args.push('--forcar');
   emitirEvento('disparo', { msg: `📤 Iniciando disparo: ${escolhido}${limite > 0 ? ` (limite: ${limite})` : ''}`, status: 'rodando' });
   processoDisparo = spawn('node', args, { cwd: PLAYWRIGHT_PATH });
+  // Salvar PID para recuperação após restart do servidor
+  fs.writeFileSync(DISPARO_PID_FILE, String(processoDisparo.pid));
   processoDisparo.stdout.on('data', d => {
     const txt = d.toString();
     for (const linha of txt.split('\n')) {
@@ -1275,13 +1423,33 @@ app.post('/api/comando/disparar', apenasLocal, (req, res) => {
     }
   });
   processoDisparo.stderr.on('data', d => emitirEvento('disparo-log', { msg: '⚠️ ' + stripAnsi(d.toString().trim()) }));
-  processoDisparo.on('close', code => { emitirEvento('disparo', { msg: `📤 Disparo finalizado (código ${code})`, status: 'parado' }); processoDisparo = null; });
+  processoDisparo.on('close', code => {
+    emitirEvento('disparo', { msg: `📤 Disparo finalizado (código ${code})`, status: 'parado' });
+    processoDisparo = null;
+    try { if (fs.existsSync(DISPARO_PID_FILE)) fs.unlinkSync(DISPARO_PID_FILE); } catch {}
+  });
   res.json({ ok: true, relatorio: escolhido });
 });
 
 app.post('/api/comando/disparo-parar', apenasLocal, (req, res) => {
-  if (!processoDisparo) return res.status(400).json({ erro: 'Nenhum disparo rodando' });
+  if (!processoDisparo) {
+    // Tentar via PID file (servidor reiniciou mas processo ainda ativo)
+    if (fs.existsSync(DISPARO_PID_FILE)) {
+      try {
+        const pid = parseInt(fs.readFileSync(DISPARO_PID_FILE, 'utf8').trim());
+        process.kill(pid, 'SIGTERM');
+        fs.unlinkSync(DISPARO_PID_FILE);
+        emitirEvento('disparo', { msg: '⏹ Disparo interrompido (via PID file)', status: 'parado' });
+        return res.json({ ok: true });
+      } catch (e) {
+        try { fs.unlinkSync(DISPARO_PID_FILE); } catch {}
+        return res.status(400).json({ erro: 'Processo não encontrado: ' + e.message });
+      }
+    }
+    return res.status(400).json({ erro: 'Nenhum disparo rodando' });
+  }
   processoDisparo.kill('SIGTERM'); processoDisparo = null;
+  try { if (fs.existsSync(DISPARO_PID_FILE)) fs.unlinkSync(DISPARO_PID_FILE); } catch {}
   emitirEvento('disparo', { msg: '⏹ Disparo interrompido manualmente', status: 'parado' });
   res.json({ ok: true });
 });
@@ -1362,6 +1530,20 @@ app.get('/api/faturas/download/:arquivo', (req, res) => {
   if (!fs.existsSync(filePath)) return res.status(404).json({ erro: 'Arquivo não encontrado' });
   res.download(filePath);
 });
+
+// ─── Proteção parcial no startup ──────────────────────────────────────────────
+(function salvarParcialAoIniciar() {
+  try {
+    const parcialPath = path.join(DISPARO_LOG_PATH, 'disparo_parcial.json');
+    if (!fs.existsSync(parcialPath)) return;
+    const entries = JSON.parse(fs.readFileSync(parcialPath, 'utf8') || '[]');
+    if (!Array.isArray(entries) || entries.length === 0) return;
+    const stamp = new Date().toISOString().replace('T','_').slice(0,16).replace(':','-');
+    const dest = path.join(DISPARO_LOG_PATH, `disparo_${stamp}_startup.json`);
+    fs.writeFileSync(dest, JSON.stringify(entries, null, 2));
+    console.log(`💾 Parcial salvo no startup: ${path.basename(dest)} (${entries.length} entradas)`);
+  } catch (e) { console.error('⚠️ Erro ao salvar parcial no startup:', e.message); }
+})();
 
 // ─── Start ────────────────────────────────────────────────────────────────────
 

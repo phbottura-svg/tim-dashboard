@@ -173,6 +173,22 @@ async function atualizarFilaStatus() {
     setText('fila-processados', d.processados);
     setText('fila-pendentes', d.pendentes);
   } catch {}
+  atualizarReprocStatus();
+}
+
+async function atualizarReprocStatus() {
+  try {
+    const d = await fetch('/api/reprocessamento-status').then(r => r.json());
+    const box = document.getElementById('reproc-status-box');
+    if (!box) return;
+    if (!d.ativo) { box.style.display = 'none'; return; }
+    box.style.display = '';
+    setText('reproc-total', d.total);
+    setText('reproc-feitos', d.feitos);
+    setText('reproc-pendentes', d.pendentes);
+    setText('reproc-recuperados', d.recuperados);
+    setText('reproc-aindaerro', d.aindaErro);
+  } catch {}
 }
 
 async function aplicarModoVps() {
@@ -342,17 +358,20 @@ async function carregarOpcoesFiltros() {
       o.value = s; o.textContent = s; selMes.appendChild(o);
     });
     const selVend = document.getElementById('filtro-vendedor');
+    selVend.innerHTML = '<option value="">Todos Vendedores</option>';
     d.vendedores?.forEach(v => {
       const o = document.createElement('option');
       o.value = v; o.textContent = v; selVend.appendChild(o);
     });
     const selEst = document.getElementById('filtro-estado');
+    selEst.innerHTML = '<option value="">Todas UFs</option>';
     d.estados?.forEach(e => {
       const o = document.createElement('option');
       o.value = e; o.textContent = e; selEst.appendChild(o);
     });
     const selSafra = document.getElementById('tabela-filtro-safra');
     if (selSafra) {
+      selSafra.innerHTML = '<option value="">Todas Safras</option>';
       d.safras?.forEach(s => {
         const o = document.createElement('option');
         o.value = s; o.textContent = `Safra ${s}`;
@@ -361,6 +380,7 @@ async function carregarOpcoesFiltros() {
     }
     const selVenc = document.getElementById('tabela-filtro-vencimento');
     if (selVenc) {
+      selVenc.innerHTML = '<option value="">Todos Vencimentos</option>';
       d.datasVencimento?.forEach(v => {
         const o = document.createElement('option');
         o.value = v; o.textContent = v;
@@ -407,6 +427,35 @@ async function limparBaseClientes() {
   const d = await r.json();
   if (d.ok) { await carregarStatusImportacao(); await atualizarTudo(); }
   else alert('Erro: ' + d.erro);
+}
+
+async function importarBasePagos(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = document.getElementById('btn-base-pagos');
+  const txt = btn.childNodes[0];
+  const orig = txt.nodeValue;
+  txt.nodeValue = ' ⏳ Enviando... ';
+  btn.style.opacity = '0.7';
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', file);
+    const r = await fetch('/api/clientes/base-pagos', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.erro) { mostrarMsg('❌ Erro: ' + d.erro, 'erro'); }
+    else {
+      let msg = `💛 ${d.faturasMarcadas} fatura(s) marcada(s) como paga(s) em ${d.clientesAfetados} cliente(s)`;
+      if (d.vencIgnorados) msg += ` · ${d.vencIgnorados} vencimento(s) ignorado(s) (sem fatura no sistema)`;
+      if (d.semCliente) msg += ` · ${d.semCliente} não encontrado(s)`;
+      mostrarMsg(msg, 'ok');
+      await carregarTudo();
+    }
+  } catch (err) { mostrarMsg('❌ ' + err.message, 'erro'); }
+  finally {
+    txt.nodeValue = orig;
+    btn.style.opacity = '';
+    input.value = '';
+  }
 }
 
 async function importarClientes(input) {
@@ -759,9 +808,10 @@ async function carregarTabela() {
       const fCells = Array.from({length: maxF}, (_, i) => {
         const fat = (c.faturas || []).find(f => f.numero === i + 1);
         if (!fat) return '<td class="dim">—</td>';
-        const cls = fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
-        const label = fat.detalhamento || fat.statusPagamento || '—';
-        return `<td><span class="status-tag ${cls}" title="${label}">${fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—'} ${fat.dataVencimento || ''}</span></td>`;
+        const cls = fat.pagoManual ? 'status-PAGO-MANUAL' : fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
+        const icone = fat.pagoManual ? '💛' : fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—';
+        const label = fat.pagoManual ? 'Pago (marcado manualmente via Base Pagos)' : (fat.detalhamento || fat.statusPagamento || '—');
+        return `<td><span class="status-tag ${cls}" title="${label}">${icone} ${fat.dataVencimento || ''}</span></td>`;
       }).join('');
       const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
       return `<tr id="tb-row-${idx}">
@@ -1025,6 +1075,55 @@ async function confirmarToken() {
   } catch (e) { adicionarLog('Erro: ' + e.message, 'erro'); }
 }
 
+// ─── Reprocessar Erros ───────────────────────────────────────────────────────
+
+async function reprocessarErros() {
+  const info = document.getElementById('reproc-info');
+  if (info) info.textContent = 'Montando fila de erros...';
+  try {
+    const d = await fetch('/api/comando/reprocessar-erros', { method: 'POST' }).then(r => r.json());
+    if (d.erro) {
+      adicionarLog('Erro ao reprocessar: ' + d.erro, 'erro');
+      if (info) info.textContent = 'Erro: ' + d.erro;
+      return;
+    }
+    if (d.total === 0) {
+      adicionarLog('✅ Nenhum erro para reprocessar!', 'robo');
+      if (info) info.textContent = '✅ Nenhum erro pendente.';
+    } else {
+      adicionarLog(`🔄 ${d.total} erro(s) na fila. Inicie os robôs para reprocessar (divididos entre eles).`, 'robo');
+      if (info) info.textContent = `🔄 ${d.total} erro(s) prontos — inicie os robôs para reprocessar.`;
+    }
+  } catch (e) {
+    adicionarLog('Erro: ' + e.message, 'erro');
+    if (info) info.textContent = 'Erro: ' + e.message;
+  }
+}
+
+async function gerarBaseReprocessados() {
+  const info = document.getElementById('reproc-info');
+  if (info) info.textContent = 'Gerando base dos reprocessados...';
+  try {
+    const d = await fetch('/api/comando/base-reprocessados', { method: 'POST' }).then(r => r.json());
+    if (d.erro) {
+      adicionarLog('Erro: ' + d.erro, 'erro');
+      if (info) info.textContent = 'Erro: ' + d.erro;
+      return;
+    }
+    adicionarLog(`📤 Base gerada com ${d.total} reprocessado(s): ${d.arquivo}`, 'robo');
+    if (info) info.textContent = `📤 ${d.total} reprocessado(s) — base "${d.arquivo}" pronta para disparo.`;
+    // Atualiza o dropdown de relatórios e já seleciona a base nova
+    if (typeof carregarRelatorios === 'function') {
+      await carregarRelatorios();
+      const sel = document.getElementById('select-relatorio');
+      if (sel) { sel.value = d.arquivo; sel.dispatchEvent(new Event('change')); }
+    }
+  } catch (e) {
+    adicionarLog('Erro: ' + e.message, 'erro');
+    if (info) info.textContent = 'Erro: ' + e.message;
+  }
+}
+
 // ─── Robôs por Estado ────────────────────────────────────────────────────────
 
 async function iniciarEstado(estado) {
@@ -1138,12 +1237,13 @@ async function atualizarInfoRelatorio() {
     const barraLbl  = document.getElementById('disparo-barra-label');
     const barraSub  = document.getElementById('disparo-barra-sub');
     if (barraWrap && totalMsg > 0) {
-      const pct = Math.round((hojeMsg / totalMsg) * 100);
+      const pct = Math.round((dispMsg / totalMsg) * 100);
+      const pendentesReais = totalMsg - dispMsg;
       barraWrap.style.display = 'block';
       barraFill.style.width = pct + '%';
       barraPct.textContent = pct + '%';
-      barraLbl.textContent = 'Disparados hoje';
-      barraSub.textContent = `${hojeMsg} / ${totalMsg} msgs · ${totalMsg - hojeMsg} pendentes`;
+      barraLbl.textContent = `Disparados total (${hojeMsg} hoje)`;
+      barraSub.textContent = `${dispMsg} / ${totalMsg} msgs · ${pendentesReais} pendentes`;
     } else if (barraWrap) {
       barraWrap.style.display = 'none';
     }

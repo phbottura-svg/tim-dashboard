@@ -29,6 +29,9 @@ const SONAR_META_PATH = path.join(DATA_PATH, 'sonar-meta.json');
 const CORRECOES_OS_PATH = path.join(DATA_PATH, 'correcoes-os.json');
 const AJUSTES_META_PATH = path.join(DATA_PATH, 'ajustes-meta.json');
 const HISTORICO_ROBOS_PATH = path.join(DATA_PATH, 'historico-robos.json');
+// Faturas marcadas manualmente como pagas ("Base Pagos") — persiste entre cruzamentos.
+// Estrutura: { [custcodeNormalizado]: { cpf, vencimentos: ["10/06/2026", ...] } }
+const PAGOS_MANUAIS_PATH = path.join(DATA_PATH, 'pagos-manuais.json');
 
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
 
@@ -154,8 +157,25 @@ function calcularStatus(statusPagamento, dataVencimento) {
   return 'INADIMPLENTE';
 }
 
+const soDigitos = s => String(s || '').replace(/\D/g, '');
+
+// Marca como pagas (amarelo/manual) as faturas cujo vencimento consta na "Base Pagos".
+// Só afeta faturas EXISTENTES que estão INADIMPLENTE → vira ADIMPLENTE com flag pagoManual.
+function aplicarPagosManuais(custcode, cpf, faturasProc, pagos) {
+  const reg = pagos[soDigitos(custcode)] || (cpf ? Object.values(pagos).find(p => soDigitos(p.cpf) === soDigitos(cpf)) : null);
+  if (!reg || !Array.isArray(reg.vencimentos) || !reg.vencimentos.length) return;
+  const alvo = new Set(reg.vencimentos.map(v => String(v).trim()));
+  for (const f of faturasProc) {
+    if (alvo.has(String(f.dataVencimento || '').trim()) && f.status !== 'ADIMPLENTE') {
+      f.status = 'ADIMPLENTE';
+      f.pagoManual = true; // usado para pintar de amarelo na tabela
+    }
+  }
+}
+
 function cruzarBases() {
   const clientes = lerJSON(BASE_CLIENTES_PATH, []);
+  const pagosManuais = lerJSON(PAGOS_MANUAIS_PATH, {});
   const sonarPR = lerJSON(BASE_SONAR.PR, []);
   const sonarSC = lerJSON(BASE_SONAR.SC, []);
   const sonarRS = lerJSON(BASE_SONAR.RS, []);
@@ -192,6 +212,9 @@ function cruzarBases() {
       suspensaoFraude: f.suspensaoFraude || null,
       status: calcularStatus(f.statusPagamento, f.dataVencimento),
     }));
+
+    // Aplica as marcações manuais de "Base Pagos" ANTES de calcular status/totais
+    aplicarPagosManuais(ref.custcode, cliente?.cpf, faturasProc, pagosManuais);
 
     const faturasPagas = faturasProc.filter(f => f.status === 'ADIMPLENTE').length;
     const algumaNaoPaga = faturasProc.some(f => f.status === 'INADIMPLENTE');
@@ -599,6 +622,63 @@ app.get('/api/clientes/exportar', (req, res) => {
     res.setHeader('Content-Disposition', 'attachment; filename="clientes.xlsx"');
     res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
     res.send(buf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Recebe a "Base Pagos" (.xlsx com Custcode/CPF + Vencimento N) e marca como pagas
+// (amarelo/manual) as faturas EXISTENTES cujo vencimento consta na planilha.
+// Persiste em pagos-manuais.json e recruza para aplicar na hora.
+app.post('/api/clientes/base-pagos', uploadMemory.single('arquivo'), (req, res) => {
+  if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
+  try {
+    const wb = XLSX.read(req.file.buffer, { type: 'buffer' });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(ws, { defval: '', raw: false });
+    if (!rows.length) return res.status(400).json({ erro: 'Planilha vazia' });
+
+    const cols = Object.keys(rows[0]);
+    const colCust = cols.find(c => /custcode/i.test(c));
+    const colCpf = cols.find(c => /cpf/i.test(c));
+    const colsVenc = cols.filter(c => /^vencimento\s*\d+$/i.test(c) || /vencimento/i.test(c));
+    if (!colCust && !colCpf) return res.status(400).json({ erro: 'Planilha sem coluna Custcode/CPF' });
+    if (!colsVenc.length) return res.status(400).json({ erro: 'Planilha sem coluna de Vencimento' });
+
+    // Índice das faturas atuais por cliente (para só marcar vencimentos que existem)
+    const base = lerJSON(BASE_CRUZADA_PATH, []);
+    const porCust = new Map(), porCpf = new Map();
+    for (const c of base) {
+      const vencs = new Set((c.faturas || []).map(f => String(f.dataVencimento || '').trim()).filter(Boolean));
+      if (soDigitos(c.custcode)) porCust.set(soDigitos(c.custcode), vencs);
+      if (soDigitos(c.cpf)) porCpf.set(soDigitos(c.cpf), vencs);
+    }
+
+    const pagos = lerJSON(PAGOS_MANUAIS_PATH, {});
+    let clientesAfetados = 0, faturasMarcadas = 0, vencIgnorados = 0, semCliente = 0;
+    for (const r of rows) {
+      const cust = soDigitos(r[colCust]);
+      const cpf = colCpf ? soDigitos(r[colCpf]) : '';
+      const vencsCliente = porCust.get(cust) || porCpf.get(cpf);
+      if (!vencsCliente) { semCliente++; continue; }
+      const marcar = [];
+      for (const cv of colsVenc) {
+        const v = String(r[cv] || '').trim();
+        if (!v) continue;
+        if (vencsCliente.has(v)) marcar.push(v); else vencIgnorados++;
+      }
+      if (!marcar.length) continue;
+      const chave = cust || cpf;
+      if (!pagos[chave]) pagos[chave] = { cpf: r[colCpf] || '', vencimentos: [] };
+      const set = new Set([...pagos[chave].vencimentos, ...marcar]);
+      const antes = pagos[chave].vencimentos.length;
+      pagos[chave].vencimentos = [...set];
+      faturasMarcadas += pagos[chave].vencimentos.length - antes;
+      clientesAfetados++;
+    }
+
+    salvarJSON(PAGOS_MANUAIS_PATH, pagos);
+    cruzarBases(); // aplica na base cruzada imediatamente
+
+    res.json({ ok: true, clientesAfetados, faturasMarcadas, vencIgnorados, semCliente });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

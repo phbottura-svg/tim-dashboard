@@ -231,6 +231,10 @@
       <div style="display:flex;align-items:center;gap:10px">
         <span id="tabela-info">—</span>
         <a id="btn-exportar-clientes" class="btn btn-secondary btn-sm" href="/api/clientes/exportar" download>📥 Exportar Excel</a>
+        <label id="btn-base-pagos" class="btn btn-secondary btn-sm" style="cursor:pointer" title="Suba uma planilha (Custcode/CPF + Vencimento) para marcar faturas como pagas (amarelo)">
+          💛 Base Pagos
+          <input type="file" accept=".xlsx,.xls" onchange="importarBasePagos(this)" style="display:none" />
+        </label>
         <button id="btn-fila-robo" class="btn btn-primary btn-sm apenas-local" style="display:none" onclick="gerarFilaRobo()">🤖 Usar como fila do robô</button>
         <button id="btn-enviar-robo" class="btn btn-primary btn-sm" onclick="enviarFilaParaRobo()" title="Envia os clientes filtrados para o robô no localhost">🚀 Gerar Base Robô</button>
       </div>
@@ -362,6 +366,13 @@
 
     <div id="aviso-vps" class="aviso-vps" style="display:none">
       ⚠️ <strong>Modo VPS</strong> — Os robôs SGR rodam apenas localmente (PC com Chrome). Aqui você pode visualizar dados e acompanhar relatórios.
+    </div>
+
+    <div class="reproc-bar apenas-local" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
+      <button class="btn btn-warning btn-sm" onclick="reprocessarErros()">🔄 Reprocessar Erros</button>
+      <button class="btn btn-primary btn-sm" onclick="gerarBaseReprocessados()">📤 Gerar Base dos Reprocessados</button>
+      <a class="btn btn-secondary btn-sm" href="/api/comando/planilha-erros" download>📥 Baixar Planilha de Erros</a>
+      <span id="reproc-info" style="color:#94a3b8;font-size:13px"></span>
     </div>
 
     <div class="robos-estados apenas-local">
@@ -496,6 +507,19 @@
       <span id="fila-processados" style="color:var(--verde); font-weight:600;">—</span> processados
       &nbsp;·&nbsp;
       <span id="fila-pendentes" style="color:var(--amarelo); font-weight:600;">—</span> pendentes
+    </div>
+
+    <div id="reproc-status-box" style="display:none; margin-top:10px; padding:12px 16px; background:var(--bg2); border-radius:10px; border:1px solid #b45309;">
+      <span style="font-size:13px; color:var(--dim);">🔄 Fila de Reprocessamento:</span>
+      <span id="reproc-total" style="margin-left:10px; font-weight:600; color:var(--texto);">—</span> erro(s) no total
+      &nbsp;·&nbsp;
+      <span id="reproc-feitos" style="color:var(--verde); font-weight:600;">—</span> reprocessados
+      &nbsp;·&nbsp;
+      <span id="reproc-pendentes" style="color:var(--amarelo); font-weight:600;">—</span> pendentes
+      &nbsp;·&nbsp;
+      <span id="reproc-recuperados" style="color:var(--verde); font-weight:600;">—</span> recuperados ✅
+      &nbsp;·&nbsp;
+      <span id="reproc-aindaerro" style="color:#ef4444; font-weight:600;">—</span> ainda com erro
     </div>
 
     <div class="separador"></div>

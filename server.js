@@ -979,6 +979,7 @@ app.get('/api/gerar-fila-dados', (req, res) => {
       cpf: c.cpf || '',
       custcode: c.custcode || '',
       contato: c.contatoPrincipal || '',
+      mesGross: c.mesGross || c.mesGrossManual || '',
     }));
     res.json({ total: clientes.length, clientes });
   } catch (err) { res.status(500).json({ erro: err.message }); }

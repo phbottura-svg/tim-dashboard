@@ -611,12 +611,24 @@ app.get('/api/resumo', (req, res) => {
     const inadimplentes = f.filter(c => c.status === 'INADIMPLENTE' && !c.churn).length;
     const adimplentes = f.filter(c => c.status === 'ADIMPLENTE' && !c.churn).length;
 
+    // IQ da safra selecionada no filtro "Mês Gross" do topo (card ao lado de
+    // Fatura 1). Sem um mês especifico escolhido não há uma janela única de
+    // 5 meses para calcular, então fica null. As listas de detalhe (_ok/
+    // _atrasados) não interessam aqui — só ao endpoint /api/iq-safra.
+    let iqSafra = null;
+    if (req.query.mesGross) {
+      iqSafra = calcularIQSafra(req.query.mesGross);
+      delete iqSafra._ok;
+      delete iqSafra._atrasados;
+    }
+
     res.json({
       total, adimplentes, inadimplentes, churn,
       com2Contatos, soSoPrincipal, semCruzamento, totalFaturasPdf,
       pctAdimplentes: total > 0 ? +(adimplentes / total * 100).toFixed(1) : 0,
       pctInadimplentes: total > 0 ? +(inadimplentes / total * 100).toFixed(1) : 0,
       faturaStats,
+      iqSafra,
       ultimaAtualizacao: meta.ultimaAtualizacao || null,
     });
   } catch (err) { res.status(500).json({ erro: err.message }); }

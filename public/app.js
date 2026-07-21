@@ -656,10 +656,31 @@ async function carregarResumo() {
     setText('v-faturas', fmt(d.totalFaturasPdf));
     setText('v-sem-cruzamento', fmt(d.semCruzamento));
 
+    // Card do IQ (Índice de Qualidade), sempre à esquerda de "Fatura 1" —
+    // só existe quando um Mês Gross específico está selecionado no filtro,
+    // pois o IQ depende de uma única janela de safra bem definida.
+    const cardIQ = (() => {
+      const r = d.iqSafra;
+      if (!r) {
+        return `<div class="kpi kpi-iq" title="Selecione um Mês Gross no filtro para ver o IQ daquela safra">
+          <div class="kpi-label">📐 IQ Safra</div>
+          <div class="kpi-value">—</div>
+          <div class="kpi-sub">selecione um Mês Gross</div>
+        </div>`;
+      }
+      const corIQ = r.percentual >= 80 ? 'kpi-verde' : r.percentual >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
+      const previaTxt = r.previa ? ' · prévia (safra em andamento)' : '';
+      return `<div class="kpi ${corIQ}" title="Janela: ${r.janela.join(', ')} — corte em ${r.dataCorte}">
+        <div class="kpi-label">📐 IQ Safra ${r.safra}</div>
+        <div class="kpi-value">${r.percentual}%</div>
+        <div class="kpi-sub">${fmt(r.clientesOk)} de ${fmt(r.totalClientes)} dentro do IQ${previaTxt}</div>
+      </div>`;
+    })();
+
     // Cards dinâmicos por fatura
     const grid = document.getElementById('kpi-faturas-grid');
     if (grid && d.faturaStats) {
-      grid.innerHTML = Object.entries(d.faturaStats).map(([key, s]) => {
+      const cardsFatura = Object.entries(d.faturaStats).map(([key, s]) => {
         const n = key.replace('f', '');
         const corPaga = s.pct >= 80 ? 'kpi-verde' : s.pct >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
         return `<div class="kpi ${corPaga}">
@@ -668,6 +689,7 @@ async function carregarResumo() {
           <div class="kpi-sub">${fmt(s.pagas)} pagas · ${fmt(s.naoPagas)} não pagas · ${fmt(s.total)} clientes</div>
         </div>`;
       }).join('');
+      grid.innerHTML = cardIQ + cardsFatura;
     }
   } catch (err) { console.error('Erro resumo:', err); }
 }

@@ -790,6 +790,9 @@ tbody td { padding: 9px 14px; font-size: 13px; white-space: nowrap; }
 .kpi-amarelo { border-color: rgba(255,214,0,0.3); }
 .kpi-amarelo .kpi-value { color: var(--amarelo); }
 
+.kpi-iq { border-color: rgba(90,160,255,0.3); }
+.kpi-iq .kpi-value { color: #5aa0ff; }
+
 /* ─── Status tags (nova base) ───────────────────────────────────────────────── */
 .status-tag {
   display: inline-block;

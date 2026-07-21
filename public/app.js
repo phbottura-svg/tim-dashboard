@@ -103,6 +103,7 @@ async function enviarFilaParaRobo() {
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
+  if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
   for (let n = 1; n <= 5; n++) {
     const v = document.getElementById(`tf-f${n}`)?.value;
     if (v) p.set(`f${n}`, v);
@@ -810,6 +811,7 @@ async function carregarTabela() {
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
+  if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
   for (let n = 1; n <= 5; n++) {
     const v = document.getElementById(`tf-f${n}`)?.value;
     if (v) p.set(`f${n}`, v);
@@ -905,7 +907,7 @@ function limparFiltrosFaturas() {
 function limparTodosFiltros() {
   const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-vencimento'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis'].forEach(id => {
+  ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis', 'tabela-filtro-pago-manual'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
   });
   for (let n = 1; n <= 5; n++) { const el = document.getElementById(`tf-f${n}`); if (el) el.value = ''; }

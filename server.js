@@ -290,6 +290,7 @@ function aplicarFiltros(lista, q) {
   if (q.contatos === '1') l = l.filter(c => (c.contatos?.length || 0) === 1);
   if (q.churn === '1') l = l.filter(c => c.churn);
   if (q.semMatch === '1') l = l.filter(c => !c.cruzado);
+  if (q.pagoManual === '1') l = l.filter(c => (c.faturas || []).some(f => f.pagoManual));
   if (q.acionaveis === '1') l = l.filter(c => {
     if (c.churn) return false;
     const atrasos = (c.faturas || []).filter(f => f.status === 'INADIMPLENTE').length;

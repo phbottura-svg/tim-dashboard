@@ -232,9 +232,10 @@
         <span id="tabela-info">—</span>
         <a id="btn-exportar-clientes" class="btn btn-secondary btn-sm" href="/api/clientes/exportar" download>📥 Exportar Excel</a>
         <label id="btn-base-pagos" class="btn btn-secondary btn-sm" style="cursor:pointer" title="Suba uma planilha (Custcode/CPF + Vencimento) para marcar faturas como pagas (amarelo)">
-          💛 Base Pagos
+          💛 Base Pagos<span id="base-pagos-count"></span>
           <input type="file" accept=".xlsx,.xls" onchange="importarBasePagos(this)" style="display:none" />
         </label>
+        <button id="btn-limpar-base-pagos" class="btn btn-secondary btn-sm" style="display:none" onclick="limparBasePagos()" title="Remove TODAS as marcações manuais da Base Pagos">🗑️</button>
         <button id="btn-fila-robo" class="btn btn-primary btn-sm apenas-local" style="display:none" onclick="gerarFilaRobo()">🤖 Usar como fila do robô</button>
         <button id="btn-enviar-robo" class="btn btn-primary btn-sm" onclick="enviarFilaParaRobo()" title="Envia os clientes filtrados para o robô no localhost">🚀 Gerar Base Robô</button>
       </div>

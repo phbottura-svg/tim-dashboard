@@ -682,6 +682,56 @@ app.post('/api/clientes/base-pagos', uploadMemory.single('arquivo'), (req, res) 
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Quantidade de clientes/faturas atualmente marcados via "Base Pagos" (para o
+// contador ao lado do botão).
+app.get('/api/clientes/base-pagos/status', (req, res) => {
+  try {
+    const pagos = lerJSON(PAGOS_MANUAIS_PATH, {});
+    const totalClientes = Object.keys(pagos).length;
+    const totalFaturas = Object.values(pagos)
+      .reduce((soma, p) => soma + (p.vencimentos || []).length, 0);
+    res.json({ totalClientes, totalFaturas });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Desmarca UM vencimento de UM cliente (engano pontual na Base Pagos).
+// A fatura volta a valer o status real vindo do Sonar no proximo cruzamento.
+app.post('/api/clientes/base-pagos/desmarcar', (req, res) => {
+  try {
+    const { custcode, cpf, vencimento } = req.body || {};
+    if (!vencimento) return res.status(400).json({ erro: 'Vencimento não informado' });
+
+    const pagos = lerJSON(PAGOS_MANUAIS_PATH, {});
+    const cust = soDigitos(custcode);
+    let chave = cust && pagos[cust] ? cust : null;
+    if (!chave && cpf) {
+      const cpfNorm = soDigitos(cpf);
+      chave = Object.keys(pagos).find(k => soDigitos(pagos[k].cpf) === cpfNorm) || null;
+    }
+    if (!chave) return res.status(404).json({ erro: 'Cliente não encontrado na Base Pagos' });
+
+    const antes = pagos[chave].vencimentos.length;
+    pagos[chave].vencimentos = pagos[chave].vencimentos.filter(v => String(v).trim() !== String(vencimento).trim());
+    if (pagos[chave].vencimentos.length === antes) {
+      return res.status(404).json({ erro: 'Vencimento não estava marcado' });
+    }
+    if (!pagos[chave].vencimentos.length) delete pagos[chave]; // sem faturas restantes: remove o cliente
+
+    salvarJSON(PAGOS_MANUAIS_PATH, pagos);
+    cruzarBases();
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Remove TODAS as marcacoes manuais da Base Pagos (reset completo).
+app.delete('/api/clientes/base-pagos', (req, res) => {
+  try {
+    salvarJSON(PAGOS_MANUAIS_PATH, {});
+    cruzarBases();
+    res.json({ ok: true });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 // ─── Filtros/Opções ───────────────────────────────────────────────────────────
 
 app.get('/api/filtros/opcoes', (req, res) => {

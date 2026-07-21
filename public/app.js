@@ -33,6 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   atualizarInfoRelatorio();
   atualizarFilaStatus();
   setInterval(atualizarFilaStatus, 10000);
+  atualizarBasePagosStatus();
   carregarHistoricoRobos();
 });
 
@@ -448,6 +449,7 @@ async function importarBasePagos(input) {
       if (d.vencIgnorados) msg += ` · ${d.vencIgnorados} vencimento(s) ignorado(s) (sem fatura no sistema)`;
       if (d.semCliente) msg += ` · ${d.semCliente} não encontrado(s)`;
       mostrarMsg(msg, 'ok');
+      await atualizarBasePagosStatus();
       await carregarTudo();
     }
   } catch (err) { mostrarMsg('❌ ' + err.message, 'erro'); }
@@ -456,6 +458,48 @@ async function importarBasePagos(input) {
     btn.style.opacity = '';
     input.value = '';
   }
+}
+
+// Contador ao lado do botão "Base Pagos" + visibilidade do botão de reset total.
+async function atualizarBasePagosStatus() {
+  try {
+    const d = await fetch('/api/clientes/base-pagos/status').then(r => r.json());
+    const badge = document.getElementById('base-pagos-count');
+    const btnLimpar = document.getElementById('btn-limpar-base-pagos');
+    if (badge) badge.textContent = d.totalClientes > 0 ? ` (${d.totalClientes})` : '';
+    if (btnLimpar) btnLimpar.style.display = d.totalClientes > 0 ? '' : 'none';
+  } catch {}
+}
+
+// Desmarca UMA fatura marcada manualmente (clique no ícone 💛 na tabela).
+async function desmarcarPagoManual(idx, numeroFatura) {
+  const c = tabelaClientesAtual[idx];
+  const fat = c && (c.faturas || []).find(f => f.numero === numeroFatura);
+  if (!fat) return;
+  if (!confirm(`Desmarcar o pagamento manual do vencimento ${fat.dataVencimento}?\n\nA fatura volta a valer o status real do Sonar.`)) return;
+  try {
+    const r = await fetch('/api/clientes/base-pagos/desmarcar', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ custcode: c.custcode, cpf: c.cpf, vencimento: fat.dataVencimento }),
+    });
+    const d = await r.json();
+    if (d.erro) { alert('Erro: ' + d.erro); return; }
+    await atualizarBasePagosStatus();
+    await carregarTudo();
+  } catch (err) { alert('Erro: ' + err.message); }
+}
+
+// Reset completo da Base Pagos (botão 🗑️, só aparece quando há algo marcado).
+async function limparBasePagos() {
+  if (!confirm('Remover TODAS as marcações manuais da Base Pagos?\n\nTodas as faturas 💛 voltam a valer o status real do Sonar.')) return;
+  try {
+    const r = await fetch('/api/clientes/base-pagos', { method: 'DELETE' });
+    const d = await r.json();
+    if (d.erro) { alert('Erro: ' + d.erro); return; }
+    await atualizarBasePagosStatus();
+    await carregarTudo();
+  } catch (err) { alert('Erro: ' + err.message); }
 }
 
 async function importarClientes(input) {
@@ -810,8 +854,9 @@ async function carregarTabela() {
         if (!fat) return '<td class="dim">—</td>';
         const cls = fat.pagoManual ? 'status-PAGO-MANUAL' : fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
         const icone = fat.pagoManual ? '💛' : fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—';
-        const label = fat.pagoManual ? 'Pago (marcado manualmente via Base Pagos)' : (fat.detalhamento || fat.statusPagamento || '—');
-        return `<td><span class="status-tag ${cls}" title="${label}">${icone} ${fat.dataVencimento || ''}</span></td>`;
+        const label = fat.pagoManual ? 'Pago (marcado manualmente via Base Pagos) — clique para desmarcar' : (fat.detalhamento || fat.statusPagamento || '—');
+        const acao = fat.pagoManual ? ` onclick="desmarcarPagoManual(${idx}, ${i + 1})" style="cursor:pointer"` : '';
+        return `<td><span class="status-tag ${cls}" title="${label}"${acao}>${icone} ${fat.dataVencimento || ''}</span></td>`;
       }).join('');
       const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
       return `<tr id="tb-row-${idx}">

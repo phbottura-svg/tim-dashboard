@@ -266,6 +266,69 @@ function safraParaMeses(mesInicio) {
   return meses;
 }
 
+// ─── IQ (Índice de Qualidade) por safra ──────────────────────────────────────
+// Regra TIM: a safra é o mês do Gross + os 4 meses seguintes (5 meses no total).
+// Um cliente conta como "dentro do IQ" se, na data de referência (o último dia
+// do 5º mês da safra — ou hoje, se a safra ainda não fechou, para dar uma
+// prévia), nenhuma fatura dele com vencimento dentro da janela da safra estiver
+// com mais de 30 dias de atraso. Usa a data de pagamento quando existe (e é
+// anterior à referência); senão, conta os dias até a própria data de
+// referência, tratando a fatura como ainda em aberto naquele momento.
+function calcularIQSafra(safra) {
+  const janela = safraParaMeses(safra);
+  const janelaSet = new Set(janela);
+  const [mmUlt, yyyyUlt] = janela[janela.length - 1].split('/').map(Number);
+  const dataCorte = new Date(yyyyUlt, mmUlt, 0); // último dia do 5º mês da safra
+  const hoje = new Date();
+  const previa = hoje < dataCorte;
+  const dataReferencia = previa ? hoje : dataCorte;
+
+  const todos = lerJSON(BASE_CRUZADA_PATH, []);
+  const cohort = todos.filter(c => c.mesGross === safra);
+
+  const ok = [], atrasados = [];
+  for (const c of cohort) {
+    const faturasNaJanela = (c.faturas || [])
+      .filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
+    const temAtraso = faturasNaJanela.some(f => {
+      const venc = parseDataBr(f.dataVencimento);
+      if (!venc || venc > dataReferencia) return false; // ainda não venceu até a referência
+      const pago = parseDataBr(f.dataPagamento);
+      const fimContagem = (pago && pago <= dataReferencia) ? pago : dataReferencia;
+      const dias = Math.round((fimContagem - venc) / 86400000);
+      return dias > 30;
+    });
+    (temAtraso ? atrasados : ok).push(c);
+  }
+
+  const fmtData = d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
+  return {
+    safra,
+    janela,
+    dataCorte: fmtData(dataCorte),
+    dataReferencia: fmtData(dataReferencia),
+    previa,
+    totalClientes: cohort.length,
+    clientesOk: ok.length,
+    percentual: cohort.length ? Math.round((ok.length / cohort.length) * 1000) / 10 : null,
+    _ok: ok.map(c => ({ nome: c.nome, custcode: c.custcode })),
+    _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode })),
+  };
+}
+
+app.get('/api/iq-safra', (req, res) => {
+  try {
+    const { safra } = req.query;
+    if (!safra || !/^\d{2}\/\d{4}$/.test(safra)) {
+      return res.status(400).json({ erro: 'Informe a safra no formato MM/YYYY' });
+    }
+    const resultado = calcularIQSafra(safra);
+    if (req.query.detalhe !== '1') { delete resultado._ok; delete resultado._atrasados; }
+    res.json(resultado);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
 function aplicarFiltros(lista, q) {
   let l = lista;
   if (q.safra)         l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));

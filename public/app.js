@@ -843,7 +843,7 @@ async function carregarTabela() {
     const d = await fetch('/api/clientes?' + p).then(r => r.json());
     const tbody = document.getElementById('tabela-body');
     if (!d.dados?.length) {
-      tbody.innerHTML = '<tr><td colspan="13" class="loading">Nenhum cliente encontrado</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="12" class="loading">Nenhum cliente encontrado</td></tr>';
       setText('tabela-info', '0 clientes');
       document.getElementById('paginacao').innerHTML = '';
       return;
@@ -868,7 +868,6 @@ async function carregarTabela() {
         <th onclick="ordenar('totalFaturas')">Faturas ↕</th>
         <th onclick="ordenar('status')">Status ↕</th>
         <th>Churn</th>
-        <th title="Índice de Qualidade: % de clientes da mesma safra (mês do Gross + 4 meses) sem fatura com mais de 30 dias de atraso na data de corte">IQ Safra</th>
         ${fCols}
       </tr>`;
     }
@@ -898,11 +897,9 @@ async function carregarTabela() {
         <td>${c.totalFaturas || 0} (${c.faturasPagas || 0} pagas)</td>
         <td><span class="status-tag status-${(c.status||'SEM_DADOS').replace(' ','_')}">${STATUS_LABEL[c.status]||c.status||'—'}</span></td>
         <td>${c.churn ? '⚠️' : '—'}</td>
-        <td id="tb-iq-${idx}" class="dim">${c.mesGross ? '…' : '—'}</td>
         ${fCells}
       </tr>`;
     }).join('');
-    atualizarIQSafraTabela(d.dados);
     setText('tabela-info', `${d.total.toLocaleString('pt-BR')} clientes`);
     const btnExp = document.getElementById('btn-exportar-clientes');
     if (btnExp) btnExp.href = '/api/clientes/exportar?' + p;
@@ -960,33 +957,6 @@ function renderPag(elId, pagAtual, totalPag, onPag) {
 
 let ajusteClientesAtual = [];
 let tabelaClientesAtual = [];
-let iqSafraCache = {};        // safra (MM/YYYY) -> resultado de /api/iq-safra
-let iqSafraEmVoo = new Set(); // safras cuja busca ja esta em andamento
-
-// Busca (uma vez por safra, com cache) e preenche a coluna "IQ Safra" da
-// tabela apos ela ja estar renderizada — nao bloqueia a exibicao do resto.
-async function atualizarIQSafraTabela(dados) {
-  const safras = [...new Set(dados.map(c => c.mesGross).filter(Boolean))];
-  const faltando = safras.filter(s => !iqSafraCache[s] && !iqSafraEmVoo.has(s));
-  faltando.forEach(s => iqSafraEmVoo.add(s));
-
-  await Promise.all(faltando.map(async safra => {
-    try {
-      const r = await fetch('/api/iq-safra?safra=' + encodeURIComponent(safra)).then(r => r.json());
-      iqSafraCache[safra] = r.erro ? null : r;
-    } catch { iqSafraCache[safra] = null; }
-    iqSafraEmVoo.delete(safra);
-  }));
-
-  dados.forEach((c, idx) => {
-    const el = document.getElementById(`tb-iq-${idx}`);
-    if (!el || !c.mesGross) return;
-    const r = iqSafraCache[c.mesGross];
-    if (!r) { el.textContent = '—'; return; }
-    const previaTxt = r.previa ? ' (prévia)' : '';
-    el.innerHTML = `<span class="status-tag status-IQ" title="Safra ${r.safra} (${r.janela.join(', ')}) — corte em ${r.dataCorte}${previaTxt}. ${r.clientesOk}/${r.totalClientes} clientes dentro do IQ.">${r.percentual}%${previaTxt}</span>`;
-  });
-}
 
 async function carregarAjustes() {
   const mesSel = document.getElementById('ajustes-filtro-mes')?.value || '';

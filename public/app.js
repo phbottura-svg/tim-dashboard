@@ -104,6 +104,8 @@ async function enviarFilaParaRobo() {
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
   if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
+  if (document.getElementById('tabela-filtro-iq-dentro')?.checked) p.set('iqSafra', 'dentro');
+  else if (document.getElementById('tabela-filtro-iq-fora')?.checked) p.set('iqSafra', 'fora');
   for (let n = 1; n <= 5; n++) {
     const v = document.getElementById(`tf-f${n}`)?.value;
     if (v) p.set(`f${n}`, v);
@@ -834,6 +836,8 @@ async function carregarTabela() {
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
   if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
+  if (document.getElementById('tabela-filtro-iq-dentro')?.checked) p.set('iqSafra', 'dentro');
+  else if (document.getElementById('tabela-filtro-iq-fora')?.checked) p.set('iqSafra', 'fora');
   for (let n = 1; n <= 5; n++) {
     const v = document.getElementById(`tf-f${n}`)?.value;
     if (v) p.set(`f${n}`, v);
@@ -926,10 +930,19 @@ function limparFiltrosFaturas() {
   buscarTabela();
 }
 
+// Checkboxes "Dentro do IQ" / "Fora do IQ" são mutuamente exclusivos — marcar
+// um desmarca o outro, já que um cliente não pode estar nos dois ao mesmo tempo.
+function onIqCheckbox(qual) {
+  const outro = document.getElementById(qual === 'dentro' ? 'tabela-filtro-iq-fora' : 'tabela-filtro-iq-dentro');
+  if (outro) outro.checked = false;
+  buscarTabela();
+}
+
 function limparTodosFiltros() {
   const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-vencimento'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
-  ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis', 'tabela-filtro-pago-manual'].forEach(id => {
+  ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis',
+   'tabela-filtro-pago-manual', 'tabela-filtro-iq-dentro', 'tabela-filtro-iq-fora'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
   });
   for (let n = 1; n <= 5; n++) { const el = document.getElementById(`tf-f${n}`); if (el) el.value = ''; }

@@ -264,6 +264,8 @@
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-sem-match" onchange="buscarTabela()"> Sem Match</label>
       <label class="filtro-toggle filtro-acionaveis"><input type="checkbox" id="tabela-filtro-acionaveis" onchange="buscarTabela()"> ⚡ Acionáveis</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-pago-manual" onchange="buscarTabela()"> 💛 Base Pagos</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-dentro" onchange="onIqCheckbox('dentro')" title="Precisa de um Mês Gross selecionado no filtro"> ✅ Dentro do IQ</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-fora" onchange="onIqCheckbox('fora')" title="Precisa de um Mês Gross selecionado no filtro"> ❌ Fora do IQ</label>
       <button class="btn btn-sm btn-secondary" onclick="limparTodosFiltros()" style="font-size:11px;padding:5px 12px;margin-left:8px">🧹 Limpar Filtros</button>
     </div>
     <div class="tabela-controles tabela-controles-faturas" id="filtros-faturas-row">

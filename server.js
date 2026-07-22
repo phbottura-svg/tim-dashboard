@@ -274,7 +274,12 @@ function safraParaMeses(mesInicio) {
 // com mais de 30 dias de atraso. Usa a data de pagamento quando existe (e é
 // anterior à referência); senão, conta os dias até a própria data de
 // referência, tratando a fatura como ainda em aberto naquele momento.
-function calcularIQSafra(safra) {
+
+// Janela (5 meses) + data de referência de uma safra. Usado tanto pelo
+// cálculo agregado (calcularIQSafra) quanto pelo filtro por cliente
+// (aplicarFiltros) — cache simples por safra evita recalcular a mesma janela
+// várias vezes num loop sobre a lista de clientes.
+function referenciaSafra(safra) {
   const janela = safraParaMeses(safra);
   const janelaSet = new Set(janela);
   const [mmUlt, yyyyUlt] = janela[janela.length - 1].split('/').map(Number);
@@ -282,23 +287,44 @@ function calcularIQSafra(safra) {
   const hoje = new Date();
   const previa = hoje < dataCorte;
   const dataReferencia = previa ? hoje : dataCorte;
+  return { janela, janelaSet, dataCorte, dataReferencia, previa };
+}
+
+function criarCacheReferenciaSafra() {
+  const cache = new Map();
+  return safra => {
+    if (!safra) return null;
+    if (!cache.has(safra)) cache.set(safra, referenciaSafra(safra));
+    return cache.get(safra);
+  };
+}
+
+// true se alguma fatura do cliente com vencimento dentro da janela estiver
+// com mais de 30 dias de atraso na data de referência — a MESMA regra usada
+// no card do IQ e no filtro "Dentro/Fora do IQ" da tabela, para os dois
+// nunca divergirem.
+function clienteForaDoIQ(cliente, janelaSet, dataReferencia) {
+  const faturasNaJanela = (cliente.faturas || [])
+    .filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
+  return faturasNaJanela.some(f => {
+    const venc = parseDataBr(f.dataVencimento);
+    if (!venc || venc > dataReferencia) return false; // ainda não venceu até a referência
+    const pago = parseDataBr(f.dataPagamento);
+    const fimContagem = (pago && pago <= dataReferencia) ? pago : dataReferencia;
+    const dias = Math.round((fimContagem - venc) / 86400000);
+    return dias > 30;
+  });
+}
+
+function calcularIQSafra(safra) {
+  const { janela, janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
 
   const todos = lerJSON(BASE_CRUZADA_PATH, []);
   const cohort = todos.filter(c => c.mesGross === safra);
 
   const ok = [], atrasados = [];
   for (const c of cohort) {
-    const faturasNaJanela = (c.faturas || [])
-      .filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
-    const temAtraso = faturasNaJanela.some(f => {
-      const venc = parseDataBr(f.dataVencimento);
-      if (!venc || venc > dataReferencia) return false; // ainda não venceu até a referência
-      const pago = parseDataBr(f.dataPagamento);
-      const fimContagem = (pago && pago <= dataReferencia) ? pago : dataReferencia;
-      const dias = Math.round((fimContagem - venc) / 86400000);
-      return dias > 30;
-    });
-    (temAtraso ? atrasados : ok).push(c);
+    (clienteForaDoIQ(c, janelaSet, dataReferencia) ? atrasados : ok).push(c);
   }
 
   const fmtData = d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
@@ -354,6 +380,15 @@ function aplicarFiltros(lista, q) {
   if (q.churn === '1') l = l.filter(c => c.churn);
   if (q.semMatch === '1') l = l.filter(c => !c.cruzado);
   if (q.pagoManual === '1') l = l.filter(c => (c.faturas || []).some(f => f.pagoManual));
+  if (q.iqSafra === 'dentro' || q.iqSafra === 'fora') {
+    const getRef = criarCacheReferenciaSafra();
+    l = l.filter(c => {
+      const ref = getRef(c.mesGross);
+      if (!ref) return false; // sem safra definida, nao entra em nenhum dos dois lados
+      const fora = clienteForaDoIQ(c, ref.janelaSet, ref.dataReferencia);
+      return q.iqSafra === 'fora' ? fora : !fora;
+    });
+  }
   if (q.acionaveis === '1') l = l.filter(c => {
     if (c.churn) return false;
     const atrasos = (c.faturas || []).filter(f => f.status === 'INADIMPLENTE').length;

@@ -307,6 +307,9 @@ function clienteForaDoIQ(cliente, janelaSet, dataReferencia) {
   const faturasNaJanela = (cliente.faturas || [])
     .filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
   return faturasNaJanela.some(f => {
+    // Fatura marcada manualmente como paga (Base Pagos) conta como em dia,
+    // mesmo sem dataPagamento preenchida — mesmo criterio do status geral.
+    if (f.pagoManual) return false;
     const venc = parseDataBr(f.dataVencimento);
     if (!venc || venc > dataReferencia) return false; // ainda não venceu até a referência
     const pago = parseDataBr(f.dataPagamento);

@@ -210,6 +210,7 @@ function cruzarBases() {
       insucessoDacc: f.insucessoDacc || null,
       nomeBanco: f.nomeBanco || null,
       suspensaoFraude: f.suspensaoFraude || null,
+      churn: f.churn || null,
       status: calcularStatus(f.statusPagamento, f.dataVencimento),
     }));
 
@@ -307,6 +308,8 @@ function clienteForaDoIQ(cliente, janelaSet, dataReferencia) {
   const faturasNaJanela = (cliente.faturas || [])
     .filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
   return faturasNaJanela.some(f => {
+    // Churn na janela da safra tira o cliente da qualidade, independente de pagamento.
+    if (f.churn === 'Sim') return true;
     // Fatura marcada manualmente como paga (Base Pagos) conta como em dia,
     // mesmo sem dataPagamento preenchida — mesmo criterio do status geral.
     if (f.pagoManual) return false;

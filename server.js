@@ -1473,7 +1473,9 @@ app.get('/api/relatorios', (req, res) => {
   if (!fs.existsSync(RELATORIOS_PATH)) return res.json({ arquivos: [] });
   const arquivos = fs.readdirSync(RELATORIOS_PATH)
     .filter(f => f.endsWith('.xlsx') && !f.startsWith('~$'))
-    .sort().reverse();
+    .map(f => ({ nome: f, mtime: fs.statSync(path.join(RELATORIOS_PATH, f)).mtimeMs }))
+    .sort((a, b) => b.mtime - a.mtime)
+    .map(a => a.nome);
   res.json({ arquivos });
 });
 
@@ -1543,7 +1545,9 @@ app.get('/api/relatorios-disparo', (req, res) => {
   if (!fs.existsSync(RELATORIOS_DISPARO_PATH)) return res.json({ arquivos: [] });
   const arquivos = fs.readdirSync(RELATORIOS_DISPARO_PATH)
     .filter(f => f.endsWith('.xlsx') && !f.startsWith('~$'))
-    .sort().reverse();
+    .map(f => ({ nome: f, mtime: fs.statSync(path.join(RELATORIOS_DISPARO_PATH, f)).mtimeMs }))
+    .sort((a, b) => b.mtime - a.mtime)
+    .map(a => a.nome);
   res.json({ arquivos });
 });
 

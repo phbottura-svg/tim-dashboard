@@ -1767,6 +1767,25 @@ app.get('/api/faturas/codigos/:arquivo', (req, res) => {
   res.json(item);
 });
 
+// ─── Webhook Chatwoot (log cru, temporário) ────────────────────────────────────
+// Etapa de descoberta: só grava o payload bruto pra entendermos o formato real
+// de um clique de botão interativo antes de implementar a lógica final.
+
+const CHATWOOT_WEBHOOK_LOG_PATH = path.join(DATA_PATH, 'chatwoot-webhook-log.json');
+
+app.post('/webhook/chatwoot', (req, res) => {
+  const log = lerJSON(CHATWOOT_WEBHOOK_LOG_PATH, []);
+  log.push({ recebidoEm: new Date().toISOString(), body: req.body });
+  while (log.length > 50) log.shift(); // mantém só os últimos 50 eventos
+  salvarJSON(CHATWOOT_WEBHOOK_LOG_PATH, log);
+  console.log('📩 Webhook Chatwoot recebido:', JSON.stringify(req.body).slice(0, 500));
+  res.status(200).json({ ok: true });
+});
+
+app.get('/webhook/chatwoot/log', (req, res) => {
+  res.json(lerJSON(CHATWOOT_WEBHOOK_LOG_PATH, []));
+});
+
 app.get('/api/faturas', (req, res) => {
   try {
     const busca = semAcento(req.query.busca || '');

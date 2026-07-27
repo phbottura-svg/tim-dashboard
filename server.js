@@ -1741,6 +1741,32 @@ app.post('/api/upload-pdf', autorizarUpload, upload.single('pdf'), (req, res) =>
   res.json({ ok: true, arquivo: req.file.filename, tamanho: req.file.size });
 });
 
+// ─── Códigos Pix / linha digitável extraídos das faturas ──────────────────────
+// Chave = nome do arquivo PDF (mesma chave usada em toda a fila/log de disparo).
+
+const FATURA_CODIGOS_PATH = path.join(DATA_PATH, 'fatura-codigos.json');
+
+app.post('/api/faturas/codigos', autorizarUpload, (req, res) => {
+  const { arquivo, pix, linhaDigitavel } = req.body || {};
+  if (!arquivo) return res.status(400).json({ erro: 'Campo "arquivo" obrigatório' });
+
+  const dados = lerJSON(FATURA_CODIGOS_PATH, {});
+  dados[arquivo] = {
+    pix: pix || null,
+    linhaDigitavel: linhaDigitavel || null,
+    atualizadoEm: new Date().toISOString(),
+  };
+  salvarJSON(FATURA_CODIGOS_PATH, dados);
+  res.json({ ok: true });
+});
+
+app.get('/api/faturas/codigos/:arquivo', (req, res) => {
+  const dados = lerJSON(FATURA_CODIGOS_PATH, {});
+  const item = dados[req.params.arquivo];
+  if (!item) return res.status(404).json({ erro: 'Não encontrado' });
+  res.json(item);
+});
+
 app.get('/api/faturas', (req, res) => {
   try {
     const busca = semAcento(req.query.busca || '');

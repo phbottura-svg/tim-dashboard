@@ -6,6 +6,8 @@ const { spawn } = require('child_process');
 const XLSX = require('xlsx');
 const multer = require('multer');
 const { parse: parseCSV } = require('csv-parse/sync');
+const session = require('express-session');
+const bcrypt = require('bcryptjs');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -32,6 +34,7 @@ const HISTORICO_ROBOS_PATH = path.join(DATA_PATH, 'historico-robos.json');
 // Faturas marcadas manualmente como pagas ("Base Pagos") — persiste entre cruzamentos.
 // Estrutura: { [custcodeNormalizado]: { cpf, vencimentos: ["10/06/2026", ...] } }
 const PAGOS_MANUAIS_PATH = path.join(DATA_PATH, 'pagos-manuais.json');
+const USUARIOS_PATH = path.join(DATA_PATH, 'usuarios.json');
 
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
 
@@ -47,7 +50,6 @@ function salvarHistoricoRobo(estado) {
 }
 
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, 'public')));
 
 // CORS para o localhost aceitar chamadas do browser vindo do VPS
 app.use((req, res, next) => {
@@ -56,6 +58,61 @@ app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
   if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
+});
+
+// ─── Login / sessão ────────────────────────────────────────────────────────────
+
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'troque-este-segredo-no-env',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 * 7, sameSite: 'lax' }, // 7 dias
+}));
+
+// Rotas que não exigem login: a própria página/endpoint de login, e os
+// endpoints chamados por máquina (tim-playwright, Chatwoot) que já têm sua
+// própria autenticação (Bearer token ou nenhuma, no caso do webhook externo).
+const ROTAS_PUBLICAS = [
+  { method: 'GET',  path: '/login.html' },
+  { method: 'POST', path: '/api/login' },
+  { method: 'POST', path: '/api/upload-pdf' },
+  { method: 'POST', path: '/api/faturas/codigos' },
+  { method: 'POST', path: '/webhook/chatwoot' },
+];
+
+function exigirLogin(req, res, next) {
+  const publico = ROTAS_PUBLICAS.some(r => r.method === req.method && req.path === r.path);
+  if (publico) return next();
+  if (req.session && req.session.usuario) return next();
+  if (req.path.startsWith('/api/') || req.path.startsWith('/webhook/')) {
+    return res.status(401).json({ erro: 'Não autenticado' });
+  }
+  return res.redirect('/login.html');
+}
+
+app.use(exigirLogin);
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.post('/api/login', (req, res) => {
+  const { usuario, senha } = req.body || {};
+  if (!usuario || !senha) return res.status(400).json({ erro: 'Usuário e senha obrigatórios' });
+
+  const usuarios = lerJSON(USUARIOS_PATH, []);
+  const encontrado = usuarios.find(u => u.usuario === usuario);
+  if (!encontrado || !bcrypt.compareSync(senha, encontrado.senhaHash)) {
+    return res.status(401).json({ erro: 'Usuário ou senha inválidos' });
+  }
+
+  req.session.usuario = { usuario: encontrado.usuario, nome: encontrado.nome };
+  res.json({ ok: true, nome: encontrado.nome });
+});
+
+app.post('/api/logout', (req, res) => {
+  req.session.destroy(() => res.json({ ok: true }));
+});
+
+app.get('/api/sessao', (req, res) => {
+  res.json({ logado: !!(req.session && req.session.usuario), usuario: req.session?.usuario || null });
 });
 
 const stripAnsi = s => s.replace(/\x1B\[[0-9;]*[mGKHF]/g, '');

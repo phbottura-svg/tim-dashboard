@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login — VONIXX TELECOM</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0a0a1a; --card: #12122a; --border: #1e1e4a;
+    --azul: #0057ff; --azul-c: #4da6ff; --texto: #e0e0ff;
+    --dim: #7070a0; --vermelho: #ff3d57;
+  }
+  body {
+    background: var(--bg); color: var(--texto);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  }
+  .card {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 40px; width: 100%; max-width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  }
+  h1 { font-size: 20px; margin-bottom: 4px; }
+  p.sub { color: var(--dim); font-size: 13px; margin-bottom: 24px; }
+  label { display: block; font-size: 13px; color: var(--dim); margin-bottom: 6px; }
+  input {
+    width: 100%; padding: 10px 12px; margin-bottom: 16px; border-radius: 8px;
+    border: 1px solid var(--border); background: #0a0a1a; color: var(--texto); font-size: 14px;
+  }
+  input:focus { outline: none; border-color: var(--azul-c); }
+  button {
+    width: 100%; padding: 11px; border: none; border-radius: 8px;
+    background: var(--azul); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+  }
+  button:hover { background: var(--azul-c); }
+  button:disabled { opacity: 0.6; cursor: default; }
+  .erro {
+    color: var(--vermelho); font-size: 13px; margin-bottom: 16px; display: none;
+  }
+</style>
+</head>
+<body>
+  <form class="card" id="form-login">
+    <h1>VONIXX TELECOM</h1>
+    <p class="sub">Dashboard de Gestão de Clientes</p>
+    <div class="erro" id="erro"></div>
+    <label for="usuario">Usuário</label>
+    <input type="text" id="usuario" autocomplete="username" required autofocus>
+    <label for="senha">Senha</label>
+    <input type="password" id="senha" autocomplete="current-password" required>
+    <button type="submit" id="btn">Entrar</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('form-login');
+    const erro = document.getElementById('erro');
+    const btn = document.getElementById('btn');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      erro.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+      try {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            usuario: document.getElementById('usuario').value.trim(),
+            senha: document.getElementById('senha').value,
+          }),
+        });
+        const data = await res.json();
+        if (res.ok) {
+          window.location.href = '/';
+        } else {
+          erro.textContent = data.erro || 'Usuário ou senha inválidos';
+          erro.style.display = 'block';
+        }
+      } catch (e) {
+        erro.textContent = 'Erro de conexão. Tente novamente.';
+        erro.style.display = 'block';
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    });
+  </script>
+</body>
+</html>

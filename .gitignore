@@ -4,3 +4,4 @@ credentials/
 data/pdfs/*
 !data/pdfs/.gitkeep
 data_backup_*/
+local-server*.log

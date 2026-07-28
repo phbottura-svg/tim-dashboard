@@ -20,18 +20,29 @@ const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS':
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
-function limparBuscaTabelaAutofill() {
+let _buscaTabelaTocada = false;
+
+function vigiarBuscaTabelaAutofill() {
   const el = document.getElementById('busca-tabela');
-  if (el && el.value) el.value = '';
+  if (!el) return;
+
+  // Só passa a respeitar o valor depois que o usuário de fato interagir
+  // (o autofill sincronizado não dispara foco/tecla real).
+  el.addEventListener('focus', () => { _buscaTabelaTocada = true; }, { once: true });
+  el.addEventListener('keydown', () => { _buscaTabelaTocada = true; }, { once: true });
+
+  // Alguns navegadores repõem o valor antigo bem depois do carregamento —
+  // fica vigiando por alguns segundos e zera de novo até o usuário mexer.
+  let tentativas = 0;
+  const intervalo = setInterval(() => {
+    tentativas++;
+    if (_buscaTabelaTocada || tentativas > 20) { clearInterval(intervalo); return; }
+    if (el.value) el.value = '';
+  }, 500);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
-  // Alguns navegadores/extensões repõem valor antigo neste campo via
-  // preenchimento automático sincronizado — força vazio de qualquer forma,
-  // inclusive um pouco depois pra pegar preenchimentos tardios de extensão.
-  limparBuscaTabelaAutofill();
-  setTimeout(limparBuscaTabelaAutofill, 400);
-  setTimeout(limparBuscaTabelaAutofill, 1200);
+  vigiarBuscaTabelaAutofill();
 
   carregarSessao();
   await aplicarModoVps();

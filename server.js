@@ -84,7 +84,12 @@ function exigirLogin(req, res, next) {
   // O login existe para proteger o dashboard exposto na internet (VPS). Rodando
   // localmente é o companion do robô, acessível só na própria máquina — pedir
   // senha ali só atrapalharia a operação.
-  if (MODO !== 'vps') return next();
+  if (MODO !== 'vps') {
+    // Abas/atalhos antigos apontando direto para a tela de login continuariam
+    // mostrando um formulário inútil aqui — manda para a raiz.
+    if (req.path === '/login.html') return res.redirect('/');
+    return next();
+  }
   const publico = ROTAS_PUBLICAS.some(r => r.method === req.method && req.path === r.path);
   if (publico) return next();
   if (req.session && req.session.usuario) return next();

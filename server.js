@@ -115,6 +115,60 @@ app.get('/api/sessao', (req, res) => {
   res.json({ logado: !!(req.session && req.session.usuario), usuario: req.session?.usuario || null });
 });
 
+// ─── Gestão de usuários ────────────────────────────────────────────────────────
+
+app.get('/api/usuarios', (req, res) => {
+  const usuarios = lerJSON(USUARIOS_PATH, []);
+  res.json(usuarios.map(u => ({ usuario: u.usuario, nome: u.nome, criadoEm: u.criadoEm })));
+});
+
+app.post('/api/usuarios', (req, res) => {
+  const { usuario, senha, nome } = req.body || {};
+  if (!usuario || !senha) return res.status(400).json({ erro: 'Usuário e senha obrigatórios' });
+  if (senha.length < 6) return res.status(400).json({ erro: 'Senha precisa de pelo menos 6 caracteres' });
+
+  const usuarios = lerJSON(USUARIOS_PATH, []);
+  if (usuarios.some(u => u.usuario === usuario)) {
+    return res.status(400).json({ erro: 'Já existe um usuário com esse nome' });
+  }
+
+  usuarios.push({
+    usuario,
+    senhaHash: bcrypt.hashSync(senha, 10),
+    nome: nome || usuario,
+    criadoEm: new Date().toISOString(),
+  });
+  salvarJSON(USUARIOS_PATH, usuarios);
+  res.json({ ok: true });
+});
+
+app.put('/api/usuarios/:usuario', (req, res) => {
+  const { senha, nome } = req.body || {};
+  const usuarios = lerJSON(USUARIOS_PATH, []);
+  const alvo = usuarios.find(u => u.usuario === req.params.usuario);
+  if (!alvo) return res.status(404).json({ erro: 'Usuário não encontrado' });
+
+  if (senha) {
+    if (senha.length < 6) return res.status(400).json({ erro: 'Senha precisa de pelo menos 6 caracteres' });
+    alvo.senhaHash = bcrypt.hashSync(senha, 10);
+  }
+  if (nome) alvo.nome = nome;
+
+  salvarJSON(USUARIOS_PATH, usuarios);
+  res.json({ ok: true });
+});
+
+app.delete('/api/usuarios/:usuario', (req, res) => {
+  const usuarios = lerJSON(USUARIOS_PATH, []);
+  if (usuarios.length <= 1) return res.status(400).json({ erro: 'Não é possível excluir o último usuário' });
+
+  const restantes = usuarios.filter(u => u.usuario !== req.params.usuario);
+  if (restantes.length === usuarios.length) return res.status(404).json({ erro: 'Usuário não encontrado' });
+
+  salvarJSON(USUARIOS_PATH, restantes);
+  res.json({ ok: true });
+});
+
 const stripAnsi = s => s.replace(/\x1B\[[0-9;]*[mGKHF]/g, '');
 
 let processoRobo = null;

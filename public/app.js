@@ -21,6 +21,7 @@ const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS':
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', async () => {
+  carregarSessao();
   await aplicarModoVps();
   iniciarScrollTop();
   restaurarEstadoDisparo();
@@ -344,6 +345,86 @@ function mudarAba(btn) {
   if (aba === 'comandos') { carregarRelatorios(); carregarRelatoriosDisparo(); }
   if (aba === 'faturas') carregarFaturas(1);
   if (aba === 'ajustes') carregarAjustes();
+  if (aba === 'usuarios') carregarUsuarios();
+}
+
+// ─── Usuários ─────────────────────────────────────────────────────────────────
+
+async function carregarSessao() {
+  try {
+    const { usuario } = await fetch('/api/sessao').then(r => r.json());
+    const el = document.getElementById('usuario-logado');
+    if (el && usuario) el.textContent = `👤 ${usuario.nome}`;
+  } catch {}
+}
+
+async function sair() {
+  await fetch('/api/logout', { method: 'POST' }).catch(() => {});
+  window.location.href = '/login.html';
+}
+
+async function carregarUsuarios() {
+  const tbody = document.getElementById('usuarios-tbody');
+  try {
+    const usuarios = await fetch('/api/usuarios').then(r => r.json());
+    tbody.innerHTML = usuarios.map(u => `
+      <tr>
+        <td>${u.usuario}</td>
+        <td>${u.nome || ''}</td>
+        <td>${u.criadoEm ? new Date(u.criadoEm).toLocaleDateString('pt-BR') : ''}</td>
+        <td>
+          <button class="btn btn-secondary btn-sm" onclick="trocarSenhaUsuario('${u.usuario}')">🔑 Trocar senha</button>
+          <button class="btn btn-danger btn-sm" onclick="excluirUsuario('${u.usuario}')">🗑 Excluir</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch {
+    tbody.innerHTML = '<tr><td colspan="4">Erro ao carregar usuários</td></tr>';
+  }
+}
+
+async function criarUsuario() {
+  const usuario = document.getElementById('novo-usuario-usuario').value.trim();
+  const nome = document.getElementById('novo-usuario-nome').value.trim();
+  const senha = document.getElementById('novo-usuario-senha').value;
+
+  if (!usuario || !senha) return alert('Usuário e senha são obrigatórios');
+
+  const res = await fetch('/api/usuarios', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ usuario, senha, nome }),
+  });
+  const data = await res.json();
+  if (!res.ok) return alert(data.erro || 'Erro ao criar usuário');
+
+  document.getElementById('novo-usuario-usuario').value = '';
+  document.getElementById('novo-usuario-nome').value = '';
+  document.getElementById('novo-usuario-senha').value = '';
+  carregarUsuarios();
+}
+
+async function trocarSenhaUsuario(usuario) {
+  const senha = prompt(`Nova senha para "${usuario}" (mín. 6 caracteres):`);
+  if (!senha) return;
+
+  const res = await fetch(`/api/usuarios/${encodeURIComponent(usuario)}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ senha }),
+  });
+  const data = await res.json();
+  if (!res.ok) return alert(data.erro || 'Erro ao trocar senha');
+  alert('Senha atualizada.');
+}
+
+async function excluirUsuario(usuario) {
+  if (!confirm(`Excluir o usuário "${usuario}"?`)) return;
+
+  const res = await fetch(`/api/usuarios/${encodeURIComponent(usuario)}`, { method: 'DELETE' });
+  const data = await res.json();
+  if (!res.ok) return alert(data.erro || 'Erro ao excluir usuário');
+  carregarUsuarios();
 }
 
 function mudarAbaBtn(aba) {

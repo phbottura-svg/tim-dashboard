@@ -25,10 +25,13 @@
     <button class="nav-btn" data-tab="faturas" onclick="mudarAba(this)">📄 Faturas</button>
     <button class="nav-btn" data-tab="ajustes" onclick="mudarAba(this)">🔧 Ajustes <span id="badge-ajustes" class="nav-badge" style="display:none">0</span></button>
     <button class="nav-btn" data-tab="comandos" onclick="mudarAba(this)">🤖 Comandos</button>
+    <button class="nav-btn" data-tab="usuarios" onclick="mudarAba(this)">👤 Usuários</button>
   </div>
   <div class="header-right">
     <span id="ultima-atualizacao" class="ts">—</span>
     <button class="btn btn-secondary" onclick="atualizarDados()">🔄 Recruzar</button>
+    <span id="usuario-logado" class="ts" style="margin-left:10px"></span>
+    <button class="btn btn-secondary btn-sm" onclick="sair()" style="margin-left:6px">🚪 Sair</button>
   </div>
 </header>
 
@@ -564,6 +567,37 @@
         <div class="console" id="console-log-SC" style="display:none"></div>
         <div class="console" id="console-log-RS" style="display:none"></div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ABA: USUÁRIOS ════════════════════════════════════════════════════════ -->
+<div id="tab-usuarios" class="tab-content">
+  <div class="ajustes-wrap">
+    <div class="ajustes-header">
+      <div class="ajustes-header-top">
+        <h3>👤 Usuários do Sistema</h3>
+      </div>
+      <div class="ajustes-filtros" style="gap:8px">
+        <input type="text" id="novo-usuario-usuario" placeholder="usuário" style="width:150px" />
+        <input type="text" id="novo-usuario-nome" placeholder="nome" style="width:180px" />
+        <input type="password" id="novo-usuario-senha" placeholder="senha (mín. 6)" style="width:150px" />
+        <button class="btn btn-primary btn-sm" onclick="criarUsuario()">+ Novo usuário</button>
+      </div>
+    </div>
+
+    <div class="tabela-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Usuário</th>
+            <th>Nome</th>
+            <th>Criado em</th>
+            <th>Ação</th>
+          </tr>
+        </thead>
+        <tbody id="usuarios-tbody"></tbody>
+      </table>
     </div>
   </div>
 </div>

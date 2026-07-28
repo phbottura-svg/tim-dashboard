@@ -20,25 +20,24 @@ const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS':
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
-let _buscaTabelaTocada = false;
+// Último valor que o usuário realmente digitou no campo de busca.
+let _buscaTabelaDigitado = '';
 
 function vigiarBuscaTabelaAutofill() {
   const el = document.getElementById('busca-tabela');
   if (!el) return;
 
-  // Só passa a respeitar o valor quando o usuário de fato digitar algo.
-  // NÃO usar "focus" aqui — é justamente ao focar que o autofill
-  // sincronizado repõe o valor antigo, então desarmar nesse momento
-  // deixava o campo desprotegido bem na hora que mais precisava.
-  el.addEventListener('keydown', () => { _buscaTabelaTocada = true; });
-
-  // Sem prazo — alguns navegadores repõem o valor bem depois do
-  // carregamento (ou de novo ao focar), então fica vigiando indefinidamente
-  // até haver digitação real.
-  setInterval(() => {
-    if (_buscaTabelaTocada) return;
-    if (el.value) el.value = '';
-  }, 400);
+  // O autofill do Chrome preenche o campo ao clicar nele, disparando eventos
+  // sintéticos: no "input" o inputType vem vazio, enquanto digitação ou
+  // colagem real sempre traz um inputType ("insertText", "insertFromPaste",
+  // "deleteContentBackward"...). É esse o critério para descartar só o
+  // preenchimento automático sem atrapalhar quem está digitando.
+  el.addEventListener('input', e => {
+    if (e.inputType) { _buscaTabelaDigitado = el.value; return; }
+    if (el.value === _buscaTabelaDigitado) return;
+    el.value = _buscaTabelaDigitado;
+    buscarTabela();
+  });
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1054,6 +1053,7 @@ function onIqCheckbox(qual) {
 function limparTodosFiltros() {
   const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-vencimento'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  _buscaTabelaDigitado = '';
   ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis',
    'tabela-filtro-pago-manual', 'tabela-filtro-iq-dentro', 'tabela-filtro-iq-fora'].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;

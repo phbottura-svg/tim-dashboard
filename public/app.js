@@ -342,6 +342,7 @@ function mudarAba(btn) {
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
   const el = document.getElementById(`tab-${aba}`);
   if (el) el.classList.add('active');
+  if (document.getElementById('sidebar')?.classList.contains('aberta')) toggleSidebar(false);
   if (aba === 'comandos') { carregarRelatorios(); carregarRelatoriosDisparo(); }
   if (aba === 'faturas') carregarFaturas(1);
   if (aba === 'ajustes') carregarAjustes();
@@ -361,6 +362,14 @@ async function carregarSessao() {
 async function sair() {
   await fetch('/api/logout', { method: 'POST' }).catch(() => {});
   window.location.href = '/login.html';
+}
+
+function toggleSidebar(forcarAberto) {
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+  const abrir = forcarAberto !== undefined ? forcarAberto : !sidebar.classList.contains('aberta');
+  sidebar.classList.toggle('aberta', abrir);
+  overlay.classList.toggle('aberta', abrir);
 }
 
 async function carregarUsuarios() {

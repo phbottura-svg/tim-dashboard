@@ -4,35 +4,41 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Login — VONIXX TELECOM</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0a0a1a; --card: #12122a; --border: #1e1e4a;
-    --azul: #0057ff; --azul-c: #4da6ff; --texto: #e0e0ff;
-    --dim: #7070a0; --vermelho: #ff3d57;
+    --bg: #0B0F1A; --card: #131A2A; --border: #212A3D;
+    --azul: #3D7FFF; --azul-c: #6FA1FF; --texto: #E6E9F0;
+    --dim: #8993AA; --label: #5C6785; --vermelho: #F0525C;
   }
   body {
     background: var(--bg); color: var(--texto);
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
   }
   .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 40px; width: 100%; max-width: 360px; box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    padding: 40px; width: 100%; max-width: 360px;
+    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.24);
   }
-  h1 { font-size: 20px; margin-bottom: 4px; }
-  p.sub { color: var(--dim); font-size: 13px; margin-bottom: 24px; }
-  label { display: block; font-size: 13px; color: var(--dim); margin-bottom: 6px; }
+  h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  p.sub { color: var(--dim); font-size: 13px; margin-bottom: 28px; }
+  label { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--label); margin-bottom: 7px; }
   input {
-    width: 100%; padding: 10px 12px; margin-bottom: 16px; border-radius: 8px;
-    border: 1px solid var(--border); background: #0a0a1a; color: var(--texto); font-size: 14px;
+    width: 100%; padding: 10px 12px; margin-bottom: 18px; border-radius: 8px;
+    border: 1px solid var(--border); background: #0E1420; color: var(--texto); font-size: 14px;
+    font-family: inherit; transition: border-color .2s;
   }
-  input:focus { outline: none; border-color: var(--azul-c); }
+  input:focus { outline: none; border-color: var(--azul); }
   button {
     width: 100%; padding: 11px; border: none; border-radius: 8px;
     background: var(--azul); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: inherit; transition: background .15s;
   }
-  button:hover { background: var(--azul-c); }
+  button:hover { background: #2E6FEF; }
   button:disabled { opacity: 0.6; cursor: default; }
   .erro {
     color: var(--vermelho); font-size: 13px; margin-bottom: 16px; display: none;

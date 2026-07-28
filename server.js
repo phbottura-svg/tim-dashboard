@@ -77,6 +77,7 @@ const ROTAS_PUBLICAS = [
   { method: 'POST', path: '/api/login' },
   { method: 'POST', path: '/api/upload-pdf' },
   { method: 'POST', path: '/api/faturas/codigos' },
+  { method: 'POST', path: '/api/faturas/envio' },
   { method: 'POST', path: '/webhook/chatwoot' },
 ];
 

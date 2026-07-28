@@ -20,7 +20,19 @@ const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS':
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
+function limparBuscaTabelaAutofill() {
+  const el = document.getElementById('busca-tabela');
+  if (el && el.value) el.value = '';
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
+  // Alguns navegadores/extensões repõem valor antigo neste campo via
+  // preenchimento automático sincronizado — força vazio de qualquer forma,
+  // inclusive um pouco depois pra pegar preenchimentos tardios de extensão.
+  limparBuscaTabelaAutofill();
+  setTimeout(limparBuscaTabelaAutofill, 400);
+  setTimeout(limparBuscaTabelaAutofill, 1200);
+
   carregarSessao();
   await aplicarModoVps();
   iniciarScrollTop();

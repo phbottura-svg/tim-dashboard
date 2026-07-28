@@ -1887,19 +1887,114 @@ app.get('/api/faturas/codigos/:arquivo', (req, res) => {
   res.json(item);
 });
 
+// ─── Última fatura enviada por número ────────────────────────────────────────
+// O Chatwoot entrega apenas o texto do botão clicado ("Copiar chave Pix"), sem
+// nenhum identificador da fatura. Para saber a qual cobrança o clique se refere,
+// registramos no disparo qual PDF foi para cada número e consultamos aqui.
+
+const FATURA_ENVIOS_PATH = path.join(DATA_PATH, 'fatura-envios.json');
+
+// O WhatsApp ora devolve o número com o nono dígito, ora sem. Gera as duas
+// formas para que o registro e a consulta se encontrem em qualquer caso.
+function chavesTelefone(telefone) {
+  const d = String(telefone || '').replace(/\D/g, '');
+  if (!d) return [];
+  const chaves = new Set([d]);
+  const m = d.match(/^55(\d{2})(\d{8,9})$/);
+  if (m) {
+    const [, ddd, numero] = m;
+    if (numero.length === 9 && numero.startsWith('9')) chaves.add(`55${ddd}${numero.slice(1)}`);
+    if (numero.length === 8) chaves.add(`55${ddd}9${numero}`);
+  }
+  return [...chaves];
+}
+
+app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
+  const { telefone, arquivo } = req.body || {};
+  if (!telefone || !arquivo) return res.status(400).json({ erro: 'Campos "telefone" e "arquivo" obrigatórios' });
+
+  const envios = lerJSON(FATURA_ENVIOS_PATH, {});
+  const registro = { arquivo, enviadoEm: new Date().toISOString() };
+  for (const chave of chavesTelefone(telefone)) envios[chave] = registro;
+  salvarJSON(FATURA_ENVIOS_PATH, envios);
+  res.json({ ok: true });
+});
+
+function ultimaFaturaDoTelefone(telefone) {
+  const envios = lerJSON(FATURA_ENVIOS_PATH, {});
+  for (const chave of chavesTelefone(telefone)) {
+    if (envios[chave]) return envios[chave];
+  }
+  return null;
+}
+
 // ─── Webhook Chatwoot (log cru, temporário) ────────────────────────────────────
 // Etapa de descoberta: só grava o payload bruto pra entendermos o formato real
 // de um clique de botão interativo antes de implementar a lógica final.
 
 const CHATWOOT_WEBHOOK_LOG_PATH = path.join(DATA_PATH, 'chatwoot-webhook-log.json');
 
+const CHATWOOT_URL = (process.env.CHATWOOT_URL || '').replace(/\/$/, '');
+const CHATWOOT_TOKEN = process.env.CHATWOOT_TOKEN || '';
+const CHATWOOT_ACCOUNT_ID = process.env.CHATWOOT_ACCOUNT_ID || '';
+
+// Comparados sem acento: o mesmo "ó" chega ora composto, ora decomposto,
+// dependendo de quem originou a mensagem — comparar o texto cru falha.
+const BOTAO_PIX = 'copiar chave pix';
+const BOTAO_BOLETO = 'copiar codigo boleto';
+
+async function responderNoChatwoot(conversaId, texto) {
+  if (!CHATWOOT_URL || !CHATWOOT_TOKEN || !CHATWOOT_ACCOUNT_ID) {
+    console.log('⚠️ Chatwoot não configurado — resposta não enviada');
+    return false;
+  }
+  try {
+    const r = await fetch(`${CHATWOOT_URL}/api/v1/accounts/${CHATWOOT_ACCOUNT_ID}/conversations/${conversaId}/messages`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', api_access_token: CHATWOOT_TOKEN },
+      body: JSON.stringify({ content: texto, message_type: 'outgoing' }),
+    });
+    if (!r.ok) { console.log('⚠️ Chatwoot respondeu', r.status, await r.text().catch(() => '')); return false; }
+    return true;
+  } catch (e) {
+    console.log('⚠️ Falha ao responder no Chatwoot:', e.message);
+    return false;
+  }
+}
+
 app.post('/webhook/chatwoot', (req, res) => {
+  const body = req.body || {};
+
   const log = lerJSON(CHATWOOT_WEBHOOK_LOG_PATH, []);
-  log.push({ recebidoEm: new Date().toISOString(), body: req.body });
+  log.push({ recebidoEm: new Date().toISOString(), body });
   while (log.length > 50) log.shift(); // mantém só os últimos 50 eventos
   salvarJSON(CHATWOOT_WEBHOOK_LOG_PATH, log);
-  console.log('📩 Webhook Chatwoot recebido:', JSON.stringify(req.body).slice(0, 500));
+
+  // Responde imediatamente: o Chatwoot não deve ficar esperando o envio.
   res.status(200).json({ ok: true });
+
+  if (body.event !== 'message_created' || body.message_type !== 'incoming') return;
+
+  const texto = semAcento(String(body.content || '').trim());
+  const querPix = texto === BOTAO_PIX;
+  const querBoleto = texto === BOTAO_BOLETO;
+  if (!querPix && !querBoleto) return;
+
+  const conversaId = body.conversation?.id;
+  const telefone = body.sender?.phone_number;
+  if (!conversaId) return;
+
+  const envio = ultimaFaturaDoTelefone(telefone);
+  const codigos = envio ? lerJSON(FATURA_CODIGOS_PATH, {})[envio.arquivo] : null;
+  const codigo = codigos ? (querPix ? codigos.pix : codigos.linhaDigitavel) : null;
+
+  if (codigo) {
+    responderNoChatwoot(conversaId, codigo);
+  } else {
+    const oQue = querPix ? 'o código Pix' : 'o código de barras';
+    responderNoChatwoot(conversaId, `Não encontramos ${oQue} dessa fatura. Vou verificar e te retorno.`);
+    console.log(`⚠️ Código ausente para ${telefone} (arquivo: ${envio?.arquivo || 'sem registro de envio'})`);
+  }
 });
 
 app.get('/webhook/chatwoot/log', (req, res) => {

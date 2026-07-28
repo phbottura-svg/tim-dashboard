@@ -40,6 +40,22 @@ table, .kpi-value, .donut-pct, .funil-val, .alerta-val {
   font-variant-numeric: tabular-nums;
 }
 
+/* O Chrome pinta campos que ele considera preenchidos automaticamente com um
+   fundo claro próprio, ignorando o background do CSS. O box-shadow interno é a
+   única forma de recobrir isso mantendo o tema escuro. */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+select:-webkit-autofill,
+textarea:-webkit-autofill {
+  -webkit-text-fill-color: var(--texto);
+  -webkit-box-shadow: 0 0 0 1000px var(--bg3) inset;
+  box-shadow: 0 0 0 1000px var(--bg3) inset;
+  caret-color: var(--texto);
+  transition: background-color 100000s ease-in-out 0s;
+}
+
 /* ─── Layout: sidebar + área principal ───────────────────────────────────── */
 .app-layout { display: flex; min-height: 100vh; align-items: stretch; }
 

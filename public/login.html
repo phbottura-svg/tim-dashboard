@@ -33,6 +33,16 @@
     font-family: inherit; transition: border-color .2s;
   }
   input:focus { outline: none; border-color: var(--azul); }
+  /* Impede o Chrome de pintar o campo de branco ao preencher automaticamente. */
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus {
+    -webkit-text-fill-color: var(--texto);
+    -webkit-box-shadow: 0 0 0 1000px #0E1420 inset;
+    box-shadow: 0 0 0 1000px #0E1420 inset;
+    caret-color: var(--texto);
+    transition: background-color 100000s ease-in-out 0s;
+  }
   button {
     width: 100%; padding: 11px; border: none; border-radius: 8px;
     background: var(--azul); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;

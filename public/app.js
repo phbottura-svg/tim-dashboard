@@ -26,19 +26,19 @@ function vigiarBuscaTabelaAutofill() {
   const el = document.getElementById('busca-tabela');
   if (!el) return;
 
-  // Só passa a respeitar o valor depois que o usuário de fato interagir
-  // (o autofill sincronizado não dispara foco/tecla real).
-  el.addEventListener('focus', () => { _buscaTabelaTocada = true; }, { once: true });
-  el.addEventListener('keydown', () => { _buscaTabelaTocada = true; }, { once: true });
+  // Só passa a respeitar o valor quando o usuário de fato digitar algo.
+  // NÃO usar "focus" aqui — é justamente ao focar que o autofill
+  // sincronizado repõe o valor antigo, então desarmar nesse momento
+  // deixava o campo desprotegido bem na hora que mais precisava.
+  el.addEventListener('keydown', () => { _buscaTabelaTocada = true; });
 
-  // Alguns navegadores repõem o valor antigo bem depois do carregamento —
-  // fica vigiando por alguns segundos e zera de novo até o usuário mexer.
-  let tentativas = 0;
-  const intervalo = setInterval(() => {
-    tentativas++;
-    if (_buscaTabelaTocada || tentativas > 20) { clearInterval(intervalo); return; }
+  // Sem prazo — alguns navegadores repõem o valor bem depois do
+  // carregamento (ou de novo ao focar), então fica vigiando indefinidamente
+  // até haver digitação real.
+  setInterval(() => {
+    if (_buscaTabelaTocada) return;
     if (el.value) el.value = '';
-  }, 500);
+  }, 400);
 }
 
 document.addEventListener('DOMContentLoaded', async () => {

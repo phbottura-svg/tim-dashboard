@@ -1910,23 +1910,47 @@ function chavesTelefone(telefone) {
   return [...chaves];
 }
 
+// Um cliente com várias faturas em aberto recebe uma mensagem por fatura, todas
+// com os mesmos botões, e o Chatwoot não diz em qual delas o clique aconteceu.
+// Por isso guardamos todas as faturas da rodada e respondemos com todos os
+// códigos identificados, em vez de arriscar devolver o de outra cobrança.
+const JANELA_ENVIOS_MS = 24 * 60 * 60 * 1000;
+
 app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
-  const { telefone, arquivo } = req.body || {};
+  const { telefone, arquivo, vencimento, mesRef } = req.body || {};
   if (!telefone || !arquivo) return res.status(400).json({ erro: 'Campos "telefone" e "arquivo" obrigatórios' });
 
   const envios = lerJSON(FATURA_ENVIOS_PATH, {});
-  const registro = { arquivo, enviadoEm: new Date().toISOString() };
-  for (const chave of chavesTelefone(telefone)) envios[chave] = registro;
+  const agora = Date.now();
+  const novo = { arquivo, vencimento: vencimento || null, mesRef: mesRef || null, enviadoEm: new Date(agora).toISOString() };
+
+  for (const chave of chavesTelefone(telefone)) {
+    const anteriores = (envios[chave]?.faturas || [])
+      .filter(f => f.arquivo !== arquivo)
+      .filter(f => agora - new Date(f.enviadoEm).getTime() < JANELA_ENVIOS_MS);
+    envios[chave] = { faturas: [...anteriores, novo] };
+  }
+
   salvarJSON(FATURA_ENVIOS_PATH, envios);
   res.json({ ok: true });
 });
 
-function ultimaFaturaDoTelefone(telefone) {
+// Faturas enviadas recentemente para o número, da mais antiga para a mais nova.
+function faturasDoTelefone(telefone) {
   const envios = lerJSON(FATURA_ENVIOS_PATH, {});
+  const agora = Date.now();
   for (const chave of chavesTelefone(telefone)) {
-    if (envios[chave]) return envios[chave];
+    const registro = envios[chave];
+    if (!registro) continue;
+
+    // Formato antigo (uma única fatura por número) — mantém compatibilidade.
+    const faturas = registro.faturas || (registro.arquivo ? [registro] : []);
+    const validas = faturas.filter(f => agora - new Date(f.enviadoEm).getTime() < JANELA_ENVIOS_MS);
+    if (validas.length) {
+      return validas.sort((a, b) => new Date(a.enviadoEm) - new Date(b.enviadoEm));
+    }
   }
-  return null;
+  return [];
 }
 
 // ─── Webhook Chatwoot (log cru, temporário) ────────────────────────────────────
@@ -1985,17 +2009,33 @@ app.post('/webhook/chatwoot', (req, res) => {
   const telefone = body.sender?.phone_number;
   if (!conversaId) return;
 
-  const envio = ultimaFaturaDoTelefone(telefone);
-  const codigos = envio ? lerJSON(FATURA_CODIGOS_PATH, {})[envio.arquivo] : null;
-  const codigo = codigos ? (querPix ? codigos.pix : codigos.linhaDigitavel) : null;
+  const faturas = faturasDoTelefone(telefone);
+  const todosCodigos = lerJSON(FATURA_CODIGOS_PATH, {});
 
-  if (codigo) {
-    responderNoChatwoot(conversaId, codigo);
-  } else {
+  const encontrados = faturas
+    .map(f => ({ ...f, codigo: querPix ? todosCodigos[f.arquivo]?.pix : todosCodigos[f.arquivo]?.linhaDigitavel }))
+    .filter(f => f.codigo);
+
+  if (!encontrados.length) {
     const oQue = querPix ? 'o código Pix' : 'o código de barras';
     responderNoChatwoot(conversaId, `Não encontramos ${oQue} dessa fatura. Vou verificar e te retorno.`);
-    console.log(`⚠️ Código ausente para ${telefone} (arquivo: ${envio?.arquivo || 'sem registro de envio'})`);
+    console.log(`⚠️ Código ausente para ${telefone} (${faturas.length} fatura(s) registrada(s))`);
+    return;
   }
+
+  (async () => {
+    // Com mais de uma fatura em aberto, identifica cada código — o cliente
+    // precisa saber a qual cobrança cada um corresponde.
+    const varias = encontrados.length > 1;
+    for (const f of encontrados) {
+      if (varias) {
+        const ref = f.mesRef || 'sua fatura';
+        const venc = f.vencimento ? ` · vencimento ${f.vencimento}` : '';
+        await responderNoChatwoot(conversaId, `📄 ${ref}${venc}:`);
+      }
+      await responderNoChatwoot(conversaId, f.codigo);
+    }
+  })();
 });
 
 app.get('/webhook/chatwoot/log', (req, res) => {

@@ -1320,7 +1320,7 @@ function aplicarDadosAnotacoes(d) {
     <div class="anot-item">
       <div class="anot-item-topo">
         <span class="anot-item-meta">${a.autor || 'Sistema'} · ${new Date(a.criadoEm).toLocaleString('pt-BR')}</span>
-        <button class="btn-edit-os" title="Excluir anotação" onclick="excluirAnotacao(${i})">🗑</button>
+        <button class="btn-excluir-anot" title="Excluir anotação" onclick="excluirAnotacao(${i})">🗑 Excluir</button>
       </div>
       <div class="anot-item-texto">${escaparHtml(a.texto)}</div>
     </div>

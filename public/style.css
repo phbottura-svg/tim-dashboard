@@ -172,6 +172,36 @@ textarea:-webkit-autofill {
   gap: 10px;
 }
 
+/* ─── Recolher a sidebar (preferência salva no navegador) ─────────────────── */
+.btn-recolher {
+  background: transparent;
+  border: none;
+  border-top: 1px solid var(--border);
+  color: var(--dim);
+  font-family: var(--fonte);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 11px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  transition: color 0.15s, background 0.15s;
+}
+.btn-recolher:hover { color: var(--texto); background: rgba(255,255,255,0.04); }
+.btn-recolher svg { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.25s ease; }
+
+.sidebar.recolhida { width: 68px; }
+.sidebar.recolhida .sidebar-logo { padding: 20px 0 18px; justify-content: center; }
+.sidebar.recolhida .sidebar-logo > div,
+.sidebar.recolhida .nav-label,
+.sidebar.recolhida #usuario-logado { display: none; }
+.sidebar.recolhida .nav-btn { justify-content: center; padding: 12px 0; gap: 0; }
+.sidebar.recolhida .nav-badge { position: absolute; top: 4px; right: 6px; }
+.sidebar.recolhida .sidebar-footer { padding: 14px 8px; justify-content: center; }
+.sidebar.recolhida .btn-recolher { justify-content: center; padding: 11px 0; gap: 0; }
+.sidebar.recolhida .btn-recolher svg { transform: rotate(180deg); }
+
 .nav-badge {
   background: var(--vermelho);
   color: #fff;
@@ -827,21 +857,27 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
   .nav-btn { justify-content: center; padding: 12px 0; gap: 0; }
   .nav-badge { position: absolute; top: 4px; right: 4px; }
   .sidebar-footer { flex-direction: column; padding: 14px 8px; }
+  /* Já está no modo trilho por largura — recolher manualmente não faz sentido. */
+  .btn-recolher { display: none; }
 }
 
 /* Sidebar vira gaveta (drawer) abaixo de 700px */
 @media (max-width: 700px) {
-  .sidebar {
+  /* No celular a sidebar é gaveta: o estado "recolhida" do desktop é ignorado. */
+  .sidebar, .sidebar.recolhida {
     position: fixed;
     left: 0; top: 0;
     width: 240px;
     transform: translateX(-100%);
   }
-  .sidebar.aberta { transform: translateX(0); }
-  .sidebar-logo div { display: block; }
-  .nav-label, .sidebar-footer #usuario-logado { display: inline; }
-  .nav-btn { justify-content: flex-start; padding: 10px 12px; gap: 11px; }
-  .sidebar-footer { flex-direction: row; padding: 16px 20px; }
+  .sidebar.aberta, .sidebar.recolhida.aberta { transform: translateX(0); }
+  .sidebar-logo div, .sidebar.recolhida .sidebar-logo > div { display: block; }
+  .sidebar-logo, .sidebar.recolhida .sidebar-logo { padding: 22px 20px 20px; justify-content: flex-start; }
+  .nav-label, .sidebar-footer #usuario-logado,
+  .sidebar.recolhida .nav-label, .sidebar.recolhida #usuario-logado { display: inline; }
+  .nav-btn, .sidebar.recolhida .nav-btn { justify-content: flex-start; padding: 10px 12px; gap: 11px; }
+  .nav-badge, .sidebar.recolhida .nav-badge { position: static; }
+  .sidebar-footer, .sidebar.recolhida .sidebar-footer { flex-direction: row; padding: 16px 20px; justify-content: space-between; }
 
   .sidebar-overlay.aberta {
     display: block;

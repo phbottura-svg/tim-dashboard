@@ -42,6 +42,7 @@ function vigiarBuscaTabelaAutofill() {
 
 document.addEventListener('DOMContentLoaded', async () => {
   vigiarBuscaTabelaAutofill();
+  restaurarSidebarRecolhida();
 
   carregarSessao();
   await aplicarModoVps();
@@ -392,6 +393,25 @@ function toggleSidebar(forcarAberto) {
   const abrir = forcarAberto !== undefined ? forcarAberto : !sidebar.classList.contains('aberta');
   sidebar.classList.toggle('aberta', abrir);
   overlay.classList.toggle('aberta', abrir);
+}
+
+// Recolher a sidebar para ganhar largura de tela. A preferência fica salva no
+// navegador para não precisar recolher de novo a cada visita.
+function aplicarSidebarRecolhida(recolher) {
+  const sidebar = document.getElementById('sidebar');
+  const btn = document.getElementById('btn-recolher');
+  if (!sidebar) return;
+  sidebar.classList.toggle('recolhida', recolher);
+  if (btn) btn.title = recolher ? 'Expandir menu' : 'Recolher menu';
+  localStorage.setItem('sidebar-recolhida', recolher ? '1' : '0');
+}
+
+function toggleRecolherSidebar() {
+  aplicarSidebarRecolhida(!document.getElementById('sidebar').classList.contains('recolhida'));
+}
+
+function restaurarSidebarRecolhida() {
+  if (localStorage.getItem('sidebar-recolhida') === '1') aplicarSidebarRecolhida(true);
 }
 
 async function carregarUsuarios() {

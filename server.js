@@ -375,6 +375,13 @@ function cruzarBases() {
   return baseCruzada;
 }
 
+// ─── Anotações de atendimento por cliente ────────────────────────────────────
+// Ficam num arquivo próprio (chave = OS) em vez de dentro da base cruzada, para
+// sobreviverem ao Recruzar e às reimportações do Sonar.
+
+const ANOTACOES_PATH = path.join(DATA_PATH, 'anotacoes-clientes.json');
+const MARCADORES_VALIDOS = ['pagou', 'promessa', 'problema_tecnico', 'problema_app'];
+
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 
 function safraParaMeses(mesInicio) {
@@ -521,6 +528,16 @@ function aplicarFiltros(lista, q) {
     const atrasos = (c.faturas || []).filter(f => f.status === 'INADIMPLENTE').length;
     return atrasos <= 2;
   });
+  // Marcadores de atendimento (anotações). Vários podem ser pedidos ao mesmo
+  // tempo — o cliente precisa ter todos os marcadores selecionados.
+  const marcadoresPedidos = MARCADORES_VALIDOS.filter(m => q[`marcador_${m}`] === '1');
+  if (marcadoresPedidos.length) {
+    const anotacoes = lerJSON(ANOTACOES_PATH, {});
+    l = l.filter(c => {
+      const marcados = anotacoes[c.os]?.marcadores || [];
+      return marcadoresPedidos.every(m => marcados.includes(m));
+    });
+  }
   // Filtros por fatura individual (f1..f5)
   for (let n = 1; n <= 5; n++) {
     const val = q[`f${n}`];
@@ -823,10 +840,67 @@ app.get('/api/clientes', (req, res) => {
     const pagina = parseInt(req.query.pagina) || 1;
     const porPagina = parseInt(req.query.porPagina) || 50;
     const total = lista.length;
-    const dados = lista.slice((pagina - 1) * porPagina, pagina * porPagina);
+    const pagina_ = lista.slice((pagina - 1) * porPagina, pagina * porPagina);
+
+    // Anexa os marcadores só da página atual, para a tabela mostrar o indicador
+    // sem precisar consultar cliente por cliente.
+    const anotacoes = lerJSON(ANOTACOES_PATH, {});
+    const dados = pagina_.map(c => ({
+      ...c,
+      marcadores: anotacoes[c.os]?.marcadores || [],
+      totalAnotacoes: (anotacoes[c.os]?.anotacoes || []).length,
+    }));
 
     res.json({ total, pagina, porPagina, totalPaginas: Math.ceil(total / porPagina) || 1, dados });
   } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ─── Anotações de atendimento ────────────────────────────────────────────────
+
+app.get('/api/clientes/anotacoes/:os', (req, res) => {
+  const dados = lerJSON(ANOTACOES_PATH, {});
+  const item = dados[req.params.os] || { marcadores: [], anotacoes: [] };
+  res.json(item);
+});
+
+app.post('/api/clientes/anotacoes/:os', (req, res) => {
+  const { texto, marcadores } = req.body || {};
+  const os = req.params.os;
+  if (!os) return res.status(400).json({ erro: 'OS obrigatória' });
+
+  const dados = lerJSON(ANOTACOES_PATH, {});
+  const atual = dados[os] || { marcadores: [], anotacoes: [] };
+
+  if (Array.isArray(marcadores)) {
+    atual.marcadores = marcadores.filter(m => MARCADORES_VALIDOS.includes(m));
+  }
+
+  const limpo = String(texto || '').trim();
+  if (limpo) {
+    atual.anotacoes.push({
+      texto: limpo,
+      autor: req.session?.usuario?.nome || 'Sistema',
+      criadoEm: new Date().toISOString(),
+    });
+  }
+
+  atual.atualizadoEm = new Date().toISOString();
+  dados[os] = atual;
+  salvarJSON(ANOTACOES_PATH, dados);
+  res.json({ ok: true, ...atual });
+});
+
+app.delete('/api/clientes/anotacoes/:os/:indice', (req, res) => {
+  const dados = lerJSON(ANOTACOES_PATH, {});
+  const atual = dados[req.params.os];
+  if (!atual) return res.status(404).json({ erro: 'Não encontrado' });
+
+  const i = parseInt(req.params.indice);
+  if (isNaN(i) || i < 0 || i >= atual.anotacoes.length) return res.status(400).json({ erro: 'Índice inválido' });
+
+  atual.anotacoes.splice(i, 1);
+  salvarJSON(ANOTACOES_PATH, dados);
+  res.json({ ok: true, ...atual });
 });
 
 app.get('/api/clientes/exportar', (req, res) => {

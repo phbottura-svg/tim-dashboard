@@ -18,6 +18,15 @@ const C = {
 const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
 const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS': C.cinza };
 
+// Marcadores de atendimento — a ordem aqui define a ordem nos filtros e no modal.
+const MARCADORES = ['pagou', 'promessa', 'problema_tecnico', 'problema_app'];
+const MARCADOR_INFO = {
+  pagou:            { icone: '💰', label: 'Cliente pagou' },
+  promessa:         { icone: '🤝', label: 'Promessa de pagamento' },
+  problema_tecnico: { icone: '🔧', label: 'Problema técnico' },
+  problema_app:     { icone: '📱', label: 'Problema no app' },
+};
+
 // ─── Init ─────────────────────────────────────────────────────────────────────
 
 // Último valor que o usuário realmente digitou no campo de busca.
@@ -130,6 +139,9 @@ async function enviarFilaParaRobo() {
   if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
   if (document.getElementById('tabela-filtro-iq-dentro')?.checked) p.set('iqSafra', 'dentro');
   else if (document.getElementById('tabela-filtro-iq-fora')?.checked) p.set('iqSafra', 'fora');
+  for (const m of MARCADORES) {
+    if (document.getElementById(`tabela-filtro-mk-${m}`)?.checked) p.set(`marcador_${m}`, '1');
+  }
   for (let n = 1; n <= 5; n++) {
     const v = document.getElementById(`tf-f${n}`)?.value;
     if (v) p.set(`f${n}`, v);
@@ -970,6 +982,9 @@ async function carregarTabela() {
   if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
   if (document.getElementById('tabela-filtro-iq-dentro')?.checked) p.set('iqSafra', 'dentro');
   else if (document.getElementById('tabela-filtro-iq-fora')?.checked) p.set('iqSafra', 'fora');
+  for (const m of MARCADORES) {
+    if (document.getElementById(`tabela-filtro-mk-${m}`)?.checked) p.set(`marcador_${m}`, '1');
+  }
   for (let n = 1; n <= 5; n++) {
     const v = document.getElementById(`tf-f${n}`)?.value;
     if (v) p.set(`f${n}`, v);
@@ -1019,9 +1034,18 @@ async function carregarTabela() {
         return `<td><span class="status-tag ${cls}" title="${label}"${acao}>${icone} ${fat.dataVencimento || ''}</span></td>`;
       }).join('');
       const fmtTel = t => t ? t.replace(/^55(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3') : '—';
+      const marcs = (c.marcadores || []).map(m => {
+        const info = MARCADOR_INFO[m];
+        return info ? `<span class="marc-tag" title="${info.label}">${info.icone}</span>` : '';
+      }).join('');
+      const temAnot = c.totalAnotacoes > 0;
+      const tituloAnot = temAnot ? `${c.totalAnotacoes} anotação(ões)` : 'Adicionar anotação';
       return `<tr id="tb-row-${idx}">
-        <td id="tb-acao-${idx}"><button class="btn-edit-os" onclick="editarClienteTabela(${idx})" title="Editar">✏️</button></td>
-        <td id="tb-nome-${idx}">${c.nome || '<em class="dim">Sem match</em>'}</td>
+        <td id="tb-acao-${idx}" class="acao-col">
+          <button class="btn-edit-os" onclick="editarClienteTabela(${idx})" title="Editar dados">✏️</button>
+          <button class="btn-edit-os${temAnot ? ' tem-anotacao' : ''}" onclick="abrirModalAnotacoes(${idx})" title="${tituloAnot}">📝</button>
+        </td>
+        <td id="tb-nome-${idx}">${c.nome || '<em class="dim">Sem match</em>'}${marcs ? ' ' + marcs : ''}</td>
         <td id="tb-cpf-${idx}" class="cpf-col">${c.cpf || '—'}</td>
         <td id="tb-c1-${idx}" class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
         <td id="tb-c2-${idx}" class="tel-col">${fmtTel(c.contatoResponsavel)}</td>
@@ -1075,7 +1099,8 @@ function limparTodosFiltros() {
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   _buscaTabelaDigitado = '';
   ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis',
-   'tabela-filtro-pago-manual', 'tabela-filtro-iq-dentro', 'tabela-filtro-iq-fora'].forEach(id => {
+   'tabela-filtro-pago-manual', 'tabela-filtro-iq-dentro', 'tabela-filtro-iq-fora',
+   ...MARCADORES.map(m => `tabela-filtro-mk-${m}`)].forEach(id => {
     const el = document.getElementById(id); if (el) el.checked = false;
   });
   for (let n = 1; n <= 5; n++) { const el = document.getElementById(`tf-f${n}`); if (el) el.value = ''; }
@@ -1250,6 +1275,101 @@ async function salvarClienteTabela(idx) {
     if (d.erro) { alert('Erro: ' + d.erro); return; }
     await carregarTabela();
   } catch (err) { alert('Erro: ' + err.message); }
+}
+
+// ─── Modal de anotações do cliente ───────────────────────────────────────────
+
+let _anotClienteOs = null;
+
+async function abrirModalAnotacoes(idx) {
+  const c = tabelaClientesAtual[idx];
+  if (!c?.os) return alert('Cliente sem OS — não é possível anotar.');
+
+  _anotClienteOs = c.os;
+  setText('anot-cliente-nome', c.nome || 'Cliente sem match');
+  setText('anot-cliente-sub', `OS ${c.os}${c.cpf ? ' · CPF ' + c.cpf : ''}`);
+  document.getElementById('anot-texto').value = '';
+  document.getElementById('anot-historico').innerHTML = '<div class="dim">Carregando...</div>';
+  document.getElementById('modal-anotacoes').style.display = 'flex';
+
+  try {
+    const d = await fetch(`/api/clientes/anotacoes/${encodeURIComponent(c.os)}`).then(r => r.json());
+    aplicarDadosAnotacoes(d);
+  } catch {
+    document.getElementById('anot-historico').innerHTML = '<div class="dim">Erro ao carregar histórico.</div>';
+  }
+}
+
+function aplicarDadosAnotacoes(d) {
+  for (const m of MARCADORES) {
+    const el = document.getElementById(`anot-mk-${m}`);
+    if (el) el.checked = (d.marcadores || []).includes(m);
+  }
+
+  const lista = d.anotacoes || [];
+  setText('anot-hist-count', lista.length ? `(${lista.length})` : '');
+  const box = document.getElementById('anot-historico');
+
+  if (!lista.length) {
+    box.innerHTML = '<div class="dim">Nenhuma anotação ainda.</div>';
+    return;
+  }
+
+  // Mais recentes primeiro — é o que interessa em um atendimento.
+  box.innerHTML = lista.map((a, i) => `
+    <div class="anot-item">
+      <div class="anot-item-topo">
+        <span class="anot-item-meta">${a.autor || 'Sistema'} · ${new Date(a.criadoEm).toLocaleString('pt-BR')}</span>
+        <button class="btn-edit-os" title="Excluir anotação" onclick="excluirAnotacao(${i})">🗑</button>
+      </div>
+      <div class="anot-item-texto">${escaparHtml(a.texto)}</div>
+    </div>
+  `).reverse().join('');
+}
+
+function escaparHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/\n/g, '<br>');
+}
+
+async function salvarAnotacao() {
+  if (!_anotClienteOs) return;
+  const texto = document.getElementById('anot-texto').value.trim();
+  const marcadores = MARCADORES.filter(m => document.getElementById(`anot-mk-${m}`)?.checked);
+
+  try {
+    const d = await fetch(`/api/clientes/anotacoes/${encodeURIComponent(_anotClienteOs)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ texto, marcadores }),
+    }).then(r => r.json());
+    if (d.erro) return alert('Erro: ' + d.erro);
+
+    document.getElementById('anot-texto').value = '';
+    aplicarDadosAnotacoes(d);
+    carregarTabela(); // atualiza os indicadores na linha
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+async function excluirAnotacao(indice) {
+  if (!_anotClienteOs || !confirm('Excluir esta anotação?')) return;
+  try {
+    const d = await fetch(`/api/clientes/anotacoes/${encodeURIComponent(_anotClienteOs)}/${indice}`, { method: 'DELETE' })
+      .then(r => r.json());
+    if (d.erro) return alert('Erro: ' + d.erro);
+    aplicarDadosAnotacoes(d);
+    carregarTabela();
+  } catch (e) { alert('Erro: ' + e.message); }
+}
+
+function fecharModalAnotacoes(ev) {
+  if (ev.target.id === 'modal-anotacoes') fecharModalAnotacoesBtn();
+}
+
+function fecharModalAnotacoesBtn() {
+  document.getElementById('modal-anotacoes').style.display = 'none';
+  _anotClienteOs = null;
 }
 
 // ─── Modal Token ──────────────────────────────────────────────────────────────

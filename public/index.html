@@ -297,6 +297,10 @@
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-pago-manual" onchange="buscarTabela()"> 💛 Base Pagos</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-dentro" onchange="onIqCheckbox('dentro')" title="Precisa de um Mês Gross selecionado no filtro"> ✅ Dentro do IQ</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-fora" onchange="onIqCheckbox('fora')" title="Precisa de um Mês Gross selecionado no filtro"> ❌ Fora do IQ</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-pagou" onchange="buscarTabela()"> 💰 Pagou</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-promessa" onchange="buscarTabela()"> 🤝 Promessa</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-problema_tecnico" onchange="buscarTabela()"> 🔧 Prob. técnico</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-problema_app" onchange="buscarTabela()"> 📱 Prob. app</label>
       <button class="btn btn-sm btn-secondary" onclick="limparTodosFiltros()" style="font-size:11px;padding:5px 12px;margin-left:8px">🧹 Limpar Filtros</button>
     </div>
     <div class="tabela-controles tabela-controles-faturas" id="filtros-faturas-row">
@@ -647,6 +651,39 @@
     <div class="modal-botoes">
       <button class="btn btn-secondary" onclick="fecharModalBtn()">Cancelar</button>
       <button class="btn btn-success" onclick="confirmarToken()">▶ Enviar Token</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MODAL: ANOTAÇÕES DO CLIENTE ═══════════════════════════════════════════ -->
+<div id="modal-anotacoes" class="modal-overlay" style="display:none" onclick="fecharModalAnotacoes(event)">
+  <div class="modal-box modal-box-largo">
+    <div class="modal-header">
+      <span class="icon-badge icon-badge-lg icon-faturas"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h6l5 5v12a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M13 3v5h5"/><path d="M9 13h6M9 17h6"/></svg></span>
+      <div>
+        <div class="modal-titulo" id="anot-cliente-nome">—</div>
+        <div class="modal-sub" id="anot-cliente-sub">—</div>
+      </div>
+    </div>
+
+    <div class="anot-secao-label">Situação do cliente</div>
+    <div class="anot-marcadores">
+      <label class="anot-marcador"><input type="checkbox" id="anot-mk-pagou"> 💰 Cliente pagou</label>
+      <label class="anot-marcador"><input type="checkbox" id="anot-mk-promessa"> 🤝 Promessa de pagamento</label>
+      <label class="anot-marcador"><input type="checkbox" id="anot-mk-problema_tecnico"> 🔧 Problema técnico</label>
+      <label class="anot-marcador"><input type="checkbox" id="anot-mk-problema_app"> 📱 Problema no app</label>
+    </div>
+
+    <div class="anot-secao-label">Nova anotação</div>
+    <textarea id="anot-texto" class="anot-textarea" rows="5"
+      placeholder="Descreva o atendimento, o combinado com o cliente, o problema relatado..."></textarea>
+
+    <div class="anot-secao-label">Histórico <span id="anot-hist-count" class="dim"></span></div>
+    <div id="anot-historico" class="anot-historico"></div>
+
+    <div class="modal-botoes">
+      <button class="btn btn-secondary" onclick="fecharModalAnotacoesBtn()">Fechar</button>
+      <button class="btn btn-primary" onclick="salvarAnotacao()">💾 Salvar</button>
     </div>
   </div>
 </div>

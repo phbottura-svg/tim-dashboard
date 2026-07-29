@@ -780,6 +780,70 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
 
 .modal-botoes { display: flex; gap: 10px; justify-content: flex-end; }
 
+/* ─── Modal de anotações do cliente ──────────────────────────────────────── */
+.modal-box-largo { width: 560px; max-height: 88vh; overflow-y: auto; }
+
+.anot-secao-label {
+  font-size: 10.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--label);
+  margin: 18px 0 9px;
+}
+
+.anot-marcadores { display: flex; flex-wrap: wrap; gap: 8px; }
+.anot-marcador {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12.5px;
+  color: var(--texto);
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+.anot-marcador:hover { border-color: var(--border2); }
+.anot-marcador input { accent-color: var(--azul); cursor: pointer; }
+.anot-marcador:has(input:checked) { border-color: var(--azul); background: rgba(61,127,255,0.1); }
+
+.anot-textarea {
+  width: 100%;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--texto);
+  font-family: var(--fonte);
+  font-size: 13.5px;
+  line-height: 1.5;
+  padding: 12px 14px;
+  resize: vertical;
+  min-height: 110px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.anot-textarea:focus { border-color: var(--azul); }
+.anot-textarea::placeholder { color: var(--label); }
+
+.anot-historico { display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto; }
+.anot-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.anot-item-topo { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 5px; }
+.anot-item-meta { font-size: 10.5px; color: var(--label); }
+.anot-item-texto { font-size: 13px; color: var(--texto); line-height: 1.5; word-break: break-word; }
+
+/* Indicadores na tabela de clientes */
+.acao-col { white-space: nowrap; }
+.btn-edit-os.tem-anotacao { opacity: 1; }
+.marc-tag { font-size: 12px; margin-left: 2px; cursor: default; }
+
 /* ─── Robôs por Estado ──────────────────────────────────────────────────────── */
 .robos-estados {
   display: flex;

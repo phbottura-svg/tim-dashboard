@@ -364,6 +364,38 @@ function cruzarBases() {
     };
   });
 
+  // Clientes importados que ainda não têm nenhuma fatura no Sonar — sem esta
+  // passada eles ficavam totalmente invisíveis na Tabela de Clientes (a base
+  // cruzada só existia a partir das faturas). Entram com status "SEM DADOS" e
+  // usam o Mês Gross da própria planilha (mesGrossManual) já que o Sonar ainda
+  // não tem nada sobre eles. Assim que o Sonar gerar a 1ª fatura, na próxima
+  // Recruzada eles passam a vir pelo caminho normal acima, com mesGross do
+  // Sonar — não sobra nenhum resquício deste "modo provisório".
+  clientes.forEach(c => {
+    if (!c.os || grupos[c.os]) return; // já entrou pelo caminho normal acima
+
+    baseCruzada.push({
+      os: c.os,
+      mesGross: c.mesGrossManual || null,
+      uf: null,
+      churn: false,
+      loginVendedor: null,
+      custcode: null,
+      nome: c.nome || null,
+      cpf: c.cpf || null,
+      vendedor: c.vendedor || null,
+      contatoPrincipal: c.contatoPrincipal || null,
+      contatoResponsavel: c.contatoResponsavel || null,
+      mesGrossManual: c.mesGrossManual || null,
+      contatos: [c.contatoPrincipal, c.contatoResponsavel].filter(Boolean),
+      cruzado: true,
+      faturas: [],
+      totalFaturas: 0,
+      faturasPagas: 0,
+      status: 'SEM DADOS',
+    });
+  });
+
   salvarJSON(BASE_CRUZADA_PATH, baseCruzada);
   const meta = lerJSON(SONAR_META_PATH, {});
   meta.ultimaAtualizacao = new Date().toISOString();
@@ -454,7 +486,11 @@ function calcularIQSafra(safra) {
   const { janela, janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
 
   const todos = lerJSON(BASE_CRUZADA_PATH, []);
-  const cohort = todos.filter(c => c.mesGross === safra);
+  // totalFaturas > 0 exclui clientes importados que ainda não têm nenhuma
+  // fatura no Sonar (ver cruzarBases) — sem essa trava eles passariam
+  // trivialmente no IQ (não há como estar em atraso sem fatura nenhuma) e
+  // inflariam o percentual com quem nem começou a ser cobrado ainda.
+  const cohort = todos.filter(c => c.mesGross === safra && c.totalFaturas > 0);
 
   const ok = [], atrasados = [];
   for (const c of cohort) {
@@ -517,6 +553,7 @@ function aplicarFiltros(lista, q) {
   if (q.iqSafra === 'dentro' || q.iqSafra === 'fora') {
     const getRef = criarCacheReferenciaSafra();
     l = l.filter(c => {
+      if (!c.totalFaturas) return false; // sem fatura no Sonar ainda, nao entra em nenhum dos dois lados
       const ref = getRef(c.mesGross);
       if (!ref) return false; // sem safra definida, nao entra em nenhum dos dois lados
       const fora = clienteForaDoIQ(c, ref.janelaSet, ref.dataReferencia);
@@ -555,10 +592,32 @@ function aplicarFiltros(lista, q) {
 
 const uploadMemory = multer({ storage: multer.memoryStorage(), limits: { fileSize: 50 * 1024 * 1024 } });
 
-// ─── Modelo Base Clientes ─────────────────────────────────────────────────────
+// ─── Modelo / Base de Clientes ────────────────────────────────────────────────
 
 app.get('/api/modelo-base-clientes', (req, res) => {
   res.download(path.join(__dirname, 'public', 'modelo-base-clientes.xlsx'), 'modelo-base-clientes.xlsx');
+});
+
+// Exporta a base de clientes já cadastrada, no mesmo formato que o import
+// espera — permite baixar, só acrescentar as linhas novas (outro mês/safra) e
+// subir de novo; o import já mescla por CPF (atualiza quem existe, adiciona
+// quem é novo).
+app.get('/api/base-clientes/exportar', (req, res) => {
+  try {
+    const clientes = lerJSON(BASE_CLIENTES_PATH, []);
+    const headers = ['Vendedor', 'Cliente', 'CPF', 'Contato Principal WhatsApp', 'Contato Responsável', 'Número Ordem/OS', 'Mês Gross'];
+    const linhas = [headers, ...clientes.map(c => [
+      c.vendedor || '', c.nome || '', c.cpf || '',
+      c.contatoPrincipal || '', c.contatoResponsavel || '',
+      c.os || '', c.mesGrossManual || '',
+    ])];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(linhas), 'Clientes');
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+    res.setHeader('Content-Disposition', 'attachment; filename="base-clientes.xlsx"');
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 // ─── Limpar Base Clientes ─────────────────────────────────────────────────────
@@ -741,6 +800,11 @@ app.get('/api/importacao/status', (req, res) => {
     };
 
     const baseCruzada = lerJSON(BASE_CRUZADA_PATH, []);
+    // "Cruzamento" descreve especificamente faturas do Sonar × cliente — os
+    // clientes importados sem fatura ainda (ver cruzarBases) não fazem parte
+    // dessa conta nem de nenhum dos dois lados, senão o indicador passaria a
+    // mentir sobre o que de fato representa.
+    const baseSonar = baseCruzada.filter(c => c.totalFaturas > 0);
     res.json({
       clientes: {
         total: meta.clientes?.total || 0,
@@ -753,9 +817,9 @@ app.get('/api/importacao/status', (req, res) => {
         RS: { total: meta.sonar?.RS?.total || 0, importadoEm: meta.sonar?.RS?.importadoEm || null, status: statusImport(meta.sonar?.RS?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('RS') },
       },
       cruzamento: {
-        total: baseCruzada.length,
-        cruzados: baseCruzada.filter(c => c.cruzado).length,
-        semMatch: baseCruzada.filter(c => !c.cruzado).length,
+        total: baseSonar.length,
+        cruzados: baseSonar.filter(c => c.cruzado).length,
+        semMatch: baseSonar.filter(c => !c.cruzado).length,
       },
       ultimaAtualizacao: meta.ultimaAtualizacao || null,
     });

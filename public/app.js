@@ -42,10 +42,9 @@ function vigiarBuscaTabelaAutofill() {
   // "deleteContentBackward"...). É esse o critério para descartar só o
   // preenchimento automático sem atrapalhar quem está digitando.
   el.addEventListener('input', e => {
-    if (e.inputType) { _buscaTabelaDigitado = el.value; return; }
+    if (e.inputType) { _buscaTabelaDigitado = el.value; buscarTabela(); return; }
     if (el.value === _buscaTabelaDigitado) return;
     el.value = _buscaTabelaDigitado;
-    buscarTabela();
   });
 }
 

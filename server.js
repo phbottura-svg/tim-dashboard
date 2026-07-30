@@ -640,6 +640,20 @@ app.delete('/api/limpar-base-clientes', (req, res) => {
   res.json({ ok: true });
 });
 
+// Remove um único cliente da Base de Clientes por OS — útil pra limpar
+// entradas erradas (ex: linha digitada com as colunas trocadas na planilha)
+// sem precisar apagar a base inteira.
+app.delete('/api/base-clientes/:os', (req, res) => {
+  const os = req.params.os;
+  const clientes = lerJSON(BASE_CLIENTES_PATH, []);
+  const restantes = clientes.filter(c => c.os !== os);
+  if (restantes.length === clientes.length) return res.status(404).json({ erro: 'Nenhum cliente com essa OS' });
+
+  salvarJSON(BASE_CLIENTES_PATH, restantes);
+  const baseCruzada = cruzarBases();
+  res.json({ ok: true, removidos: clientes.length - restantes.length, total: baseCruzada.length });
+});
+
 // ─── Importar Clientes Excel ──────────────────────────────────────────────────
 
 app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) => {

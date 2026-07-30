@@ -605,8 +605,17 @@ app.get('/api/modelo-base-clientes', (req, res) => {
 app.get('/api/base-clientes/exportar', (req, res) => {
   try {
     const clientes = lerJSON(BASE_CLIENTES_PATH, []);
+    // Sem isso, a ordem seria "por quando entrou no sistema" — clientes recém
+    // importados ficam no fim da lista independente do mês, dificultando
+    // revisar a planilha antes de subir de novo. Quem não tem Mês Gross vai
+    // para o final.
+    const chaveMes = c => {
+      const m = String(c.mesGrossManual || '').match(/^(\d{2})\/(\d{4})$/);
+      return m ? (+m[2] * 12 + +m[1]) : Infinity;
+    };
+    const clientesOrdenados = [...clientes].sort((a, b) => chaveMes(a) - chaveMes(b));
     const headers = ['Vendedor', 'Cliente', 'CPF', 'Contato Principal WhatsApp', 'Contato Responsável', 'Número Ordem/OS', 'Mês Gross'];
-    const linhas = [headers, ...clientes.map(c => [
+    const linhas = [headers, ...clientesOrdenados.map(c => [
       c.vendedor || '', c.nome || '', c.cpf || '',
       c.contatoPrincipal || '', c.contatoResponsavel || '',
       c.os || '', c.mesGrossManual || '',

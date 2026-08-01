@@ -35,6 +35,9 @@ const HISTORICO_ROBOS_PATH = path.join(DATA_PATH, 'historico-robos.json');
 // Estrutura: { [custcodeNormalizado]: { cpf, vencimentos: ["10/06/2026", ...] } }
 const PAGOS_MANUAIS_PATH = path.join(DATA_PATH, 'pagos-manuais.json');
 const USUARIOS_PATH = path.join(DATA_PATH, 'usuarios.json');
+// Fechamento oficial mensal da TIM (planilha "Cesta de Qualidade") — quando existe
+// pra uma safra, substitui a nossa estimativa por atraso (ver calcularIQSafra).
+const CESTA_OFICIAL_PATH = path.join(DATA_PATH, 'cesta-oficial.json');
 
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
 
@@ -265,8 +268,11 @@ function calcularStatus(statusPagamento, dataVencimento) {
   const sp = String(statusPagamento).trim();
   // 01 = pagou no vencimento, 02 = pagou até 30 dias após → ADIMPLENTE
   if (sp.startsWith('01') || sp.startsWith('02')) return 'ADIMPLENTE';
-  // 03, 04 = pagou com atraso >30 dias, 05 = não pagou → INADIMPLENTE
-  if (sp.startsWith('03') || sp.startsWith('04') || sp.startsWith('05')) return 'INADIMPLENTE';
+  // 03, 04 = pagou com atraso >30 dias — já foi pago (não é mais uma cobrança em
+  // aberto), mas conta como atraso pra qualidade/IQ do mesmo jeito que antes.
+  if (sp.startsWith('03') || sp.startsWith('04')) return 'PAGO_ATRASO';
+  // 05 = não pagou → INADIMPLENTE
+  if (sp.startsWith('05')) return 'INADIMPLENTE';
   if (!dataVencimento) return 'INADIMPLENTE';
   try {
     const partes = String(dataVencimento).split('/');
@@ -338,9 +344,11 @@ function cruzarBases() {
     // Aplica as marcações manuais de "Base Pagos" ANTES de calcular status/totais
     aplicarPagosManuais(ref.custcode, cliente?.cpf, faturasProc, pagosManuais);
 
-    const faturasPagas = faturasProc.filter(f => f.status === 'ADIMPLENTE').length;
+    // PAGO_ATRASO conta como paga (o cliente já quitou, só que fora do prazo).
+    const faturasPagas = faturasProc.filter(f => f.status === 'ADIMPLENTE' || f.status === 'PAGO_ATRASO').length;
     const algumaNaoPaga = faturasProc.some(f => f.status === 'INADIMPLENTE');
-    const statusGeral = algumaNaoPaga ? 'INADIMPLENTE' : (faturasPagas > 0 ? 'ADIMPLENTE' : 'SEM DADOS');
+    const algumaPagaAtraso = faturasProc.some(f => f.status === 'PAGO_ATRASO');
+    const statusGeral = algumaNaoPaga ? 'INADIMPLENTE' : (algumaPagaAtraso ? 'PAGO_ATRASO' : (faturasPagas > 0 ? 'ADIMPLENTE' : 'SEM DADOS'));
 
     return {
       os,
@@ -460,11 +468,33 @@ function criarCacheReferenciaSafra() {
   };
 }
 
-// true se alguma fatura do cliente com vencimento dentro da janela estiver
-// com mais de 30 dias de atraso na data de referência — a MESMA regra usada
-// no card do IQ e no filtro "Dentro/Fora do IQ" da tabela, para os dois
-// nunca divergirem.
-function clienteForaDoIQ(cliente, janelaSet, dataReferencia) {
+// Fechamento oficial da TIM (planilha "Cesta de Qualidade") pra uma safra —
+// null se a TIM ainda não fechou/enviou essa safra. Quando existe, é a
+// verdade absoluta (pega downgrade, recompra, suspensão e fraude que a Sonar
+// não informa); sem ela, caímos na estimativa por atraso (clienteForaDoIQ).
+function carregarCestaOficialPorSafra(safra) {
+  const todos = lerJSON(CESTA_OFICIAL_PATH, []);
+  const mapa = {};
+  todos.forEach(r => { if (r.mesGross === safra) mapa[r.os] = r; });
+  return Object.keys(mapa).length ? mapa : null;
+}
+
+function criarCacheCestaOficial() {
+  const cache = new Map();
+  return safra => {
+    if (!safra) return null;
+    if (!cache.has(safra)) cache.set(safra, carregarCestaOficialPorSafra(safra));
+    return cache.get(safra);
+  };
+}
+
+// true se o cliente está fora da qualidade/IQ da safra. Usa o fechamento
+// oficial da TIM quando disponível pra essa safra (ver carregarCestaOficialPorSafra);
+// senão cai na estimativa por atraso — a MESMA regra usada no card do IQ e no
+// filtro "Dentro/Fora do IQ" da tabela, pra nunca divergirem entre si.
+function clienteForaDoIQ(cliente, janelaSet, dataReferencia, oficialPorOS) {
+  if (oficialPorOS && oficialPorOS[cliente.os]) return !oficialPorOS[cliente.os].eleg;
+
   const faturasNaJanela = (cliente.faturas || [])
     .filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
   return faturasNaJanela.some(f => {
@@ -486,15 +516,26 @@ function calcularIQSafra(safra) {
   const { janela, janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
 
   const todos = lerJSON(BASE_CRUZADA_PATH, []);
-  // totalFaturas > 0 exclui clientes importados que ainda não têm nenhuma
-  // fatura no Sonar (ver cruzarBases) — sem essa trava eles passariam
-  // trivialmente no IQ (não há como estar em atraso sem fatura nenhuma) e
-  // inflariam o percentual com quem nem começou a ser cobrado ainda.
-  const cohort = todos.filter(c => c.mesGross === safra && c.totalFaturas > 0);
+  const oficialPorOS = carregarCestaOficialPorSafra(safra);
+
+  let cohort;
+  if (oficialPorOS) {
+    // Fechamento oficial da TIM já chegou pra essa safra — ele é quem manda quem
+    // entra na conta, não a nossa aproximação por fatura (pega cliente suspenso
+    // por fraude/downgrade/recompra que às vezes nem gera fatura na Sonar).
+    cohort = todos.filter(c => oficialPorOS[c.os]);
+  } else {
+    // Sem fechamento oficial ainda: prévia por atraso. totalFaturas > 0 exclui
+    // clientes importados que ainda não têm nenhuma fatura no Sonar (ver
+    // cruzarBases) — sem essa trava eles passariam trivialmente no IQ (não há
+    // como estar em atraso sem fatura nenhuma) e inflariam o percentual com
+    // quem nem começou a ser cobrado ainda.
+    cohort = todos.filter(c => c.mesGross === safra && c.totalFaturas > 0);
+  }
 
   const ok = [], atrasados = [];
   for (const c of cohort) {
-    (clienteForaDoIQ(c, janelaSet, dataReferencia) ? atrasados : ok).push(c);
+    (clienteForaDoIQ(c, janelaSet, dataReferencia, oficialPorOS) ? atrasados : ok).push(c);
   }
 
   const fmtData = d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
@@ -505,11 +546,12 @@ function calcularIQSafra(safra) {
     dataCorte: fmtData(dataCorte),
     dataReferencia: fmtData(dataReferencia),
     previa,
+    oficial: !!oficialPorOS,
     totalClientes: cohort.length,
     clientesOk: ok.length,
     percentual: cohort.length ? Math.round((ok.length / cohort.length) * 1000) / 10 : null,
-    _ok: ok.map(c => ({ nome: c.nome, custcode: c.custcode })),
-    _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode })),
+    _ok: ok.map(c => ({ nome: c.nome, custcode: c.custcode, motivo: oficialPorOS?.[c.os]?.motivo || null })),
+    _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode, motivo: oficialPorOS?.[c.os]?.motivo || null })),
   };
 }
 
@@ -552,10 +594,25 @@ function aplicarFiltros(lista, q) {
   if (q.pagoManual === '1') l = l.filter(c => (c.faturas || []).some(f => f.pagoManual));
   if (q.iqSafra === 'dentro' || q.iqSafra === 'fora') {
     const getRef = criarCacheReferenciaSafra();
+    const getOficial = criarCacheCestaOficial();
     l = l.filter(c => {
-      if (!c.totalFaturas) return false; // sem fatura no Sonar ainda, nao entra em nenhum dos dois lados
+      if (!c.mesGross) return false; // sem safra definida, nao entra em nenhum dos dois lados
+      const oficialPorOS = getOficial(c.mesGross);
+      if (oficialPorOS) {
+        // Fechamento oficial da safra existe — mesma regra e mesmo grupo do
+        // card do IQ (calcularIQSafra): só entra quem está no fechamento.
+        // Cliente com esse mesGross mas fora do arquivo (ex: entrou depois do
+        // fechamento) não conta em nenhum dos dois lados, pra tabela e card
+        // nunca divergirem.
+        if (!oficialPorOS[c.os]) return false;
+        const fora = !oficialPorOS[c.os].eleg;
+        return q.iqSafra === 'fora' ? fora : !fora;
+      }
+      // Sem fechamento oficial da safra, só entra quem já tem fatura no Sonar
+      // (sem isso não dá pra saber se está ou não em atraso).
+      if (!c.totalFaturas) return false;
       const ref = getRef(c.mesGross);
-      if (!ref) return false; // sem safra definida, nao entra em nenhum dos dois lados
+      if (!ref) return false;
       const fora = clienteForaDoIQ(c, ref.janelaSet, ref.dataReferencia);
       return q.iqSafra === 'fora' ? fora : !fora;
     });
@@ -787,6 +844,42 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
   }
 });
 
+// ─── Importar Fechamento Oficial (Cesta de Qualidade da TIM) ─────────────────
+// Planilha mensal que a TIM manda com o fechamento oficial do IQ por safra —
+// tem eventos que a Sonar não informa (downgrade, recompra, suspensão comum e
+// por fraude). Quando existe fechamento pra uma safra, ele vira a fonte de
+// verdade do IQ daquela safra (ver calcularIQSafra); sem ele, a gente usa a
+// prévia por atraso, igual já era.
+
+app.post('/api/importar-cesta-oficial', uploadMemory.single('arquivo'), (req, res) => {
+  if (!req.file) return res.status(400).json({ erro: 'Nenhum arquivo enviado' });
+  try {
+    const wb = XLSX.read(req.file.buffer, { type: 'buffer', cellDates: true });
+    const ws = wb.Sheets[wb.SheetNames[0]];
+    const registros = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+    const processados = registros.map(r => ({
+      os: String(r['COD_ORDEM_SIEBEL'] || '').trim(),
+      mesGross: normalizarMes(r['MES_GROSS_SIEBEL']),
+      eleg: String(r['FL_ELEG_CESTA_QUAL']).trim() === '1',
+      motivo: r['1o_EVENTO_NAO_QUALIDADE_GROSS'] || null,
+    })).filter(r => r.os && r.mesGross);
+
+    if (!processados.length) return res.status(400).json({ erro: 'Nenhum registro válido encontrado (confira as colunas COD_ORDEM_SIEBEL / MES_GROSS_SIEBEL)' });
+
+    const safrasNoArquivo = [...new Set(processados.map(r => r.mesGross))];
+
+    // Substitui por safra — permite reimportar/corrigir um fechamento sem duplicar.
+    const existente = lerJSON(CESTA_OFICIAL_PATH, []);
+    const mantidos = existente.filter(r => !safrasNoArquivo.includes(r.mesGross));
+    salvarJSON(CESTA_OFICIAL_PATH, [...mantidos, ...processados]);
+
+    res.json({ ok: true, total: processados.length, safras: safrasNoArquivo });
+  } catch (err) {
+    res.status(500).json({ erro: err.message });
+  }
+});
+
 // ─── Status de importação ─────────────────────────────────────────────────────
 
 function parseDataBr(s) {
@@ -870,12 +963,16 @@ app.get('/api/resumo', (req, res) => {
       const comFatura = f.filter(c => c.faturas?.some(fat => fat.numero === n));
       if (!comFatura.length) continue;
       const pagas = comFatura.filter(c => c.faturas.find(fat => fat.numero === n)?.status === 'ADIMPLENTE').length;
-      const naoPagas = comFatura.filter(c => c.faturas.find(fat => fat.numero === n)?.status === 'INADIMPLENTE').length;
+      // Fatura N% mantém o critério de antes: PAGO_ATRASO conta como não-paga
+      // aqui (mesmo já tendo sido quitada), só a Tabela de Clientes mudou a
+      // exibição — este indicador continua igual ao que já era.
+      const naoPagas = comFatura.filter(c => ['INADIMPLENTE', 'PAGO_ATRASO'].includes(c.faturas.find(fat => fat.numero === n)?.status)).length;
       faturaStats[`f${n}`] = { total: comFatura.length, pagas, naoPagas, pct: +(pagas / comFatura.length * 100).toFixed(1) };
     }
 
     const inadimplentes = f.filter(c => c.status === 'INADIMPLENTE' && !c.churn).length;
-    const adimplentes = f.filter(c => c.status === 'ADIMPLENTE' && !c.churn).length;
+    // PAGO_ATRASO conta como adimplente aqui — já foi pago, só que fora do prazo.
+    const adimplentes = f.filter(c => (c.status === 'ADIMPLENTE' || c.status === 'PAGO_ATRASO') && !c.churn).length;
 
     // IQ da safra selecionada no filtro "Mês Gross" do topo (card ao lado de
     // Fatura 1). Sem um mês especifico escolhido não há uma janela única de
@@ -1168,7 +1265,7 @@ app.get('/api/graficos/status-geral', (req, res) => {
     const todos = lerJSON(BASE_CRUZADA_PATH, []);
     const f = aplicarFiltros(todos, req.query);
     const total = f.length;
-    const adimplentes = f.filter(c => c.status === 'ADIMPLENTE' && !c.churn).length;
+    const adimplentes = f.filter(c => (c.status === 'ADIMPLENTE' || c.status === 'PAGO_ATRASO') && !c.churn).length;
     const inadimplentes = f.filter(c => c.status === 'INADIMPLENTE' && !c.churn).length;
     const semDados = f.filter(c => c.status === 'SEM DADOS').length;
     const churn = f.filter(c => c.churn).length;
@@ -1187,7 +1284,7 @@ app.get('/api/graficos/evolucao', (req, res) => {
     const meses = [...new Set(f.map(c => c.mesGross))].sort();
     res.json({
       labels: meses,
-      adimplentes: meses.map(m => f.filter(c => c.mesGross === m && c.status === 'ADIMPLENTE').length),
+      adimplentes: meses.map(m => f.filter(c => c.mesGross === m && (c.status === 'ADIMPLENTE' || c.status === 'PAGO_ATRASO')).length),
       inadimplentes: meses.map(m => f.filter(c => c.mesGross === m && c.status === 'INADIMPLENTE').length),
     });
   } catch (err) { res.status(500).json({ erro: err.message }); }

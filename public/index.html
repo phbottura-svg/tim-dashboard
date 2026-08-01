@@ -113,6 +113,16 @@
         <div class="importar-ts" id="importar-ultima-ts">—</div>
       </div>
 
+      <!-- Fechamento Oficial IQ (Cesta de Qualidade TIM) -->
+      <div class="importar-bloco">
+        <div class="importar-bloco-label">FECHAMENTO OFICIAL IQ (CESTA TIM)</div>
+        <label class="btn btn-importar" id="btn-importar-cesta-oficial">
+          📥 Importar Fechamento (.xlsx)
+          <input type="file" accept=".xlsx,.xls" onchange="importarCestaOficial(this)" style="display:none" />
+        </label>
+        <div class="importar-status" id="status-cesta-oficial">Sobe a planilha da TIM quando fechar uma safra — o IQ dessa safra passa a usar o número oficial em vez da prévia por atraso.</div>
+      </div>
+
     </div>
     <div id="importar-msg" class="importar-msg" style="display:none"></div>
   </section>
@@ -277,6 +287,7 @@
         <option value="">Todos status</option>
         <option value="ADIMPLENTE">Adimplente</option>
         <option value="INADIMPLENTE">Inadimplente</option>
+        <option value="PAGO_ATRASO">Pago com atraso</option>
         <option value="SEM DADOS">Sem Dados</option>
       </select>
       <select id="tabela-filtro-uf" class="filtro-select-sm" onchange="buscarTabela()">
@@ -305,11 +316,11 @@
     </div>
     <div class="tabela-controles tabela-controles-faturas" id="filtros-faturas-row">
       <span class="filtro-label-faturas">Filtrar por fatura:</span>
-      <select id="tf-f1" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F1 — Todos</option><option value="ADIMPLENTE">F1 Adim.</option><option value="INADIMPLENTE">F1 Inadim.</option><option value="SEM">F1 Sem fatura</option></select>
-      <select id="tf-f2" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F2 — Todos</option><option value="ADIMPLENTE">F2 Adim.</option><option value="INADIMPLENTE">F2 Inadim.</option><option value="SEM">F2 Sem fatura</option></select>
-      <select id="tf-f3" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F3 — Todos</option><option value="ADIMPLENTE">F3 Adim.</option><option value="INADIMPLENTE">F3 Inadim.</option><option value="SEM">F3 Sem fatura</option></select>
-      <select id="tf-f4" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F4 — Todos</option><option value="ADIMPLENTE">F4 Adim.</option><option value="INADIMPLENTE">F4 Inadim.</option><option value="SEM">F4 Sem fatura</option></select>
-      <select id="tf-f5" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F5 — Todos</option><option value="ADIMPLENTE">F5 Adim.</option><option value="INADIMPLENTE">F5 Inadim.</option><option value="SEM">F5 Sem fatura</option></select>
+      <select id="tf-f1" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F1 — Todos</option><option value="ADIMPLENTE">F1 Adim.</option><option value="PAGO_ATRASO">F1 Pago c/ atraso</option><option value="INADIMPLENTE">F1 Inadim.</option><option value="SEM">F1 Sem fatura</option></select>
+      <select id="tf-f2" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F2 — Todos</option><option value="ADIMPLENTE">F2 Adim.</option><option value="PAGO_ATRASO">F2 Pago c/ atraso</option><option value="INADIMPLENTE">F2 Inadim.</option><option value="SEM">F2 Sem fatura</option></select>
+      <select id="tf-f3" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F3 — Todos</option><option value="ADIMPLENTE">F3 Adim.</option><option value="PAGO_ATRASO">F3 Pago c/ atraso</option><option value="INADIMPLENTE">F3 Inadim.</option><option value="SEM">F3 Sem fatura</option></select>
+      <select id="tf-f4" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F4 — Todos</option><option value="ADIMPLENTE">F4 Adim.</option><option value="PAGO_ATRASO">F4 Pago c/ atraso</option><option value="INADIMPLENTE">F4 Inadim.</option><option value="SEM">F4 Sem fatura</option></select>
+      <select id="tf-f5" class="filtro-select-sm" onchange="buscarTabela()"><option value="">F5 — Todos</option><option value="ADIMPLENTE">F5 Adim.</option><option value="PAGO_ATRASO">F5 Pago c/ atraso</option><option value="INADIMPLENTE">F5 Inadim.</option><option value="SEM">F5 Sem fatura</option></select>
       <button class="btn btn-sm btn-secondary" onclick="limparFiltrosFaturas()" style="font-size:11px;padding:5px 10px">Limpar</button>
     </div>
     <div class="tabela-scroll-top" id="tabela-scroll-top"><div class="tabela-scroll-top-inner" id="tabela-scroll-top-inner"></div></div>

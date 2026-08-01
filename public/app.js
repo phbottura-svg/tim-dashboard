@@ -15,8 +15,8 @@ const C = {
   roxo: '#7c4dff', cinza: '#7070a0',
 };
 
-const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
-const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, 'SEM DADOS': C.cinza };
+const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', PAGO_ATRASO: 'Pago com atraso', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
+const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, PAGO_ATRASO: C.laranja, 'SEM DADOS': C.cinza };
 
 // Marcadores de atendimento — a ordem aqui define a ordem nos filtros e no modal.
 const MARCADORES = ['pagou', 'promessa', 'problema_tecnico', 'problema_app'];
@@ -696,6 +696,32 @@ async function importarSonar(input, estado) {
   finally { input.value = ''; }
 }
 
+async function importarCestaOficial(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const btn = document.getElementById('btn-importar-cesta-oficial');
+  btn.textContent = '⏳ Importando...';
+  btn.style.opacity = '0.7';
+  try {
+    const fd = new FormData();
+    fd.append('arquivo', file);
+    const r = await fetch('/api/importar-cesta-oficial', { method: 'POST', body: fd });
+    const d = await r.json();
+    if (d.erro) { mostrarMsg('❌ Erro: ' + d.erro, 'erro'); }
+    else {
+      mostrarMsg(`✅ Fechamento oficial importado: ${d.total} clientes · safra(s) ${d.safras.join(', ')}`, 'ok');
+      const st = document.getElementById('status-cesta-oficial');
+      if (st) st.textContent = `✅ Última importação: ${d.safras.join(', ')} (${d.total} clientes)`;
+      await carregarTudo();
+    }
+  } catch (err) { mostrarMsg('❌ ' + err.message, 'erro'); }
+  finally {
+    btn.textContent = '📥 Importar Fechamento (.xlsx)';
+    btn.style.opacity = '';
+    input.value = '';
+  }
+}
+
 async function carregarStatusImportacao() {
   try {
     const d = await fetch('/api/importacao/status').then(r => r.json());
@@ -814,11 +840,11 @@ async function carregarResumo() {
         </div>`;
       }
       const corIQ = r.percentual >= 80 ? 'kpi-verde' : r.percentual >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
-      const previaTxt = r.previa ? ' · prévia (safra em andamento)' : '';
+      const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM' : (r.previa ? ' · prévia (safra em andamento)' : ' · estimativa por atraso');
       return `<div class="kpi ${corIQ}" title="Janela: ${r.janela.join(', ')} — corte em ${r.dataCorte}">
         <div class="kpi-label">📐 IQ Safra ${r.safra}</div>
         <div class="kpi-value">${r.percentual}%</div>
-        <div class="kpi-sub">${fmt(r.clientesOk)} de ${fmt(r.totalClientes)} dentro do IQ${previaTxt}</div>
+        <div class="kpi-sub">${fmt(r.clientesOk)} de ${fmt(r.totalClientes)} dentro do IQ${fonteTxt}</div>
       </div>`;
     })();
 
@@ -1026,8 +1052,8 @@ async function carregarTabela() {
       const fCells = Array.from({length: maxF}, (_, i) => {
         const fat = (c.faturas || []).find(f => f.numero === i + 1);
         if (!fat) return '<td class="dim">—</td>';
-        const cls = fat.pagoManual ? 'status-PAGO-MANUAL' : fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
-        const icone = fat.pagoManual ? '💛' : fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'INADIMPLENTE' ? '❌' : '—';
+        const cls = fat.pagoManual ? 'status-PAGO-MANUAL' : fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'PAGO_ATRASO' ? 'status-PAGO-ATRASO' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
+        const icone = fat.pagoManual ? '💛' : fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'PAGO_ATRASO' ? '🟠' : fat.status === 'INADIMPLENTE' ? '❌' : '—';
         const label = fat.pagoManual ? 'Pago (marcado manualmente via Base Pagos) — clique para desmarcar' : (fat.detalhamento || fat.statusPagamento || '—');
         const acao = fat.pagoManual ? ` onclick="desmarcarPagoManual(${idx}, ${i + 1})" style="cursor:pointer"` : '';
         return `<td><span class="status-tag ${cls}" title="${label}"${acao}>${icone} ${fat.dataVencimento || ''}</span></td>`;

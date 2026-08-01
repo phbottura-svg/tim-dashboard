@@ -1091,6 +1091,8 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
 .status-INADIMPLENTE { background: rgba(240,82,92,0.14); color: var(--vermelho); border: 1px solid rgba(240,82,92,0.3); }
 .status-SEM_DADOS    { background: rgba(137,147,170,0.14); color: var(--dim);    border: 1px solid rgba(137,147,170,0.28); }
 .status-PAGO-MANUAL  { background: rgba(111,161,255,0.14); color: var(--azul-c); border: 1px solid rgba(111,161,255,0.3); }
+.status-PAGO-ATRASO,
+.status-PAGO_ATRASO  { background: rgba(232,150,58,0.14);  color: var(--laranja); border: 1px solid rgba(232,150,58,0.3); }
 .status-CHURN        { background: rgba(232,150,58,0.14);  color: var(--laranja); border: 1px solid rgba(232,150,58,0.3); }
 
 /* ─── Colunas da tabela ─────────────────────────────────────────────────────── */

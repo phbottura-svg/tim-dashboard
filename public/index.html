@@ -131,7 +131,7 @@
   <section class="filtros">
     <div class="filtro-grupo">
       <label>Mês Gross</label>
-      <select id="filtro-mesGross" onchange="aplicarFiltros()">
+      <select id="filtro-mesGross" onchange="mudarMesGrossAtalho(this.value)">
         <option value="">Todos</option>
       </select>
     </div>
@@ -295,6 +295,9 @@
         <option value="PR">PR</option>
         <option value="SC">SC</option>
         <option value="RS">RS</option>
+      </select>
+      <select id="tabela-filtro-mesgross" class="filtro-select-sm" onchange="mudarMesGrossAtalho(this.value)" title="O mesmo filtro de Mês Gross do topo da tela">
+        <option value="">Todos Meses Gross</option>
       </select>
       <select id="tabela-filtro-safra" class="filtro-select-sm" onchange="buscarTabela()">
         <option value="">Todas Safras</option>

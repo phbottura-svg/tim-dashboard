@@ -500,9 +500,11 @@ async function carregarOpcoesFiltros() {
   try {
     const d = await fetch('/api/filtros/opcoes').then(r => r.json());
     const selMes = document.getElementById('filtro-mesGross');
+    const selMesAtalho = document.getElementById('tabela-filtro-mesgross');
     d.mesesGross?.forEach(s => {
       const o = document.createElement('option');
       o.value = s; o.textContent = s; selMes.appendChild(o);
+      if (selMesAtalho) selMesAtalho.appendChild(o.cloneNode(true));
     });
     const selVend = document.getElementById('filtro-vendedor');
     selVend.innerHTML = '<option value="">Todos Vendedores</option>';
@@ -555,6 +557,17 @@ function coletarFiltros() {
 async function aplicarFiltros() {
   state.pagina = 1;
   await carregarTudo();
+}
+
+// Mês Gross tem dois seletores na tela (o do topo e o atalho na Tabela de
+// Clientes) que representam o MESMO filtro — mudar um reflete no outro pra
+// não precisar subir/descer a tela pra trocar de mês.
+function mudarMesGrossAtalho(valor) {
+  const topo = document.getElementById('filtro-mesGross');
+  const atalho = document.getElementById('tabela-filtro-mesgross');
+  if (topo) topo.value = valor;
+  if (atalho) atalho.value = valor;
+  aplicarFiltros();
 }
 
 // ─── Importação ───────────────────────────────────────────────────────────────
@@ -802,6 +815,8 @@ async function carregarOpcoesFiltrosReset() {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<option value="">Todos</option>';
   });
+  const atalho = document.getElementById('tabela-filtro-mesgross');
+  if (atalho) atalho.innerHTML = '<option value="">Todos Meses Gross</option>';
   await carregarOpcoesFiltros();
 }
 
@@ -1108,7 +1123,7 @@ function limparFiltrosFaturas() {
     const el = document.getElementById(`tf-f${n}`);
     if (el) el.value = '';
   }
-  buscarTabela();
+  aplicarFiltros();
 }
 
 // Checkboxes "Dentro do IQ" / "Fora do IQ" são mutuamente exclusivos — marcar
@@ -1122,6 +1137,10 @@ function onIqCheckbox(qual) {
 function limparTodosFiltros() {
   const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-vencimento'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const topo = document.getElementById('filtro-mesGross');
+  const atalho = document.getElementById('tabela-filtro-mesgross');
+  if (topo) topo.value = '';
+  if (atalho) atalho.value = '';
   _buscaTabelaDigitado = '';
   ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis',
    'tabela-filtro-pago-manual', 'tabela-filtro-iq-dentro', 'tabela-filtro-iq-fora',

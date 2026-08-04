@@ -603,6 +603,16 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
 .disparo-select { flex: 1; min-width: 280px; background: var(--bg3); border: 1px solid var(--border); color: var(--texto); border-radius: 8px; padding: 8px 12px; font-size: 13px; }
 .disparo-select:focus { outline: none; border-color: var(--azul); }
 .disparo-info { font-size: 11px; color: var(--dim); margin-top: 8px; }
+.disparo-subtitulo {
+  font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
+  color: var(--dim); margin: 14px 0 8px; padding-top: 12px; border-top: 1px solid var(--border);
+}
+.disparo-subtitulo:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+.disparo-dica { font-size: 11px; color: var(--dim); margin-top: 6px; opacity: 0.85; }
+.disparo-aviso {
+  font-size: 12px; font-weight: 600; color: var(--vermelho); margin-top: 6px;
+  background: rgba(240,82,92,0.1); border: 1px solid rgba(240,82,92,0.3); border-radius: 8px; padding: 6px 10px;
+}
 
 .progresso-wrap { margin-top: 12px; }
 .progresso-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }

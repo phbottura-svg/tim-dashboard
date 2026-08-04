@@ -1586,8 +1586,12 @@ async function atualizarInfoRelatorio() {
     const d = await fetch(`/api/relatorios/info/${encodeURIComponent(arquivo)}`).then(r => r.json());
     if (d.erro) { if (info) info.textContent = d.erro; return; }
     const forcar = document.getElementById('disparo-forcar')?.checked || false;
-    const pend = forcar ? d.total : (d.pendentes != null ? d.pendentes : d.total);
-    const pendMsg = forcar ? (d.totalDisparos || 0) : ((d.totalDisparos || 0) - (d.disparadosMsg || 0));
+    // "Pendentes" sempre mostra o real (quem ainda não recebeu) — não muda de
+    // significado com a caixa "Reenviar já disparados" pra não confundir; o
+    // efeito dessa caixa aparece só no aviso abaixo.
+    const pendMsg = (d.totalDisparos || 0) - (d.disparadosMsg || 0);
+    const avisoForcar = document.getElementById('disparo-forcar-aviso');
+    if (avisoForcar) avisoForcar.style.display = forcar ? 'block' : 'none';
 
     // Distribuição por número de faturas
     const fat1 = d.clientesUmaFatura || 0;
@@ -1627,7 +1631,9 @@ async function atualizarInfoRelatorio() {
       barraWrap.style.display = 'none';
     }
 
-    calcularTempoDisparo(pendMsg);
+    // Com "Reenviar já disparados" ativo, o robô manda pra TODO mundo de novo,
+    // não só pros pendentes — a estimativa de tempo precisa refletir isso.
+    calcularTempoDisparo(forcar ? totalMsg : pendMsg);
   } catch (e) { if (info) info.textContent = 'Erro ao ler relatório: ' + e.message; }
 }
 

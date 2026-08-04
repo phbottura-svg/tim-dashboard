@@ -498,13 +498,14 @@
         <span class="disparo-label">📋 Relatório para Disparo</span>
         <button class="btn btn-secondary btn-sm" onclick="carregarRelatorios()">🔄 Atualizar lista</button>
       </div>
+      <div class="disparo-subtitulo">⚙️ Configuração</div>
       <div class="disparo-select-wrap">
         <select id="select-relatorio" class="disparo-select" onchange="atualizarInfoRelatorio()">
           <option value="">— Selecione um relatório —</option>
         </select>
         <div class="disparo-limite-wrap">
           <input type="number" id="disparo-limite" class="disparo-limite-input" placeholder="Todos" min="1" max="9999" oninput="atualizarInfoRelatorio()" />
-          <span class="disparo-limite-tag">limite</span>
+          <span class="disparo-limite-tag">clientes</span>
         </div>
         <div class="disparo-limite-wrap">
           <input type="number" id="disparo-delay" class="disparo-limite-input" placeholder="30" min="5" max="300" value="30" oninput="atualizarInfoRelatorio()" />
@@ -518,13 +519,17 @@
           <input type="number" id="disparo-pausa-lote" class="disparo-limite-input" placeholder="300" min="60" max="3600" value="300" oninput="atualizarInfoRelatorio()" />
           <span class="disparo-limite-tag">seg pausa</span>
         </div>
-        <label class="filtro-toggle" style="border-color:var(--vermelho); color:var(--vermelho)" title="Reenvia mesmo para quem já recebeu">
+        <label class="filtro-toggle" style="border-color:var(--vermelho); color:var(--vermelho)" title="Reenvia mesmo para quem já recebeu, em qualquer dia anterior">
           <input type="checkbox" id="disparo-forcar" style="accent-color:var(--vermelho)" onchange="salvarEstadoDisparo(); atualizarInfoRelatorio()"> Reenviar já disparados
         </label>
         <button class="btn btn-primary" id="btn-disparar" onclick="dispararFaturas()">📤 Disparar WhatsApp</button>
         <button class="btn btn-danger" id="btn-parar-disparo" onclick="pararDisparo()" style="display:none">⏹ Parar Disparo</button>
       </div>
+      <div class="disparo-dica">💡 "Clientes" é a quantidade de pessoas — cada uma pode ter mais de 1 fatura em aberto, então o número de mensagens enviadas costuma ser maior.</div>
       <div id="disparo-relatorio-info" class="disparo-info"></div>
+      <div id="disparo-forcar-aviso" class="disparo-aviso" style="display:none">⚠️ Reenvio ativo — vai mandar de novo pra quem já recebeu antes, não só pros pendentes.</div>
+
+      <div class="disparo-subtitulo">📊 Andamento</div>
       <div id="disparo-barra-static-wrap" style="display:none;margin-top:8px">
         <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:3px">
           <span id="disparo-barra-label">Progresso do disparo</span>

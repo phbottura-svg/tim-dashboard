@@ -420,7 +420,7 @@ function cruzarBases() {
 // sobreviverem ao Recruzar e às reimportações do Sonar.
 
 const ANOTACOES_PATH = path.join(DATA_PATH, 'anotacoes-clientes.json');
-const MARCADORES_VALIDOS = ['pagou', 'promessa', 'problema_tecnico', 'problema_app'];
+const MARCADORES_VALIDOS = ['pagou', 'promessa', 'problema_tecnico', 'problema_app', 'cancelamento', 'venda_errada'];
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 

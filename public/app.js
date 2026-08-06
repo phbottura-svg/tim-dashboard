@@ -19,12 +19,14 @@ const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', P
 const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, PAGO_ATRASO: C.laranja, 'SEM DADOS': C.cinza };
 
 // Marcadores de atendimento — a ordem aqui define a ordem nos filtros e no modal.
-const MARCADORES = ['pagou', 'promessa', 'problema_tecnico', 'problema_app'];
+const MARCADORES = ['pagou', 'promessa', 'problema_tecnico', 'problema_app', 'cancelamento', 'venda_errada'];
 const MARCADOR_INFO = {
   pagou:            { icone: '💰', label: 'Cliente pagou' },
   promessa:         { icone: '🤝', label: 'Promessa de pagamento' },
   problema_tecnico: { icone: '🔧', label: 'Problema técnico' },
   problema_app:     { icone: '📱', label: 'Problema no app' },
+  cancelamento:     { icone: '🚫', label: 'Solicitou cancelamento' },
+  venda_errada:     { icone: '🔁', label: 'Venda errada' },
 };
 
 // ─── Init ─────────────────────────────────────────────────────────────────────

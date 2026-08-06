@@ -1464,12 +1464,15 @@ app.post('/api/corrigir-os', (req, res) => {
 // Corrigir qualquer campo de um cliente sem match (cria/atualiza na base de clientes)
 app.post('/api/ajustes/corrigir-cliente', (req, res) => {
   try {
-    const { osAtual, nome, cpf, contatoPrincipal, contatoResponsavel, mesGross } = req.body;
+    const { osAtual, nome, cpf, contatoPrincipal, contatoResponsavel, mesGross, vendedor } = req.body;
     if (!osAtual) return res.status(400).json({ erro: 'osAtual é obrigatório' });
 
     const clientes = lerJSON(BASE_CLIENTES_PATH, []);
     // Tenta localizar pelo OS original (sem match não tem cpf/nome na base)
     const idx = clientes.findIndex(c => c.os === osAtual);
+    // vendedor só é sobrescrito se vier no payload (a tela de Ajustes não manda
+    // esse campo) — sem isso, salvar por lá apagaria o vendedor já cadastrado.
+    const vendedorAtual = idx >= 0 ? (clientes[idx].vendedor || '') : '';
     const entrada = {
       os: osAtual,
       nome: (nome || '').trim(),
@@ -1477,7 +1480,7 @@ app.post('/api/ajustes/corrigir-cliente', (req, res) => {
       contatoPrincipal: limparTelefone(contatoPrincipal),
       contatoResponsavel: limparTelefone(contatoResponsavel) || null,
       mesGrossManual: converterDataParaMesAno((mesGross || '').trim()),
-      vendedor: idx >= 0 ? (clientes[idx].vendedor || '') : '',
+      vendedor: vendedor !== undefined ? String(vendedor).trim() : vendedorAtual,
     };
     if (idx >= 0) clientes[idx] = { ...clientes[idx], ...entrada };
     else clientes.push(entrada);

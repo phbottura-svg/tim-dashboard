@@ -1234,7 +1234,11 @@ app.get('/api/filtros/opcoes', (req, res) => {
   try {
     const todos = lerJSON(BASE_CRUZADA_PATH, []);
     const mesesGross = [...new Set(todos.map(c => c.mesGross).filter(Boolean))].sort();
-    const vendedores = [...new Set(todos.map(c => c.vendedor).filter(Boolean))].sort();
+    // Com um Mês Gross selecionado, a lista de vendedores só traz quem teve
+    // venda naquele mês — pra casar com quem realmente aparece na Tabela de
+    // Clientes filtrada, em vez de listar todo mundo da base inteira.
+    const baseVendedores = req.query.mesGross ? todos.filter(c => c.mesGross === req.query.mesGross) : todos;
+    const vendedores = [...new Set(baseVendedores.map(c => c.vendedor).filter(Boolean))].sort();
     const estados = [...new Set(todos.map(c => c.uf).filter(Boolean))].sort();
     const safras = mesesGross;
     const datasVencimento = [...new Set(

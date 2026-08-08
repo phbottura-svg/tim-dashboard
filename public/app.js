@@ -564,12 +564,33 @@ async function aplicarFiltros() {
 // Mês Gross tem dois seletores na tela (o do topo e o atalho na Tabela de
 // Clientes) que representam o MESMO filtro — mudar um reflete no outro pra
 // não precisar subir/descer a tela pra trocar de mês.
-function mudarMesGrossAtalho(valor) {
+async function mudarMesGrossAtalho(valor) {
   const topo = document.getElementById('filtro-mesGross');
   const atalho = document.getElementById('tabela-filtro-mesgross');
   if (topo) topo.value = valor;
   if (atalho) atalho.value = valor;
+  await atualizarVendedoresPorMesGross(valor);
   aplicarFiltros();
+}
+
+// Restringe o filtro de Vendedor a quem tem venda no Mês Gross selecionado,
+// pra casar com quem realmente aparece na Tabela de Clientes filtrada — sem
+// mês selecionado, volta a listar todo mundo. Mantém o vendedor já escolhido
+// se ele continuar valendo na nova lista.
+async function atualizarVendedoresPorMesGross(mesGross) {
+  const sel = document.getElementById('filtro-vendedor');
+  if (!sel) return;
+  const atual = sel.value;
+  try {
+    const qs = mesGross ? '?mesGross=' + encodeURIComponent(mesGross) : '';
+    const d = await fetch('/api/filtros/opcoes' + qs).then(r => r.json());
+    sel.innerHTML = '<option value="">Todos Vendedores</option>';
+    d.vendedores?.forEach(v => {
+      const o = document.createElement('option');
+      o.value = v; o.textContent = v; sel.appendChild(o);
+    });
+    sel.value = (atual && d.vendedores?.includes(atual)) ? atual : '';
+  } catch {}
 }
 
 // ─── Importação ───────────────────────────────────────────────────────────────
@@ -1143,6 +1164,7 @@ function limparTodosFiltros() {
   const atalho = document.getElementById('tabela-filtro-mesgross');
   if (topo) topo.value = '';
   if (atalho) atalho.value = '';
+  atualizarVendedoresPorMesGross('');
   _buscaTabelaDigitado = '';
   ['tabela-filtro-churn', 'tabela-filtro-sem-match', 'tabela-filtro-acionaveis',
    'tabela-filtro-pago-manual', 'tabela-filtro-iq-dentro', 'tabela-filtro-iq-fora',

@@ -81,6 +81,7 @@ const ROTAS_PUBLICAS = [
   { method: 'POST', path: '/api/upload-pdf' },
   { method: 'POST', path: '/api/faturas/codigos' },
   { method: 'POST', path: '/api/faturas/envio' },
+  { method: 'GET',  path: '/api/faturas/nomes' },
   { method: 'POST', path: '/webhook/chatwoot' },
 ];
 
@@ -2308,6 +2309,16 @@ app.post('/webhook/chatwoot', (req, res) => {
 
 app.get('/webhook/chatwoot/log', (req, res) => {
   res.json(lerJSON(CHATWOOT_WEBHOOK_LOG_PATH, []));
+});
+
+// Lista crua de todos os nomes de PDF no servidor — usado pra diagnosticar
+// reconciliação (comparar com o que existe localmente na máquina do robô,
+// já que o upload pro VPS pode falhar silenciosamente e nunca é reprocessado).
+app.get('/api/faturas/nomes', autorizarUpload, (req, res) => {
+  try {
+    const arquivos = fs.readdirSync(PDFS_PATH).filter(f => f.toLowerCase().endsWith('.pdf'));
+    res.json({ total: arquivos.length, arquivos });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
 app.get('/api/faturas', (req, res) => {

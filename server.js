@@ -2312,12 +2312,15 @@ app.get('/webhook/chatwoot/log', (req, res) => {
 
 app.get('/api/faturas', (req, res) => {
   try {
-    const busca = semAcento(req.query.busca || '');
+    // O nome do arquivo usa "_" no lugar de espaço (ex: "ROBERTO_CARLOS_GALINA_...pdf"),
+    // mas quem busca digita com espaço normal — sem normalizar os dois lados
+    // pro mesmo separador, a busca por nome completo nunca dava match.
+    const busca = semAcento(req.query.busca || '').replace(/_/g, ' ');
     const pagina = Math.max(1, parseInt(req.query.pagina) || 1);
     const porPagina = 20;
 
     let arquivos = fs.readdirSync(PDFS_PATH).filter(f => f.toLowerCase().endsWith('.pdf')).sort();
-    if (busca) arquivos = arquivos.filter(f => semAcento(f).includes(busca));
+    if (busca) arquivos = arquivos.filter(f => semAcento(f).replace(/_/g, ' ').includes(busca));
 
     const total = arquivos.length;
     const paginas = Math.ceil(total / porPagina) || 1;

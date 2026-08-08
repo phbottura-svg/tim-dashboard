@@ -2179,7 +2179,10 @@ function chavesTelefone(telefone) {
 // com os mesmos botões, e o Chatwoot não diz em qual delas o clique aconteceu.
 // Por isso guardamos todas as faturas da rodada e respondemos com todos os
 // códigos identificados, em vez de arriscar devolver o de outra cobrança.
-const JANELA_ENVIOS_MS = 24 * 60 * 60 * 1000;
+// 45 dias (não 24h) porque o cliente não paga na hora que recebe a mensagem —
+// no uso real ele clica no botão dias depois; com 24h o sistema "esquecia" a
+// fatura enviada e respondia "não encontramos" pra quem só demorou pra pagar.
+const JANELA_ENVIOS_MS = 45 * 24 * 60 * 60 * 1000;
 
 app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
   const { telefone, arquivo, vencimento, mesRef } = req.body || {};

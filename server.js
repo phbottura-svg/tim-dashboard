@@ -2323,6 +2323,7 @@ app.get('/api/faturas', (req, res) => {
     const paginas = Math.ceil(total / porPagina) || 1;
     const slice = arquivos.slice((pagina - 1) * porPagina, pagina * porPagina);
 
+    const codigos = lerJSON(FATURA_CODIGOS_PATH, {});
     const clientes = {};
     for (const arq of slice) {
       const m = arq.match(/^(.+)_(\d{2}-\d{4})\.pdf$/i);
@@ -2337,7 +2338,12 @@ app.get('/api/faturas', (req, res) => {
         nome = arq.replace('.pdf', ''); cpf = ''; mesAno = ''; chave = nome;
       }
       if (!clientes[chave]) clientes[chave] = { nome, cpf, faturas: [] };
-      clientes[chave].faturas.push({ arquivo: arq, mesAno });
+      clientes[chave].faturas.push({
+        arquivo: arq,
+        mesAno,
+        pix: codigos[arq]?.pix || null,
+        linhaDigitavel: codigos[arq]?.linhaDigitavel || null,
+      });
     }
 
     res.json({ total, pagina, paginas, clientes: Object.values(clientes) });

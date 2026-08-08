@@ -1045,13 +1045,14 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
 .fatura-items { display: flex; flex-wrap: wrap; gap: 8px; }
 .fatura-item {
   display: flex;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;
+  gap: 6px;
   background: var(--card2);
   border: 1px solid var(--border);
   border-radius: 6px;
-  padding: 5px 10px;
+  padding: 6px 10px;
 }
+.fatura-item-topo { display: flex; align-items: center; gap: 8px; }
 .fatura-mes { color: var(--azul-c); font-size: 0.85rem; font-weight: 500; }
 .fatura-dl {
   font-size: 0.78rem;
@@ -1059,6 +1060,20 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
   text-decoration: none;
   display: inline-block;
 }
+.fatura-codigos { display: flex; gap: 6px; }
+.btn-copiar-codigo {
+  font-size: 0.75rem;
+  padding: 3px 8px;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: var(--bg3);
+  color: var(--texto);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+.btn-copiar-codigo:hover { border-color: var(--azul-c); color: var(--azul-c); }
+.btn-copiar-codigo.copiado { border-color: var(--verde); color: var(--verde); }
+.fatura-codigo-vazio { font-size: 0.75rem; color: var(--dim); padding: 3px 8px; }
 .faturas-paginacao {
   display: flex;
   align-items: center;

@@ -1843,8 +1843,18 @@ async function carregarFaturas(pagina) {
         <div class="fatura-items">
           ${c.faturas.map(f => `
             <div class="fatura-item">
-              <span class="fatura-mes">${formatarMesAno(f.mesAno)}</span>
-              <a class="btn btn-sm btn-secondary fatura-dl" href="/api/faturas/download/${encodeURIComponent(f.arquivo)}" download>⬇ Baixar</a>
+              <div class="fatura-item-topo">
+                <span class="fatura-mes">${formatarMesAno(f.mesAno)}</span>
+                <a class="btn btn-sm btn-secondary fatura-dl" href="/api/faturas/download/${encodeURIComponent(f.arquivo)}" download>⬇ Baixar</a>
+              </div>
+              <div class="fatura-codigos">
+                ${f.pix
+                  ? `<button class="btn-copiar-codigo" onclick="copiarCodigoFatura(this)" data-codigo="${escaparHtml(f.pix)}" title="${escaparHtml(f.pix)}">📋 Pix</button>`
+                  : `<span class="fatura-codigo-vazio" title="Código Pix não encontrado nessa fatura">— Pix</span>`}
+                ${f.linhaDigitavel
+                  ? `<button class="btn-copiar-codigo" onclick="copiarCodigoFatura(this)" data-codigo="${escaparHtml(f.linhaDigitavel)}" title="${escaparHtml(f.linhaDigitavel)}">📋 Boleto</button>`
+                  : `<span class="fatura-codigo-vazio" title="Linha digitável não encontrada nessa fatura">— Boleto</span>`}
+              </div>
             </div>
           `).join('')}
         </div>
@@ -1858,6 +1868,20 @@ async function carregarFaturas(pagina) {
       paginacaoEl.innerHTML = btns.join('');
     } else { paginacaoEl.innerHTML = ''; }
   } catch (e) { lista.innerHTML = `<div class="faturas-vazio">Erro ao carregar: ${e.message}</div>`; }
+}
+
+async function copiarCodigoFatura(btn) {
+  const codigo = btn.dataset.codigo;
+  if (!codigo) return;
+  try {
+    await navigator.clipboard.writeText(codigo);
+    const original = btn.textContent;
+    btn.textContent = '✅ Copiado!';
+    btn.classList.add('copiado');
+    setTimeout(() => { btn.textContent = original; btn.classList.remove('copiado'); }, 1500);
+  } catch {
+    alert('Não foi possível copiar automaticamente. Código:\n\n' + codigo);
+  }
 }
 
 function formatarMesAno(mesAno) {

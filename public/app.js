@@ -1136,7 +1136,7 @@ async function carregarTabela() {
         <td id="tb-cpf-${idx}" class="cpf-col">${c.cpf || '—'}</td>
         <td id="tb-c1-${idx}" class="tel-col">${fmtTel(c.contatoPrincipal)}</td>
         <td id="tb-c2-${idx}" class="tel-col">${fmtTel(c.contatoResponsavel)}</td>
-        <td class="custcode-col">${c.custcode || '—'}</td>
+        <td id="tb-custcode-${idx}" class="custcode-col">${c.custcode || '—'}</td>
         <td id="tb-os-${idx}" class="os-col">${c.os || '—'}</td>
         <td id="tb-vendedor-${idx}">${c.vendedor || '—'}</td>
         <td>${c.uf || '—'}</td>
@@ -1341,6 +1341,7 @@ function editarClienteTabela(idx) {
   document.getElementById(`tb-c2-${idx}`).innerHTML   = `<input class="input-inline" id="tei-c2-${idx}"   value="${fmtTelInput(c.contatoResponsavel)}" placeholder="(41) 99999-0000">`;
   document.getElementById(`tb-os-${idx}`).innerHTML   = `<input class="input-inline" id="tei-os-${idx}"   value="${(c.os||'').replace(/"/g,'&quot;')}" placeholder="OS">`;
   document.getElementById(`tb-vendedor-${idx}`).innerHTML = `<input class="input-inline" id="tei-vendedor-${idx}" value="${(c.vendedor||'').replace(/"/g,'&quot;')}" placeholder="Vendedor">`;
+  document.getElementById(`tb-custcode-${idx}`).innerHTML = `<input class="input-inline" id="tei-custcode-${idx}" value="${(c.custcode||'').replace(/"/g,'&quot;')}" placeholder="Custcode">`;
   document.getElementById(`tb-acao-${idx}`).innerHTML = `
     <button class="btn btn-primary btn-sm" onclick="salvarClienteTabela(${idx})" title="Salvar">✅</button>
     <button class="btn btn-secondary btn-sm" onclick="carregarTabela()" title="Cancelar">✖</button>
@@ -1359,6 +1360,7 @@ async function salvarClienteTabela(idx) {
     contatoResponsavel: val(`tei-c2-${idx}`),
     mesGross: c.mesGross,
     vendedor: val(`tei-vendedor-${idx}`),
+    custcode: val(`tei-custcode-${idx}`),
   };
   try {
     const d = await fetch('/api/ajustes/corrigir-cliente', {

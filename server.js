@@ -357,7 +357,9 @@ function cruzarBases() {
       uf: ref.uf || null,
       churn: faturas.some(f => f.churn === 'Sim'),
       loginVendedor: ref.loginVendedor || null,
-      custcode: ref.custcode || null,
+      // Prioriza o custcode corrigido manualmente (tela de edição) sobre o da
+      // Sonar — é pra isso que a correção existe, quando o da Sonar tá errado.
+      custcode: cliente?.custcode || ref.custcode || null,
       nome: cliente?.nome || null,
       cpf: cliente?.cpf || null,
       vendedor: cliente?.vendedor || null,
@@ -389,7 +391,7 @@ function cruzarBases() {
       uf: null,
       churn: false,
       loginVendedor: null,
-      custcode: null,
+      custcode: c.custcode || null,
       nome: c.nome || null,
       cpf: c.cpf || null,
       vendedor: c.vendedor || null,
@@ -1469,15 +1471,17 @@ app.post('/api/corrigir-os', (req, res) => {
 // Corrigir qualquer campo de um cliente sem match (cria/atualiza na base de clientes)
 app.post('/api/ajustes/corrigir-cliente', (req, res) => {
   try {
-    const { osAtual, nome, cpf, contatoPrincipal, contatoResponsavel, mesGross, vendedor } = req.body;
+    const { osAtual, nome, cpf, contatoPrincipal, contatoResponsavel, mesGross, vendedor, custcode } = req.body;
     if (!osAtual) return res.status(400).json({ erro: 'osAtual é obrigatório' });
 
     const clientes = lerJSON(BASE_CLIENTES_PATH, []);
     // Tenta localizar pelo OS original (sem match não tem cpf/nome na base)
     const idx = clientes.findIndex(c => c.os === osAtual);
-    // vendedor só é sobrescrito se vier no payload (a tela de Ajustes não manda
-    // esse campo) — sem isso, salvar por lá apagaria o vendedor já cadastrado.
+    // vendedor/custcode só são sobrescritos se vierem no payload (a tela de
+    // Ajustes não manda esses campos) — sem isso, salvar por lá apagaria o
+    // que já tava cadastrado.
     const vendedorAtual = idx >= 0 ? (clientes[idx].vendedor || '') : '';
+    const custcodeAtual = idx >= 0 ? (clientes[idx].custcode || '') : '';
     const entrada = {
       os: osAtual,
       nome: (nome || '').trim(),
@@ -1486,6 +1490,7 @@ app.post('/api/ajustes/corrigir-cliente', (req, res) => {
       contatoResponsavel: limparTelefone(contatoResponsavel) || null,
       mesGrossManual: converterDataParaMesAno((mesGross || '').trim()),
       vendedor: vendedor !== undefined ? String(vendedor).trim() : vendedorAtual,
+      custcode: custcode !== undefined ? String(custcode).trim() : custcodeAtual,
     };
     if (idx >= 0) clientes[idx] = { ...clientes[idx], ...entrada };
     else clientes.push(entrada);

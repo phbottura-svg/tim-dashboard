@@ -10,9 +10,9 @@ const graficos = {};
 // ─── Cores ───────────────────────────────────────────────────────────────────
 
 const C = {
-  verde: '#00b894', laranja: '#e17055', vermelho: '#e17055',
-  amarelo: '#f0b90b', azul: '#6c5ce7', azulC: '#8b7ff5',
-  roxo: '#6c5ce7', cinza: '#8892a4',
+  verde: '#00d68f', laranja: '#ff9142', vermelho: '#ff4757',
+  amarelo: '#f0b90b', azul: '#7b5cfa', azulC: '#9b8cff',
+  roxo: '#7b5cfa', cinza: '#8892a4',
 };
 
 const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', PAGO_ATRASO: 'Pago com atraso', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };

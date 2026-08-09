@@ -392,7 +392,9 @@ async function carregarSessao() {
   try {
     const { usuario } = await fetch('/api/sessao').then(r => r.json());
     const el = document.getElementById('usuario-logado');
-    if (el && usuario) el.textContent = `👤 ${usuario.nome}`;
+    if (el && usuario) el.textContent = usuario.nome;
+    const avatar = document.getElementById('user-avatar');
+    if (avatar && usuario?.nome) avatar.textContent = usuario.nome.trim().charAt(0).toUpperCase();
   } catch {}
 }
 
@@ -437,9 +439,7 @@ function aplicarTema(tema) {
   else document.documentElement.removeAttribute('data-theme');
   localStorage.setItem('tema', claro ? 'light' : 'dark');
   const icone = document.getElementById('icone-tema');
-  const label = document.getElementById('label-tema');
   if (icone) icone.textContent = claro ? '☀️' : '🌙';
-  if (label) label.textContent = claro ? 'Tema claro' : 'Tema escuro';
 }
 
 function alternarTema() {

@@ -101,17 +101,51 @@ textarea:-webkit-autofill {
   transition: transform 0.25s ease;
 }
 
-.sidebar-logo { display: flex; align-items: center; gap: 13px; padding: 22px 20px 20px; }
+.sidebar-logo { display: flex; align-items: center; gap: 10px; padding: 18px 16px; border-bottom: 1px solid var(--border); }
 .logo-mark {
-  width: 40px; height: 40px;
+  width: 36px; height: 36px;
   border-radius: 50%;
   object-fit: cover;
   object-position: 45% 40%;
   flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.5);
 }
-.sidebar-logo h1 { font-size: 15px; font-weight: 700; color: var(--texto); letter-spacing: 0.3px; line-height: 1.3; }
-.subtitle { font-size: 10.5px; color: var(--dim); }
+.sidebar-logo h1 { font-size: 15px; font-weight: 800; color: var(--texto); letter-spacing: 0.3px; line-height: 1.3; }
+.subtitle { font-size: 9px; color: var(--dim); letter-spacing: 0.4px; text-transform: uppercase; }
+
+/* ─── Bloco de usuário (avatar + nome + sair), igual ao vendas.vonixxsc.com.br ── */
+.sidebar-user {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.user-avatar-lg {
+  width: 38px; height: 38px;
+  background: linear-gradient(135deg, var(--azul), #4834D4);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 700; color: #fff;
+  flex-shrink: 0;
+}
+.user-details { min-width: 0; flex: 1; }
+.user-name { font-size: 13px; font-weight: 600; color: var(--texto); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.user-role {
+  font-size: 9px; padding: 2px 6px; border-radius: 4px;
+  font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+  display: inline-block; margin-top: 2px;
+  background: rgba(108,92,231,0.15); color: var(--azul-c);
+}
+.user-settings-btn {
+  margin-left: auto; background: none; border: none;
+  color: var(--dim); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  padding: 4px; border-radius: 6px; transition: all 0.15s;
+  flex-shrink: 0;
+}
+.user-settings-btn:hover { color: var(--vermelho); background: rgba(225,112,85,0.12); }
+.user-settings-btn svg { width: 15px; height: 15px; }
 
 /* ─── Ícones flat com fundo tintado (mesmo padrão do vendas.vonixxsc.com.br:
    metric-icon-circle/activity-icon — círculo/quadrado arredondado com fundo
@@ -155,68 +189,68 @@ textarea:-webkit-autofill {
 .nav-btn {
   background: transparent;
   border: none;
-  border-left: 3px solid transparent;
+  border-left: 2px solid transparent;
   color: var(--dim);
-  padding: 10px 12px;
-  border-radius: 8px;
-  font-size: 13.5px;
+  padding: 9px 16px;
+  border-radius: 0;
+  font-size: 13px;
   font-family: var(--fonte);
-  font-weight: 600;
+  font-weight: 500;
   cursor: pointer;
   transition: color 0.15s, background 0.15s, border-color 0.15s;
   display: flex;
   align-items: center;
-  gap: 11px;
+  gap: 10px;
   position: relative;
   text-align: left;
   width: 100%;
 }
+.nav-btn svg { width: 15px; height: 15px; flex-shrink: 0; }
 .nav-icon { font-size: 16px; width: 18px; text-align: center; flex-shrink: 0; }
 .nav-label { flex: 1; }
-.nav-btn:hover { color: var(--texto); background: rgba(255,255,255,0.04); }
+.nav-btn:hover { color: var(--texto); background: var(--card2); }
 .nav-btn.active {
-  color: var(--texto);
+  color: var(--azul-c);
   background: rgba(108,92,231,0.12);
   border-left-color: var(--azul);
 }
 
 .sidebar-footer {
-  padding: 16px 20px;
+  padding: 8px;
   border-top: 1px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
 }
 
-/* ─── Recolher a sidebar (preferência salva no navegador) ─────────────────── */
+/* ─── Recolher a sidebar (preferência salva no navegador — o vendas.vonixxsc.com.br
+   não tem essa opção, mas o Paulo pediu pra manter aqui nos dois lados) ────── */
 .btn-recolher {
   background: transparent;
   border: none;
-  border-top: 1px solid var(--border);
   color: var(--dim);
   font-family: var(--fonte);
   font-size: 12px;
   font-weight: 600;
-  padding: 11px 20px;
+  padding: 9px 8px;
+  border-radius: 8px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 11px;
+  width: 100%;
   transition: color 0.15s, background 0.15s;
 }
-.btn-recolher:hover { color: var(--texto); background: rgba(255,255,255,0.04); }
+.btn-recolher:hover { color: var(--texto); background: var(--card2); }
 .btn-recolher svg { width: 16px; height: 16px; flex-shrink: 0; transition: transform 0.25s ease; }
 
 .sidebar.recolhida { width: 68px; }
-.sidebar.recolhida .sidebar-logo { padding: 20px 0 18px; justify-content: center; }
+.sidebar.recolhida .sidebar-logo { padding: 18px 0; justify-content: center; }
 .sidebar.recolhida .sidebar-logo > div,
 .sidebar.recolhida .nav-label,
-.sidebar.recolhida #usuario-logado { display: none; }
-.sidebar.recolhida .nav-btn { justify-content: center; padding: 12px 0; gap: 0; }
+.sidebar.recolhida .user-details,
+.sidebar.recolhida .user-settings-btn { display: none; }
+.sidebar.recolhida .sidebar-user { padding: 14px 0; justify-content: center; }
+.sidebar.recolhida .nav-btn { justify-content: center; padding: 10px 0; gap: 0; }
 .sidebar.recolhida .nav-badge { position: absolute; top: 4px; right: 6px; }
-.sidebar.recolhida .sidebar-footer { padding: 14px 8px; justify-content: center; }
-.sidebar.recolhida .btn-recolher { justify-content: center; padding: 11px 0; gap: 0; }
+.sidebar.recolhida .btn-recolher { justify-content: center; padding: 9px 0; gap: 0; }
 .sidebar.recolhida .btn-recolher svg { transform: rotate(180deg); }
 
 .nav-badge {
@@ -242,6 +276,15 @@ textarea:-webkit-autofill {
   top: 0;
   z-index: 90;
 }
+
+.icon-btn {
+  background: var(--bg3); border: 1px solid var(--border);
+  border-radius: 8px; color: var(--dim);
+  padding: 8px; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s; font-size: 14px; line-height: 1;
+}
+.icon-btn:hover { border-color: var(--azul); color: var(--azul-c); }
 
 .hamburger {
   display: none;

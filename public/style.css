@@ -311,9 +311,11 @@ textarea:-webkit-autofill {
   flex-wrap: wrap;
   gap: 14px;
   align-items: flex-end;
-  padding: 16px 28px;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
+  margin: 18px 28px 0;
+  padding: 18px 22px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 
 .filtro-grupo { display: flex; flex-direction: column; gap: 6px; }
@@ -1039,7 +1041,7 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
   .kpi-grid, .alertas-grid, .graficos-grid { padding-left: 16px; padding-right: 16px; }
   .kpi-grid { flex-wrap: wrap; }
   .kpi { min-width: calc(50% - 5px); flex: 1 1 calc(50% - 5px); }
-  .tabela-section, .comandos-wrap, .ajustes-wrap, .importar-panel { margin-left: 16px; margin-right: 16px; }
+  .tabela-section, .comandos-wrap, .ajustes-wrap, .importar-panel, .filtros { margin-left: 16px; margin-right: 16px; }
 }
 
 /* ─── Aba Faturas ─────────────────────────────────────────────────────────── */

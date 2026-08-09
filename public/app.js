@@ -11,7 +11,7 @@ const graficos = {};
 
 const C = {
   verde: '#00b894', laranja: '#e17055', vermelho: '#e17055',
-  amarelo: '#fdcb6e', azul: '#6c5ce7', azulC: '#8b7ff5',
+  amarelo: '#f0b90b', azul: '#6c5ce7', azulC: '#8b7ff5',
   roxo: '#6c5ce7', cinza: '#8892a4',
 };
 
@@ -1040,7 +1040,7 @@ async function carregarRobo(p) {
     const d = await fetch('/api/graficos/robo').then(r => r.json());
     criarOuAtualizar('g-robo', 'line', {
       labels: d.labels,
-      datasets: [{ label: 'Faturas Baixadas', data: d.valores, borderColor: C.amarelo, backgroundColor: 'rgba(255,214,0,0.1)', fill: true, tension: 0.4, pointRadius: 3 }],
+      datasets: [{ label: 'Faturas Baixadas', data: d.valores, borderColor: C.amarelo, backgroundColor: 'rgba(240,185,11,0.1)', fill: true, tension: 0.4, pointRadius: 3 }],
     }, { plugins: { legend: { display: false } }, scales: defOpts.scales });
   } catch {}
 }

@@ -26,6 +26,32 @@
   --shadow:   0 1px 2px rgba(0,0,0,0.4), 0 8px 24px rgba(0,0,0,0.24);
 }
 
+/* Tema claro — troca só as variáveis; o resto do CSS já usa var(--x) em tudo,
+   então a maior parte da tela se adapta sozinha. Cores de status/acento
+   (verde, vermelho, laranja, azul) ficam um pouco mais escuras aqui pra
+   manter contraste legível em cima de fundo claro. */
+:root[data-theme="light"] {
+  --bg:       #F4F6FA;
+  --bg2:      #FFFFFF;
+  --bg3:      #EDF0F5;
+  --card:     #FFFFFF;
+  --card2:    #F3F5F9;
+  --border:   #DEE3EC;
+  --border2:  #C7CEDC;
+  --azul:     #2F6FEF;
+  --azul-c:   #2558C9;
+  --verde:    #158A44;
+  --verde-c:  #1DA851;
+  --vermelho: #D6323D;
+  --laranja:  #B9720E;
+  --amarelo:  #A87C08;
+  --roxo:     #6B46E5;
+  --texto:    #16202E;
+  --dim:      #5C6879;
+  --label:    #7C879C;
+  --shadow:   0 1px 2px rgba(20,30,50,0.08), 0 8px 24px rgba(20,30,50,0.08);
+}
+
 body {
   background: var(--bg);
   color: var(--texto);

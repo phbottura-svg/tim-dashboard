@@ -53,6 +53,7 @@ function vigiarBuscaTabelaAutofill() {
 document.addEventListener('DOMContentLoaded', async () => {
   vigiarBuscaTabelaAutofill();
   restaurarSidebarRecolhida();
+  restaurarTema();
 
   carregarSessao();
   await aplicarModoVps();
@@ -425,6 +426,29 @@ function toggleRecolherSidebar() {
 
 function restaurarSidebarRecolhida() {
   if (localStorage.getItem('sidebar-recolhida') === '1') aplicarSidebarRecolhida(true);
+}
+
+// Tema claro/escuro — o <head> já aplica o tema salvo antes da tela pintar
+// (evita flash do tema errado); aqui só sincroniza o botão com o estado atual
+// e trata o clique de alternar.
+function aplicarTema(tema) {
+  const claro = tema === 'light';
+  if (claro) document.documentElement.setAttribute('data-theme', 'light');
+  else document.documentElement.removeAttribute('data-theme');
+  localStorage.setItem('tema', claro ? 'light' : 'dark');
+  const icone = document.getElementById('icone-tema');
+  const label = document.getElementById('label-tema');
+  if (icone) icone.textContent = claro ? '☀️' : '🌙';
+  if (label) label.textContent = claro ? 'Tema claro' : 'Tema escuro';
+}
+
+function alternarTema() {
+  const atual = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+  aplicarTema(atual === 'light' ? 'dark' : 'light');
+}
+
+function restaurarTema() {
+  aplicarTema(localStorage.getItem('tema') || 'dark');
 }
 
 async function carregarUsuarios() {

@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
+  <script>
+    // Aplica o tema salvo antes do CSS pintar a tela, pra não piscar o tema
+    // errado por uma fração de segundo ao carregar a página.
+    (function() {
+      try {
+        const tema = localStorage.getItem('tema') || 'dark';
+        if (tema === 'light') document.documentElement.setAttribute('data-theme', 'light');
+      } catch {}
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>VONIXX TELECOM — Dashboard</title>
@@ -52,6 +62,9 @@
     </button>
     <div class="sidebar-footer">
       <span id="usuario-logado" class="ts"></span>
+      <button class="btn btn-secondary btn-sm icon-inline" id="btn-tema" onclick="alternarTema()" title="Alternar tema claro/escuro">
+        <span id="icone-tema">🌙</span><span class="nav-label" id="label-tema">Tema escuro</span>
+      </button>
       <button class="btn btn-secondary btn-sm icon-inline" onclick="sair()" title="Sair"><span class="icon-badge icon-badge-sm icon-sair"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h4"/><path d="M16 17l5-5-5-5M21 12H9"/></svg></span><span class="nav-label">Sair</span></button>
     </div>
   </aside>

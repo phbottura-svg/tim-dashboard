@@ -239,55 +239,6 @@
     <!-- gerado dinamicamente pelo JS -->
   </section>
 
-  <!-- Gráficos -->
-  <div class="secao-titulo icon-inline"><span class="icon-badge icon-badge-sm icon-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M12 20V4M20 20v-7"/></svg></span>Análise Visual</div>
-  <section class="graficos-grid">
-
-    <div class="grafico-card grafico-donut-wrap">
-      <h3>Status da Base</h3>
-      <p class="grafico-sub">distribuição geral</p>
-      <div class="donut-container">
-        <canvas id="g-status-geral"></canvas>
-        <div class="donut-centro">
-          <div class="donut-pct" id="donut-pct">—</div>
-          <div class="donut-label">Adim.</div>
-        </div>
-      </div>
-      <div class="donut-legenda" id="donut-legenda"></div>
-    </div>
-
-    <div class="grafico-card">
-      <h3>Distribuição por Estado</h3>
-      <p class="grafico-sub">PR / SC / RS</p>
-      <canvas id="g-estados"></canvas>
-    </div>
-
-    <div class="grafico-card grafico-largo">
-      <h3>Evolução por Mês Gross</h3>
-      <p class="grafico-sub">Adimplentes vs Inadimplentes por mês de ativação</p>
-      <canvas id="g-evolucao"></canvas>
-    </div>
-
-    <div class="grafico-card">
-      <h3>Inadimplência por Vendedor</h3>
-      <p class="grafico-sub">top 10 com mais inadimplentes</p>
-      <canvas id="g-vendedores"></canvas>
-    </div>
-
-    <div class="grafico-card">
-      <h3>Faturas Enviadas por Dia</h3>
-      <p class="grafico-sub">últimos 30 dias · via WhatsApp</p>
-      <canvas id="g-disparos"></canvas>
-    </div>
-
-    <div class="grafico-card grafico-largo">
-      <h3>Faturas Baixadas pelo Robô</h3>
-      <p class="grafico-sub">últimos 30 dias · baixadas automaticamente</p>
-      <canvas id="g-robo"></canvas>
-    </div>
-
-  </section>
-
   <!-- Tabela -->
   <div class="tabela-section">
     <div class="tabela-header">
@@ -374,6 +325,55 @@
     </div>
     <div class="paginacao" id="paginacao"></div>
   </div>
+
+  <!-- Gráficos -->
+  <div class="secao-titulo icon-inline"><span class="icon-badge icon-badge-sm icon-dashboard"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V11M12 20V4M20 20v-7"/></svg></span>Análise Visual</div>
+  <section class="graficos-grid">
+
+    <div class="grafico-card grafico-donut-wrap">
+      <h3>Status da Base</h3>
+      <p class="grafico-sub">distribuição geral</p>
+      <div class="donut-container">
+        <canvas id="g-status-geral"></canvas>
+        <div class="donut-centro">
+          <div class="donut-pct" id="donut-pct">—</div>
+          <div class="donut-label">Adim.</div>
+        </div>
+      </div>
+      <div class="donut-legenda" id="donut-legenda"></div>
+    </div>
+
+    <div class="grafico-card">
+      <h3>Distribuição por Estado</h3>
+      <p class="grafico-sub">PR / SC / RS</p>
+      <canvas id="g-estados"></canvas>
+    </div>
+
+    <div class="grafico-card grafico-largo">
+      <h3>Evolução por Mês Gross</h3>
+      <p class="grafico-sub">Adimplentes vs Inadimplentes por mês de ativação</p>
+      <canvas id="g-evolucao"></canvas>
+    </div>
+
+    <div class="grafico-card">
+      <h3>Inadimplência por Vendedor</h3>
+      <p class="grafico-sub">top 10 com mais inadimplentes</p>
+      <canvas id="g-vendedores"></canvas>
+    </div>
+
+    <div class="grafico-card">
+      <h3>Faturas Enviadas por Dia</h3>
+      <p class="grafico-sub">últimos 30 dias · via WhatsApp</p>
+      <canvas id="g-disparos"></canvas>
+    </div>
+
+    <div class="grafico-card grafico-largo">
+      <h3>Faturas Baixadas pelo Robô</h3>
+      <p class="grafico-sub">últimos 30 dias · baixadas automaticamente</p>
+      <canvas id="g-robo"></canvas>
+    </div>
+
+  </section>
 
 </div><!-- /tab-dashboard -->
 

@@ -2096,7 +2096,11 @@ app.post('/api/comando/disparo-parar', apenasLocal, (req, res) => {
 // ─── Upload e faturas PDF ─────────────────────────────────────────────────────
 
 const UPLOAD_TOKEN = process.env.UPLOAD_TOKEN || '';
-const NOME_PDF_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9 _\-]+_\d{3}\.\d{3}\.\d{3}-\d{2}_\d{2}-\d{4}\.pdf$/i;
+// Exigia CPF no formato exato 3.3.3-2 antes do mês — rejeitava (silenciosamente,
+// sem retry, do lado do robô) qualquer cliente PJ, cujo "cpf" na verdade é um
+// CNPJ/custcode com outra quantidade de dígitos, e nomes de empresa com "&".
+// Agora só exige terminar em "_MM-AAAA.pdf", sem travar o formato do meio.
+const NOME_PDF_RE = /^[A-Za-zÀ-ÖØ-öø-ÿ0-9 ._&-]+_\d{2}-\d{4}\.pdf$/i;
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, PDFS_PATH),

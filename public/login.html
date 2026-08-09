@@ -10,9 +10,9 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0B0F1A; --card: #131A2A; --border: #212A3D;
-    --azul: #3D7FFF; --azul-c: #6FA1FF; --texto: #E6E9F0;
-    --dim: #8993AA; --label: #5C6785; --vermelho: #F0525C;
+    --bg: #0F1117; --card: #1C2333; --border: #1E2436;
+    --azul: #6C5CE7; --azul-c: #8B7FF5; --texto: #F0F2F5;
+    --dim: #8892A4; --label: #4A5568; --vermelho: #E17055;
   }
   body {
     background: var(--bg); color: var(--texto);
@@ -20,35 +20,35 @@
     min-height: 100vh; display: flex; align-items: center; justify-content: center;
   }
   .card {
-    background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 16px;
     padding: 40px; width: 100%; max-width: 360px;
-    box-shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.24);
+    box-shadow: 0 4px 20px rgba(0,0,0,.3);
   }
   h1 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
   p.sub { color: var(--dim); font-size: 13px; margin-bottom: 28px; }
   label { display: block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--label); margin-bottom: 7px; }
   input {
     width: 100%; padding: 10px 12px; margin-bottom: 18px; border-radius: 8px;
-    border: 1px solid var(--border); background: #0E1420; color: var(--texto); font-size: 14px;
+    border: 1px solid var(--border); background: #0F1117; color: var(--texto); font-size: 14px;
     font-family: inherit; transition: border-color .2s;
   }
-  input:focus { outline: none; border-color: var(--azul); }
+  input:focus { outline: none; border-color: var(--azul); box-shadow: 0 0 0 3px rgba(108,92,231,0.15); }
   /* Impede o Chrome de pintar o campo de branco ao preencher automaticamente. */
   input:-webkit-autofill,
   input:-webkit-autofill:hover,
   input:-webkit-autofill:focus {
     -webkit-text-fill-color: var(--texto);
-    -webkit-box-shadow: 0 0 0 1000px #0E1420 inset;
-    box-shadow: 0 0 0 1000px #0E1420 inset;
+    -webkit-box-shadow: 0 0 0 1000px #0F1117 inset;
+    box-shadow: 0 0 0 1000px #0F1117 inset;
     caret-color: var(--texto);
     transition: background-color 100000s ease-in-out 0s;
   }
   button {
     width: 100%; padding: 11px; border: none; border-radius: 8px;
     background: var(--azul); color: #fff; font-size: 14px; font-weight: 600; cursor: pointer;
-    font-family: inherit; transition: background .15s;
+    font-family: inherit; transition: background .15s, transform .15s;
   }
-  button:hover { background: #2E6FEF; }
+  button:hover { background: var(--azul-c); transform: translateY(-1px); }
   button:disabled { opacity: 0.6; cursor: default; }
   .erro {
     color: var(--vermelho); font-size: 13px; margin-bottom: 16px; display: none;

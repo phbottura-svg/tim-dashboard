@@ -10,9 +10,9 @@ const graficos = {};
 // ─── Cores ───────────────────────────────────────────────────────────────────
 
 const C = {
-  verde: '#00c853', laranja: '#ff9100', vermelho: '#ff3d57',
-  amarelo: '#ffd600', azul: '#0057ff', azulC: '#4da6ff',
-  roxo: '#7c4dff', cinza: '#7070a0',
+  verde: '#00b894', laranja: '#e17055', vermelho: '#e17055',
+  amarelo: '#fdcb6e', azul: '#6c5ce7', azulC: '#8b7ff5',
+  roxo: '#6c5ce7', cinza: '#8892a4',
 };
 
 const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', PAGO_ATRASO: 'Pago com atraso', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
@@ -931,10 +931,10 @@ async function carregarResumo() {
 
 const defOpts = {
   responsive: true, maintainAspectRatio: true,
-  plugins: { legend: { labels: { color: '#7070a0', font: { size: 11 } } } },
+  plugins: { legend: { labels: { color: '#8892a4', font: { size: 11 } } } },
   scales: {
-    x: { ticks: { color: '#7070a0', maxRotation: 45 }, grid: { color: 'rgba(30,30,74,0.8)' } },
-    y: { ticks: { color: '#7070a0' }, grid: { color: 'rgba(30,30,74,0.8)' } },
+    x: { ticks: { color: '#8892a4', maxRotation: 45 }, grid: { color: 'rgba(30,30,74,0.8)' } },
+    y: { ticks: { color: '#8892a4' }, grid: { color: 'rgba(30,30,74,0.8)' } },
   },
 };
 
@@ -998,7 +998,7 @@ async function carregarEstados(p) {
     criarOuAtualizar('g-estados', 'doughnut', {
       labels: d.labels,
       datasets: [{ data: d.valores, backgroundColor: [C.azulC, C.verde, C.laranja, C.roxo, C.vermelho], borderWidth: 0 }],
-    }, { maintainAspectRatio: false, plugins: { legend: { labels: { color: '#7070a0' } } }, scales: {} });
+    }, { maintainAspectRatio: false, plugins: { legend: { labels: { color: '#8892a4' } } }, scales: {} });
   } catch {}
 }
 
@@ -1011,7 +1011,7 @@ async function carregarEvolucao(p) {
         { label: 'Adimplentes', data: d.adimplentes, borderColor: C.verde, backgroundColor: 'rgba(0,200,83,0.1)', fill: true, tension: 0.4, pointRadius: 4 },
         { label: 'Inadimplentes', data: d.inadimplentes, borderColor: C.vermelho, backgroundColor: 'rgba(255,61,87,0.1)', fill: true, tension: 0.4, pointRadius: 4 },
       ],
-    }, { plugins: { legend: { labels: { color: '#7070a0' } } }, scales: defOpts.scales });
+    }, { plugins: { legend: { labels: { color: '#8892a4' } } }, scales: defOpts.scales });
   } catch {}
 }
 
@@ -1021,7 +1021,7 @@ async function carregarVendedores(p) {
     criarOuAtualizar('g-vendedores', 'bar', {
       labels: d.labels,
       datasets: [{ label: 'Inadimplentes', data: d.valores, backgroundColor: 'rgba(255,61,87,0.8)', borderRadius: 4 }],
-    }, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#7070a0' }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { ticks: { color: '#7070a0', font: { size: 10 } }, grid: { display: false } } } });
+    }, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892a4' }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { ticks: { color: '#8892a4', font: { size: 10 } }, grid: { display: false } } } });
   } catch {}
 }
 

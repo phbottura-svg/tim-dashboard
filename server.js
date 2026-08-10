@@ -89,6 +89,7 @@ const ROTAS_PUBLICAS = [
   { method: 'POST', path: '/api/faturas/codigos' },
   { method: 'POST', path: '/api/faturas/envio' },
   { method: 'GET',  path: '/api/faturas/nomes' },
+  { method: 'GET',  path: '/api/iq-safra/comparar' },
   { method: 'POST', path: '/api/usuarios/definir-senha' },
   { method: 'POST', path: '/webhook/chatwoot' },
 ];
@@ -604,6 +605,69 @@ function calcularIQSafra(safra) {
 
   return resultado;
 }
+
+// Diagnóstico: compara a NOSSA estimativa por atraso/churn contra o
+// fechamento oficial da TIM, cliente por cliente — pra saber se a lógica da
+// estimativa está certa ou precisa de ajuste. Só funciona pra safra que já
+// tem fechamento oficial importado (senão não tem com o que comparar).
+app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
+  try {
+    const { safra } = req.query;
+    if (!safra) return res.status(400).json({ erro: 'Informe a safra' });
+    const oficialPorOS = carregarCestaOficialPorSafra(safra);
+    if (!oficialPorOS) return res.status(404).json({ erro: 'Essa safra não tem fechamento oficial importado' });
+
+    const { janelaSet, dataReferencia } = referenciaSafra(safra);
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const porOS = {};
+    todos.forEach(c => { porOS[c.os] = c; });
+
+    const osOficiais = Object.keys(oficialPorOS);
+    const totalOficial = osOficiais.length;
+    const okOficial = osOficiais.filter(os => oficialPorOS[os].eleg).length;
+
+    let matchOkOk = 0, matchForaFora = 0, nosOkOficialFora = 0, nosForaOficialOk = 0, naoAchado = 0;
+    const porMotivo = {};
+    const exemplosNosOkOficialFora = [];
+    const exemplosNosForaOficialOk = [];
+
+    for (const os of osOficiais) {
+      const cliente = porOS[os];
+      if (!cliente) { naoAchado++; continue; }
+      // oficialPorOS = null força ignorar o oficial e usar só a estimativa por atraso/churn.
+      const nossoFora = clienteForaDoIQ(cliente, janelaSet, dataReferencia, null);
+      const oficialFora = !oficialPorOS[os].eleg;
+
+      if (nossoFora === oficialFora) {
+        if (oficialFora) matchForaFora++; else matchOkOk++;
+      } else if (!nossoFora && oficialFora) {
+        nosOkOficialFora++;
+        const motivo = oficialPorOS[os].motivo || 'desconhecido';
+        porMotivo[motivo] = (porMotivo[motivo] || 0) + 1;
+        if (exemplosNosOkOficialFora.length < 15) exemplosNosOkOficialFora.push({ os, nome: cliente.nome, motivo });
+      } else {
+        nosForaOficialOk++;
+        if (exemplosNosForaOficialOk.length < 15) exemplosNosForaOficialOk.push({ os, nome: cliente.nome });
+      }
+    }
+
+    const nossoOk = matchOkOk + nosForaOficialOk;
+    res.json({
+      safra,
+      totalOficial,
+      okOficial,
+      percentualOficial: totalOficial ? +(okOficial / totalOficial * 100).toFixed(1) : null,
+      nossoOk,
+      percentualNosso: totalOficial ? +(nossoOk / totalOficial * 100).toFixed(1) : null,
+      naoAchadoNaBase: naoAchado,
+      acertos: { matchOkOk, matchForaFora, total: matchOkOk + matchForaFora },
+      erros: { nosOkOficialFora, nosForaOficialOk, total: nosOkOficialFora + nosForaOficialOk },
+      divergentesPorMotivo: porMotivo,
+      exemplosNosOkOficialFora,
+      exemplosNosForaOficialOk,
+    });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
 
 app.get('/api/iq-safra', (req, res) => {
   try {

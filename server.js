@@ -634,6 +634,7 @@ app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
     let nosForaPorChurn = 0, nosForaPorAtraso = 0;
     const exemplosNosOkOficialFora = [];
     const exemplosNosForaOficialOk = [];
+    const detalheAtraso = [];
 
     for (const os of osOficiais) {
       const cliente = porOS[os];
@@ -655,6 +656,24 @@ app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
         const foiChurn = faturasNaJanela.some(f => f.churn === 'Sim');
         if (foiChurn) nosForaPorChurn++; else nosForaPorAtraso++;
         if (exemplosNosForaOficialOk.length < 15) exemplosNosForaOficialOk.push({ os, nome: cliente.nome, motivoNosso: foiChurn ? 'churn' : 'atraso' });
+
+        if (!foiChurn) {
+          // Detalhe completo (todas, não só as 15 de exemplo) de quem a gente
+          // marcou fora só por atraso — pra ver se o padrão do "erro" é uma
+          // diferença de critério (ex: janela de dias, fatura fora do range).
+          const faturasAtrasadas = faturasNaJanela
+            .filter(f => !f.pagoManual)
+            .map(f => {
+              const venc = parseDataBr(f.dataVencimento);
+              if (!venc || venc > dataReferencia) return null;
+              const pago = parseDataBr(f.dataPagamento);
+              const fim = (pago && pago <= dataReferencia) ? pago : dataReferencia;
+              const dias = Math.round((fim - venc) / 86400000);
+              return dias > 30 ? { numero: f.numero, venc: f.dataVencimento, pago: f.dataPagamento, dias, statusPagamento: f.statusPagamento } : null;
+            })
+            .filter(Boolean);
+          detalheAtraso.push({ os, nome: cliente.nome, faturasAtrasadas });
+        }
       }
     }
 
@@ -676,6 +695,7 @@ app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
       divergentesPorMotivo: porMotivo,
       exemplosNosOkOficialFora,
       exemplosNosForaOficialOk,
+      detalheAtraso,
     });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });

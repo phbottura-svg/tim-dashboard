@@ -902,8 +902,12 @@ async function carregarResumo() {
         </div>`;
       }
       const corIQ = r.percentual >= 80 ? 'kpi-verde' : r.percentual >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
-      const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM' : (r.previa ? ' · prévia (safra em andamento)' : ' · estimativa por atraso');
-      return `<div class="kpi ${corIQ}" title="Janela: ${r.janela.join(', ')} — corte em ${r.dataCorte}">
+      const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM'
+        : r.previa ? ' · prévia (safra em andamento)'
+        : r.congelado ? ' · 🔒 estimativa travada (aguardando fechamento oficial)'
+        : ' · estimativa por atraso';
+      const tituloCongelado = r.congelado ? ` — travado em ${new Date(r.congeladoEm).toLocaleDateString('pt-BR')}` : '';
+      return `<div class="kpi ${corIQ}" title="Janela: ${r.janela.join(', ')} — corte em ${r.dataCorte}${tituloCongelado}">
         <div class="kpi-label">📐 IQ Safra ${r.safra}</div>
         <div class="kpi-value">${r.percentual}%</div>
         <div class="kpi-sub">${fmt(r.clientesOk)} de ${fmt(r.totalClientes)} dentro do IQ${fonteTxt}</div>

@@ -38,6 +38,13 @@ const USUARIOS_PATH = path.join(DATA_PATH, 'usuarios.json');
 // Fechamento oficial mensal da TIM (planilha "Cesta de Qualidade") — quando existe
 // pra uma safra, substitui a nossa estimativa por atraso (ver calcularIQSafra).
 const CESTA_OFICIAL_PATH = path.join(DATA_PATH, 'cesta-oficial.json');
+// IQ travado por safra — ver calcularIQSafra: uma safra fechada (sem
+// fechamento oficial ainda) trava no primeiro cálculo em vez de recalcular
+// pra sempre, porque o campo de churn da Sonar não tem data (é marcado
+// retroativo em TODAS as faturas do cliente assim que ele cancela, mesmo
+// meses depois) — sem travar, safras antigas vão "acumulando" churn futuro
+// pra sempre e o IQ delas fica cada vez mais errado com o tempo.
+const IQ_CONGELADO_PATH = path.join(DATA_PATH, 'iq-safra-congelado.json');
 
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
 
@@ -538,10 +545,18 @@ function clienteForaDoIQ(cliente, janelaSet, dataReferencia, oficialPorOS) {
 
 function calcularIQSafra(safra) {
   const { janela, janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
+  const oficialPorOS = carregarCestaOficialPorSafra(safra);
+  // Só trava quem não tem fechamento oficial (esse sempre manda, é sempre
+  // recalculado com o arquivo mais recente) e já passou da data de corte —
+  // safra em andamento (prévia) continua recalculando normal a cada request.
+  const elegivelParaTravar = !oficialPorOS && !previa;
+
+  if (elegivelParaTravar) {
+    const congelados = lerJSON(IQ_CONGELADO_PATH, {});
+    if (congelados[safra]) return congelados[safra];
+  }
 
   const todos = lerJSON(BASE_CRUZADA_PATH, []);
-  const oficialPorOS = carregarCestaOficialPorSafra(safra);
-
   let cohort;
   if (oficialPorOS) {
     // Fechamento oficial da TIM já chegou pra essa safra — ele é quem manda quem
@@ -564,19 +579,30 @@ function calcularIQSafra(safra) {
 
   const fmtData = d => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 
-  return {
+  const resultado = {
     safra,
     janela,
     dataCorte: fmtData(dataCorte),
     dataReferencia: fmtData(dataReferencia),
     previa,
     oficial: !!oficialPorOS,
+    congelado: false,
     totalClientes: cohort.length,
     clientesOk: ok.length,
     percentual: cohort.length ? Math.round((ok.length / cohort.length) * 1000) / 10 : null,
     _ok: ok.map(c => ({ nome: c.nome, custcode: c.custcode, motivo: oficialPorOS?.[c.os]?.motivo || null })),
     _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode, motivo: oficialPorOS?.[c.os]?.motivo || null })),
   };
+
+  if (elegivelParaTravar) {
+    resultado.congelado = true;
+    resultado.congeladoEm = new Date().toISOString();
+    const congelados = lerJSON(IQ_CONGELADO_PATH, {});
+    congelados[safra] = resultado;
+    salvarJSON(IQ_CONGELADO_PATH, congelados);
+  }
+
+  return resultado;
 }
 
 app.get('/api/iq-safra', (req, res) => {

@@ -620,7 +620,15 @@ app.get('/api/iq-safra/diagnostico', autorizarUpload, (req, res) => {
     if (!safra || !/^\d{2}\/\d{4}$/.test(safra)) {
       return res.status(400).json({ erro: 'Informe a safra no formato MM/YYYY' });
     }
-    const { janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
+    let { janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
+    // Back-test: força a data de referência pra N dias antes do corte da safra,
+    // pra ver o que a prévia estaria mostrando naquele ponto do ciclo. Só faz
+    // sentido em safra já fechada (aí dá pra comparar com o oficial e medir o
+    // quanto a prévia ainda ia andar).
+    const diasAntesCorte = Number(req.query.diasAntesCorte);
+    if (Number.isFinite(diasAntesCorte) && diasAntesCorte > 0) {
+      dataReferencia = new Date(dataCorte.getTime() - diasAntesCorte * 86400000);
+    }
     const oficialPorOS = carregarCestaOficialPorSafra(safra);
     const todos = lerJSON(BASE_CRUZADA_PATH, []);
     const cohort = oficialPorOS
@@ -665,6 +673,7 @@ app.get('/api/iq-safra/diagnostico', autorizarUpload, (req, res) => {
       exibidoTotal: exibido.totalClientes,
       congeladoEm: exibido.congeladoEm || null,
       recalculoAgora: {
+        refUsada: `${String(dataReferencia.getDate()).padStart(2, '0')}/${String(dataReferencia.getMonth() + 1).padStart(2, '0')}/${dataReferencia.getFullYear()}`,
         totalClientes: cohort.length,
         totalFaturasNaJanela: totalFaturasJanela,
         ok, percentual: pct(ok),

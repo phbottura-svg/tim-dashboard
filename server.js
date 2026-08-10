@@ -82,6 +82,7 @@ const ROTAS_PUBLICAS = [
   { method: 'POST', path: '/api/faturas/codigos' },
   { method: 'POST', path: '/api/faturas/envio' },
   { method: 'GET',  path: '/api/faturas/nomes' },
+  { method: 'POST', path: '/api/usuarios/definir-senha' },
   { method: 'POST', path: '/webhook/chatwoot' },
 ];
 
@@ -170,6 +171,26 @@ app.put('/api/usuarios/:usuario', (req, res) => {
 
   salvarJSON(USUARIOS_PATH, usuarios);
   res.json({ ok: true });
+});
+
+// Upsert por Bearer token (mesmo UPLOAD_TOKEN das rotas de upload) — usado pra
+// definir/alinhar credenciais sem precisar de uma sessão de admin já logada.
+app.post('/api/usuarios/definir-senha', autorizarUpload, (req, res) => {
+  const { usuario, senha, nome } = req.body || {};
+  if (!usuario || !senha) return res.status(400).json({ erro: 'Usuário e senha obrigatórios' });
+  if (senha.length < 6) return res.status(400).json({ erro: 'Senha precisa de pelo menos 6 caracteres' });
+
+  const usuarios = lerJSON(USUARIOS_PATH, []);
+  const existente = usuarios.find(u => u.usuario === usuario);
+  const senhaHash = bcrypt.hashSync(senha, 10);
+  if (existente) {
+    existente.senhaHash = senhaHash;
+    if (nome) existente.nome = nome;
+  } else {
+    usuarios.push({ usuario, senhaHash, nome: nome || usuario, criadoEm: new Date().toISOString() });
+  }
+  salvarJSON(USUARIOS_PATH, usuarios);
+  res.json({ ok: true, criado: !existente });
 });
 
 app.delete('/api/usuarios/:usuario', (req, res) => {

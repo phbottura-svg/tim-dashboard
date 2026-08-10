@@ -628,6 +628,10 @@ app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
 
     let matchOkOk = 0, matchForaFora = 0, nosOkOficialFora = 0, nosForaOficialOk = 0, naoAchado = 0;
     const porMotivo = {};
+    // Pra quem a gente marca fora (errado) e o oficial diz que tá ok: identifica
+    // se foi churn ou atraso que causou — é o que explica a maior parte do erro
+    // (churn da Sonar não tem data, ver calcularIQSafra/clienteForaDoIQ).
+    let nosForaPorChurn = 0, nosForaPorAtraso = 0;
     const exemplosNosOkOficialFora = [];
     const exemplosNosForaOficialOk = [];
 
@@ -647,11 +651,17 @@ app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
         if (exemplosNosOkOficialFora.length < 15) exemplosNosOkOficialFora.push({ os, nome: cliente.nome, motivo });
       } else {
         nosForaOficialOk++;
-        if (exemplosNosForaOficialOk.length < 15) exemplosNosForaOficialOk.push({ os, nome: cliente.nome });
+        const faturasNaJanela = (cliente.faturas || []).filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
+        const foiChurn = faturasNaJanela.some(f => f.churn === 'Sim');
+        if (foiChurn) nosForaPorChurn++; else nosForaPorAtraso++;
+        if (exemplosNosForaOficialOk.length < 15) exemplosNosForaOficialOk.push({ os, nome: cliente.nome, motivoNosso: foiChurn ? 'churn' : 'atraso' });
       }
     }
 
-    const nossoOk = matchOkOk + nosForaOficialOk;
+    // "Nosso OK" = todo mundo que a NOSSA lógica considera dentro do IQ, certo
+    // ou errado — matchOkOk (acertamos) + nosOkOficialFora (erramos pro lado
+    // otimista, ex: downgrade que não dá pra ver na Sonar).
+    const nossoOk = matchOkOk + nosOkOficialFora;
     res.json({
       safra,
       totalOficial,
@@ -662,6 +672,7 @@ app.get('/api/iq-safra/comparar', autorizarUpload, (req, res) => {
       naoAchadoNaBase: naoAchado,
       acertos: { matchOkOk, matchForaFora, total: matchOkOk + matchForaFora },
       erros: { nosOkOficialFora, nosForaOficialOk, total: nosOkOficialFora + nosForaOficialOk },
+      nosForaOficialOkPorMotivoNosso: { churn: nosForaPorChurn, atraso: nosForaPorAtraso },
       divergentesPorMotivo: porMotivo,
       exemplosNosOkOficialFora,
       exemplosNosForaOficialOk,

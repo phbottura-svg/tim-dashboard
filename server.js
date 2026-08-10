@@ -90,6 +90,7 @@ const ROTAS_PUBLICAS = [
   { method: 'POST', path: '/api/faturas/envio' },
   { method: 'GET',  path: '/api/faturas/nomes' },
   { method: 'GET',  path: '/api/iq-safra/comparar' },
+  { method: 'GET',  path: '/api/iq-safra/diagnostico' },
   { method: 'POST', path: '/api/usuarios/definir-senha' },
   { method: 'POST', path: '/webhook/chatwoot' },
 ];
@@ -605,6 +606,74 @@ function calcularIQSafra(safra) {
 
   return resultado;
 }
+
+// Diagnóstico: abre o número do IQ de uma safra qualquer (com ou sem
+// fechamento oficial) mostrando QUANTOS dos "fora do IQ" são por churn e
+// quantos são por atraso de pagamento. Serve pra medir o quanto uma safra
+// está exposta ao problema do churn sem data (a Sonar marca churn='Sim' em
+// todas as faturas antigas do cliente quando ele cancela, inclusive nas de
+// safras que já tinham fechado em dia). Quando a safra está congelada,
+// devolve os dois números: o travado e o que daria recalculando agora.
+app.get('/api/iq-safra/diagnostico', autorizarUpload, (req, res) => {
+  try {
+    const { safra } = req.query;
+    if (!safra || !/^\d{2}\/\d{4}$/.test(safra)) {
+      return res.status(400).json({ erro: 'Informe a safra no formato MM/YYYY' });
+    }
+    const { janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
+    const oficialPorOS = carregarCestaOficialPorSafra(safra);
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const cohort = oficialPorOS
+      ? todos.filter(c => oficialPorOS[c.os])
+      : todos.filter(c => c.mesGross === safra && c.totalFaturas > 0);
+
+    // Recálculo ao vivo pela estimativa pura (ignora oficial e congelado),
+    // separando o motivo de cada cliente que fica fora.
+    let ok = 0, soChurn = 0, soAtraso = 0, ambos = 0;
+    for (const c of cohort) {
+      const naJanela = (c.faturas || []).filter(f => janelaSet.has(normalizarMes(f.mesVencimento || '')));
+      const temChurn = naJanela.some(f => f.churn === 'Sim');
+      const temAtraso = naJanela.some(f => {
+        if (f.churn === 'Sim' || f.pagoManual) return false;
+        const venc = parseDataBr(f.dataVencimento);
+        if (!venc || venc > dataReferencia) return false;
+        const pago = parseDataBr(f.dataPagamento);
+        const fim = (pago && pago <= dataReferencia) ? pago : dataReferencia;
+        return Math.round((fim - venc) / 86400000) > 30;
+      });
+      if (temChurn && temAtraso) ambos++;
+      else if (temChurn) soChurn++;
+      else if (temAtraso) soAtraso++;
+      else ok++;
+    }
+    const fora = soChurn + soAtraso + ambos;
+    const pct = n => cohort.length ? Math.round((n / cohort.length) * 1000) / 10 : null;
+
+    // O que o dashboard mostra hoje pra essa safra (oficial > congelado > prévia).
+    const exibido = calcularIQSafra(safra);
+    const totalFaturasJanela = cohort.reduce(
+      (a, c) => a + (c.faturas || []).filter(f => janelaSet.has(normalizarMes(f.mesVencimento || ''))).length, 0);
+
+    res.json({
+      safra,
+      dataCorte: exibido.dataCorte,
+      dataReferencia: exibido.dataReferencia,
+      previa,
+      fonteExibida: oficialPorOS ? 'oficial' : (exibido.congelado ? 'congelado' : 'previa'),
+      percentualExibido: exibido.percentual,
+      exibidoOk: exibido.clientesOk,
+      exibidoTotal: exibido.totalClientes,
+      congeladoEm: exibido.congeladoEm || null,
+      recalculoAgora: {
+        totalClientes: cohort.length,
+        totalFaturasNaJanela: totalFaturasJanela,
+        ok, percentual: pct(ok),
+        fora, foraSoChurn: soChurn, foraSoAtraso: soAtraso, foraAmbos: ambos,
+        pctDoForaQueEhChurn: fora ? Math.round(((soChurn + ambos) / fora) * 1000) / 10 : null,
+      },
+    });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
 
 // Diagnóstico: compara a NOSSA estimativa por atraso/churn contra o
 // fechamento oficial da TIM, cliente por cliente — pra saber se a lógica da

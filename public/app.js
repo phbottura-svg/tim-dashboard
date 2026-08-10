@@ -266,6 +266,19 @@ async function carregarTudo() {
   }
 }
 
+// Mostra no card de cada robô o login SGR que ele realmente usa (vem do .env),
+// em vez do código fixo no HTML — que ficava desatualizado ao trocar de login.
+async function carregarLoginsRobos() {
+  try {
+    const d = await fetch('/api/robos/logins').then(r => r.json());
+    for (const [estado, login] of Object.entries(d || {})) {
+      const el = document.getElementById(`robo-user-${estado}`);
+      if (el && login) el.textContent = login;
+    }
+  } catch {}
+}
+document.addEventListener('DOMContentLoaded', carregarLoginsRobos);
+
 // ─── SSE ──────────────────────────────────────────────────────────────────────
 
 let _sse = null;

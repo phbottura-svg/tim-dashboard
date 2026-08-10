@@ -1743,6 +1743,25 @@ app.post('/api/gerar-fila-robo', apenasLocal, (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// Login SGR real de cada robô, lido do .env do tim-playwright (mesma regra do
+// robo-estado.js: SGR_USER_<EST> → SONAR_USER_<EST> → SGR_USER). Evita mostrar
+// código desatualizado na tela quando um login é trocado.
+app.get('/api/robos/logins', (req, res) => {
+  const env = {};
+  try {
+    const txt = fs.readFileSync(path.join(PLAYWRIGHT_PATH, '.env'), 'utf8');
+    for (const linha of txt.split(/\r?\n/)) {
+      const m = linha.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)$/);
+      if (m) env[m[1]] = m[2].trim();
+    }
+  } catch { /* sem .env acessível — devolve vazio */ }
+  const out = {};
+  for (const e of ESTADOS_VALIDOS) {
+    out[e] = env[`SGR_USER_${e}`] || env[`SONAR_USER_${e}`] || env.SGR_USER || '';
+  }
+  res.json(out);
+});
+
 // ─── Status da Fila do Robô ───────────────────────────────────────────────────
 
 app.get('/api/fila-status', apenasLocal, (req, res) => {

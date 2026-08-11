@@ -1652,7 +1652,8 @@ async function atualizarInfoRelatorio() {
   const arquivo = sel?.value;
   if (!arquivo) { if (info) info.textContent = ''; return; }
   try {
-    const d = await fetch(`/api/relatorios/info/${encodeURIComponent(arquivo)}`).then(r => r.json());
+    const todasFat = document.getElementById('disparo-todas-faturas')?.checked ? '?todasFaturas=1' : '';
+    const d = await fetch(`/api/relatorios/info/${encodeURIComponent(arquivo)}${todasFat}`).then(r => r.json());
     if (d.erro) { if (info) info.textContent = d.erro; return; }
     const forcar = document.getElementById('disparo-forcar')?.checked || false;
     // "Pendentes" sempre mostra o real (quem ainda não recebeu) — não muda de

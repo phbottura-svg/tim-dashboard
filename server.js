@@ -2110,6 +2110,36 @@ app.get('/api/relatorios', (req, res) => {
   res.json({ arquivos });
 });
 
+// Mesma regra do disparo: se o cliente tem fatura vencida, só as vencidas são
+// enviadas. Usado na prévia para o número da tela bater com o que sai de fato.
+function pdfsDoCliente(r, todasFaturas) {
+  const idxDe = k => parseInt(String(k).match(/\d+/)?.[0] || '0');
+  const numKeys = Object.keys(r).filter(k => /^Número\s*\d+$/i.test(k)).sort((a, b) => idxDe(a) - idxDe(b));
+  const vencKeys = Object.keys(r).filter(k => /^Vencimento\s*\d+$/i.test(k)).sort((a, b) => idxDe(a) - idxDe(b));
+  // formato legado (sem "Número N") — devolve tudo, sem filtrar
+  if (!numKeys.length) {
+    return Object.keys(r).filter(k => /^Número/i.test(k))
+      .map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
+  }
+  const pares = [];
+  for (let i = 0; i < numKeys.length; i++) {
+    const pdf = String(r[numKeys[i]] || '').trim();
+    if (!pdf.toLowerCase().endsWith('.pdf')) continue;
+    pares.push({ pdf, venc: vencKeys[i] ? String(r[vencKeys[i]] || '').trim() : '' });
+  }
+  if (todasFaturas) return pares.map(p => p.pdf);
+  const hoje = new Date(); hoje.setHours(0, 0, 0, 0);
+  const brParaData = v => {
+    const m = String(v).trim().match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (!m) return null;
+    const d = new Date(+m[3], +m[2] - 1, +m[1]);
+    return isNaN(d) ? null : d;
+  };
+  const vencidas = pares.filter(p => { const d = brParaData(p.venc); return d && d < hoje; });
+  const usar = (vencidas.length && vencidas.length < pares.length) ? vencidas : pares;
+  return usar.map(p => p.pdf);
+}
+
 app.get('/api/relatorios/info/:arquivo', (req, res) => {
   const arquivo = path.basename(req.params.arquivo);
   const filePath = path.join(RELATORIOS_PATH, arquivo);
@@ -2123,11 +2153,9 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     const totalClientes = sucesso.length;
 
     // Conta total de disparos reais (1 por PDF/fatura)
+    const todasFaturas = req.query.todasFaturas === '1';
     let totalDisparos = 0;
-    for (const r of sucesso) {
-      const pdfs = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
-      totalDisparos += pdfs.length;
-    }
+    for (const r of sucesso) totalDisparos += pdfsDoCliente(r, todasFaturas).length;
 
     const jaEnviadosPdfs = new Set();
     const hoje = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
@@ -2155,8 +2183,12 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     let clientesTresMaisFaturas = 0;
 
     for (const r of sucesso) {
-      const numeros = Object.keys(r).filter(k => /^Número/i.test(k)).map(k => String(r[k] || '').trim()).filter(n => n.toLowerCase().endsWith('.pdf'));
-      if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) { disparados++; disparadosMsg += numeros.length; }
+      const numeros = pdfsDoCliente(r, todasFaturas);
+      // clientes com TODAS as faturas já enviadas
+      if (numeros.length > 0 && numeros.every(n => jaEnviadosPdfs.has(n))) disparados++;
+      // mensagens já enviadas — conta PDF a PDF (antes só somava quando o cliente
+      // tinha TODAS enviadas, o que subnotificava muito: 17 em vez de 266)
+      disparadosMsg += numeros.filter(n => jaEnviadosPdfs.has(n)).length;
       disparadosHojeMsg += numeros.filter(n => hojePdfs.has(n)).length;
 
       if (numeros.length === 1) clientesUmaFatura++;

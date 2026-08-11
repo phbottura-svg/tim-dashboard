@@ -1,0 +1,4773 @@
+{
+  "10/2025": {
+    "safra": "10/2025",
+    "janela": [
+      "10/2025",
+      "11/2025",
+      "12/2025",
+      "01/2026",
+      "02/2026"
+    ],
+    "dataCorte": "28/02/2026",
+    "dataReferencia": "28/02/2026",
+    "previa": false,
+    "oficial": false,
+    "congelado": true,
+    "totalClientes": 412,
+    "clientesOk": 253,
+    "percentual": 61.4,
+    "_ok": [
+      {
+        "nome": "CAROLINE DO NASCIMENTO RODRIGUES DE FRANCA",
+        "custcode": "1.348339379",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348165255",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ROBERTO LACERDA",
+        "custcode": "1.348176897",
+        "motivo": null
+      },
+      {
+        "nome": "JOZILENE ANJOS DA SILVA",
+        "custcode": "1.348448245",
+        "motivo": null
+      },
+      {
+        "nome": "EDILSON VIANA",
+        "custcode": "1.348653884",
+        "motivo": null
+      },
+      {
+        "nome": "LESLYE LAYNE FURMAN",
+        "custcode": "1.347225106",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIANA FERREIRA MAIA",
+        "custcode": "1.347782481",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO EDUARDO PRESTES DE OLIVEIRA",
+        "custcode": "1.348200955",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIELA GERMANO DA CUNHA",
+        "custcode": "1.348414476",
+        "motivo": null
+      },
+      {
+        "nome": "ELOINA DIDAL MACHADO LIMA",
+        "custcode": "1.348495518",
+        "motivo": null
+      },
+      {
+        "nome": "SILVIO DANIEL KOSAK LEOPISK",
+        "custcode": "1.348176883",
+        "motivo": null
+      },
+      {
+        "nome": "ROSANGELA MARIA DA SILVA",
+        "custcode": "1.348414515",
+        "motivo": null
+      },
+      {
+        "nome": "WILMA MORAES DE LIMA",
+        "custcode": "1.348603852",
+        "motivo": null
+      },
+      {
+        "nome": "FELIPE JESUS DE PAULA",
+        "custcode": "1.348414548",
+        "motivo": null
+      },
+      {
+        "nome": "ERICA COUTINHO VALENCIO",
+        "custcode": "1.347876522",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIA DA SILVA RODRIGUES",
+        "custcode": "1.348420218",
+        "motivo": null
+      },
+      {
+        "nome": "FABIANE DE JESUS RAMOS",
+        "custcode": "1.348562098",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTIANO APARECIDO DE LIMA",
+        "custcode": "1.348593016",
+        "motivo": null
+      },
+      {
+        "nome": "ANA PAULA DE MELO",
+        "custcode": "1.348336271",
+        "motivo": null
+      },
+      {
+        "nome": "LAIS BISCONCINI VIANA",
+        "custcode": "1.348085636",
+        "motivo": null
+      },
+      {
+        "nome": "KELI CRISTINA TEODORO DO ROSARIO",
+        "custcode": "1.348621762",
+        "motivo": null
+      },
+      {
+        "nome": "VANDERLEY VIEIRA ANTUNES",
+        "custcode": "1.348567882",
+        "motivo": null
+      },
+      {
+        "nome": "ODETE GIOLO CUNHA",
+        "custcode": "1.348107664",
+        "motivo": null
+      },
+      {
+        "nome": "MARLI MARIA DE PAULA CONCEICAO",
+        "custcode": "1.348495265",
+        "motivo": null
+      },
+      {
+        "nome": "DANIEL MEDEIROS DE OLIVEIRA",
+        "custcode": "1.348431073",
+        "motivo": null
+      },
+      {
+        "nome": "EVELIN KAROLAINE DA CRUZ RAMOS",
+        "custcode": "1.348741913",
+        "motivo": null
+      },
+      {
+        "nome": "DIEGO IRINEU SANTOS DOS SANTOS",
+        "custcode": "1.348462872",
+        "motivo": null
+      },
+      {
+        "nome": "NEY HAROLDO PEREIRA LOPES",
+        "custcode": "1.347949954",
+        "motivo": null
+      },
+      {
+        "nome": "FELIPE MAKOSKI FRANCELINO",
+        "custcode": "1.348620251",
+        "motivo": null
+      },
+      {
+        "nome": "ELZA FATIMA DE SOUZA",
+        "custcode": "1.348703539",
+        "motivo": null
+      },
+      {
+        "nome": "TEREZINHA ARCONTE RAMOS",
+        "custcode": "1.348589341",
+        "motivo": null
+      },
+      {
+        "nome": "SILVIO AUGUSTO PIRES TOMASI",
+        "custcode": "1.348119309",
+        "motivo": null
+      },
+      {
+        "nome": "JONATHAN ALVES DE SOUZA",
+        "custcode": "1.348779367",
+        "motivo": null
+      },
+      {
+        "nome": "CATIA BERGONZINI SILVA FERNANDES",
+        "custcode": "1.348366306",
+        "motivo": null
+      },
+      {
+        "nome": "FABIO LARA DOS SANTOS PAZ",
+        "custcode": "1.348726774",
+        "motivo": null
+      },
+      {
+        "nome": "FELIPE DOS SANTOS PASSOS",
+        "custcode": "1.348653933",
+        "motivo": null
+      },
+      {
+        "nome": "ELISANGELA FERNANDES BENASSUTE",
+        "custcode": "1.348726267",
+        "motivo": null
+      },
+      {
+        "nome": "SILMARA PINHEIROS",
+        "custcode": "1.348238618",
+        "motivo": null
+      },
+      {
+        "nome": "VANESSA IRENO DOS SANTOS",
+        "custcode": "1.348478589",
+        "motivo": null
+      },
+      {
+        "nome": "VALDIVINA CEZARIO DOS SANTOS",
+        "custcode": "1.348246653",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA YEREZA SOARES DE CARVALHO",
+        "custcode": "1.348455779",
+        "motivo": null
+      },
+      {
+        "nome": "DORACI DE OLIVEIRA",
+        "custcode": "1.348593509",
+        "motivo": null
+      },
+      {
+        "nome": "DAVINA VARELA REZES",
+        "custcode": "1.348309790",
+        "motivo": null
+      },
+      {
+        "nome": "KLAOS EMBOABA LACERDA",
+        "custcode": "1.348462123",
+        "motivo": null
+      },
+      {
+        "nome": "ANGEL LUIS AGUILAR MACHADO",
+        "custcode": "1.348099944",
+        "motivo": null
+      },
+      {
+        "nome": "LUANA FLORSINO",
+        "custcode": "1.348498904",
+        "motivo": null
+      },
+      {
+        "nome": "TALIA CRISTINA LUCIA DE LIMA",
+        "custcode": "1.347542393",
+        "motivo": null
+      },
+      {
+        "nome": "DYULIANE VALERIO CHAGAS",
+        "custcode": "1.348604492",
+        "motivo": null
+      },
+      {
+        "nome": "TEREZINHA APARECIDA ROSA DOS SANTOS",
+        "custcode": "1.348142261",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE GREGORIO MANRIQUE HERNANDEZ",
+        "custcode": "1.348462173",
+        "motivo": null
+      },
+      {
+        "nome": "RITA DE CASSIA MORAES RODRIGUES",
+        "custcode": "1.347884164",
+        "motivo": null
+      },
+      {
+        "nome": "TEREZINHA DO BELEM RIBEIRO",
+        "custcode": "1.348490085",
+        "motivo": null
+      },
+      {
+        "nome": "TERESINHA DE FATIMA DO NASCIMENTO CRUZ",
+        "custcode": "1.348456901",
+        "motivo": null
+      },
+      {
+        "nome": "MICHELE REGIANE CORREIA DE ARAUJO",
+        "custcode": "1.348699840",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS TORREABAS",
+        "custcode": "1.348326647",
+        "motivo": null
+      },
+      {
+        "nome": "VILMA MACAL DA SILVA",
+        "custcode": "1.348241447",
+        "motivo": null
+      },
+      {
+        "nome": "ALVA VALERIA MARIA DE MOURA RIBEIRO",
+        "custcode": "1.348179132",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZA DE FATIMA OLIVEIRA",
+        "custcode": "1.348653857",
+        "motivo": null
+      },
+      {
+        "nome": "ROSANGELA ALVES MACHADO",
+        "custcode": "1.348148225",
+        "motivo": null
+      },
+      {
+        "nome": "DJANI SAO PEDRO",
+        "custcode": "1.348621758",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIO SOARES DE ANDRADE",
+        "custcode": "1.348420423",
+        "motivo": null
+      },
+      {
+        "nome": "AUCILANIA BARBOSA PEREIRA PINTO",
+        "custcode": "1.348280044",
+        "motivo": null
+      },
+      {
+        "nome": "RAFAELA OLIVEIRA DA SILVA",
+        "custcode": "1.347813608",
+        "motivo": null
+      },
+      {
+        "nome": "MATHEUS GUSTAVO TRINDADE HENKEL",
+        "custcode": "1.347882032",
+        "motivo": null
+      },
+      {
+        "nome": "JULIE DA CRUZ RIBEIRO DOS SANTOS",
+        "custcode": "1.348514417",
+        "motivo": null
+      },
+      {
+        "nome": "DIONATAN DA SILVA",
+        "custcode": "1.348516340",
+        "motivo": null
+      },
+      {
+        "nome": "ELISANGELA PIMENTEL RAIMUNDO",
+        "custcode": "1.348683471",
+        "motivo": null
+      },
+      {
+        "nome": "CAMILA DO ROCIO DE FRANÇA CARDOSO",
+        "custcode": "1.348620726",
+        "motivo": null
+      },
+      {
+        "nome": "RUDINEIA DA SILVA",
+        "custcode": "1.348271481",
+        "motivo": null
+      },
+      {
+        "nome": "GUSTAVO AFONSO HITO",
+        "custcode": "1.348367007",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIEL SIEBRE NOGAUSKI",
+        "custcode": "1.348465559",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348271921",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIEL RAMALHO",
+        "custcode": "1.347767010",
+        "motivo": null
+      },
+      {
+        "nome": "DANIEL ALEXANDRE BARINGER PEREIRA",
+        "custcode": "1.348684197",
+        "motivo": null
+      },
+      {
+        "nome": "MARISOL LOURDES LAFFONT",
+        "custcode": "1.347630235",
+        "motivo": null
+      },
+      {
+        "nome": "RENAN DE SOUZA KLEM",
+        "custcode": "1.348740317",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA ROSA PEREIRA DA SILVA LAURINDO",
+        "custcode": "1.348137893",
+        "motivo": null
+      },
+      {
+        "nome": "MURILO LUIS DA SILVA DE PAULA",
+        "custcode": "1.348455487",
+        "motivo": null
+      },
+      {
+        "nome": "IZABELE ALVES REDEDE",
+        "custcode": "1.347791352",
+        "motivo": null
+      },
+      {
+        "nome": "EDUARDO CELLI MARTINS",
+        "custcode": "1.348149031",
+        "motivo": null
+      },
+      {
+        "nome": "CAROLINE GREGOLIN",
+        "custcode": "1.348634755",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELO DE LIMA",
+        "custcode": "1.347945545",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIANE APARECIDA DA ROCHA",
+        "custcode": "1.348177625",
+        "motivo": null
+      },
+      {
+        "nome": "JOANA SCHAFRANSKI MARQUES DA SILVA",
+        "custcode": "1.348570493",
+        "motivo": null
+      },
+      {
+        "nome": "GILLIANO FELIPE DOS SANTOS VEIGA",
+        "custcode": "1.348166829",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS YUDI BORGES NARUKAWA",
+        "custcode": "1.348294998",
+        "motivo": null
+      },
+      {
+        "nome": "TAYNA SOVINSKI CAMARGO",
+        "custcode": "1.348135044",
+        "motivo": null
+      },
+      {
+        "nome": "CLEMENCEAU DO NASCIMENTO",
+        "custcode": "1.348456609",
+        "motivo": null
+      },
+      {
+        "nome": "IZABEL CRISTINA PEDROSO EUFRASIO",
+        "custcode": "1.348515539",
+        "motivo": null
+      },
+      {
+        "nome": "ORLEY ANTONIO BONETTO",
+        "custcode": "1.348205623",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTIANA DE LARA",
+        "custcode": "1.348272160",
+        "motivo": null
+      },
+      {
+        "nome": "AIRTON LUIZ CORDEIRO",
+        "custcode": "1.348139585",
+        "motivo": null
+      },
+      {
+        "nome": "ALICE LEITE MODESTO",
+        "custcode": "1.348652709",
+        "motivo": null
+      },
+      {
+        "nome": "THAYS LUANA FERREIRA DE SOUZA SOARES",
+        "custcode": "1.348356349",
+        "motivo": null
+      },
+      {
+        "nome": "ROSA BENEDITA DE SOUZA",
+        "custcode": "1.348772081",
+        "motivo": null
+      },
+      {
+        "nome": "MARA CRISTINA VILAÇA",
+        "custcode": "1.348177677",
+        "motivo": null
+      },
+      {
+        "nome": "GIOVANA SANTA ROSA",
+        "custcode": "1.348424898",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO ROCHA",
+        "custcode": "1.348498045",
+        "motivo": null
+      },
+      {
+        "nome": "NILCEIA APARECIDA BARBOSA DE LIMA SILVERIO",
+        "custcode": "1.348569941",
+        "motivo": null
+      },
+      {
+        "nome": "REGIANE SALETE CARDOSO",
+        "custcode": "1.348366218",
+        "motivo": null
+      },
+      {
+        "nome": "MATHEUS CARNEIRO GALVAO",
+        "custcode": "1.348528627",
+        "motivo": null
+      },
+      {
+        "nome": "FRANCIELI HENRICHSEN OBREGON",
+        "custcode": "1.348516732",
+        "motivo": null
+      },
+      {
+        "nome": "JOSEMAR GONCALVES DE PAULA",
+        "custcode": "1.348425045",
+        "motivo": null
+      },
+      {
+        "nome": "PABLO MIGUEL NOVACOSTI DE PAULA",
+        "custcode": "1.348334407",
+        "motivo": null
+      },
+      {
+        "nome": "LINDOMAR DE QUADRA",
+        "custcode": "1.348589226",
+        "motivo": null
+      },
+      {
+        "nome": "NELSON CANDIDO MACHADO",
+        "custcode": "1.348562426",
+        "motivo": null
+      },
+      {
+        "nome": "VANDERLEI KERIK DA LUZ",
+        "custcode": "1.348690091",
+        "motivo": null
+      },
+      {
+        "nome": "JACKELINE GRZYBOVSKI ARRUDA",
+        "custcode": "1.348200131",
+        "motivo": null
+      },
+      {
+        "nome": "NABOR SEVERO MENESES MACHADO",
+        "custcode": "1.348388636",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS FELIPE SELENKO",
+        "custcode": "1.348778259",
+        "motivo": null
+      },
+      {
+        "nome": "LUANA FERRARI",
+        "custcode": "1.347876855",
+        "motivo": null
+      },
+      {
+        "nome": "VALTAIR CARNEIRO CIT",
+        "custcode": "1.348245411",
+        "motivo": null
+      },
+      {
+        "nome": "SANDRA MARIA PAULO",
+        "custcode": "1.348245684",
+        "motivo": null
+      },
+      {
+        "nome": "LARISSA SIVIDANES NEVES",
+        "custcode": "1.348594016",
+        "motivo": null
+      },
+      {
+        "nome": "ZENOBIA SKOVRON",
+        "custcode": "1.347153317",
+        "motivo": null
+      },
+      {
+        "nome": "GISELE ROBAINA",
+        "custcode": "1.348529516",
+        "motivo": null
+      },
+      {
+        "nome": "GLENDA BRUNA DE OLIVEIRA",
+        "custcode": "1.348139205",
+        "motivo": null
+      },
+      {
+        "nome": "DANIELE DA SILVA",
+        "custcode": "1.348603404",
+        "motivo": null
+      },
+      {
+        "nome": "JS DISTRIBUIDORA DE BEBIDA E MERCEARIA",
+        "custcode": "1.348699542",
+        "motivo": null
+      },
+      {
+        "nome": "MICHAEL VIEIRA DA ROSA",
+        "custcode": "1.347953634",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANA PAZINATTO DE MATOS",
+        "custcode": "1.348645708",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ABEL BARIOS DE LA FUENTE",
+        "custcode": "1.347784837",
+        "motivo": null
+      },
+      {
+        "nome": "NELCI TEREZINHA BATISTA",
+        "custcode": "1.348334441",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.347050329",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA GORETI JUVENAL DA LUZ DO PRADO",
+        "custcode": "1.348326861",
+        "motivo": null
+      },
+      {
+        "nome": "ROMILDO BENTO",
+        "custcode": "1.348641080",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIO SOUZA DOS SANTOS",
+        "custcode": "1.348199117",
+        "motivo": null
+      },
+      {
+        "nome": "MARCIELI SALETE MACIEL ANSELMO",
+        "custcode": "1.348420674",
+        "motivo": null
+      },
+      {
+        "nome": "REGIVALDO SOUSA DA SILVA",
+        "custcode": "1.347865661",
+        "motivo": null
+      },
+      {
+        "nome": "JANE MARIA VICENTE",
+        "custcode": "1.348699387",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICIA DE FATIMA CZAIKA CARVALHO",
+        "custcode": "1.348148087",
+        "motivo": null
+      },
+      {
+        "nome": "SIDNEI DE ALMEIDA",
+        "custcode": "1.348603834",
+        "motivo": null
+      },
+      {
+        "nome": "RENAN VINICIUS DE OLIVEIRA",
+        "custcode": "1.347828979",
+        "motivo": null
+      },
+      {
+        "nome": "TAILER PATRICK LOPES",
+        "custcode": "1.348231256",
+        "motivo": null
+      },
+      {
+        "nome": "RAMIRES SEVERIANO DOS SANTOS DE LIMA",
+        "custcode": "1.348455459",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANE DE FATIMA ALMEIDA PINHEIRO",
+        "custcode": "1.348641640",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE PEREIRA",
+        "custcode": "1.348653829",
+        "motivo": null
+      },
+      {
+        "nome": "JOÃO PEDRO VENANCIO",
+        "custcode": "1.348369764",
+        "motivo": null
+      },
+      {
+        "nome": "WILSON MARFUT",
+        "custcode": "1.348340508",
+        "motivo": null
+      },
+      {
+        "nome": "LEIDIANE APARECIDA FRANCA ANTUNES",
+        "custcode": "1.348043545",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZ CLAUDIO ROLIM DE SOUZA",
+        "custcode": "1.348562212",
+        "motivo": null
+      },
+      {
+        "nome": "LORENA CATARINA JACOMASSO",
+        "custcode": "1.348562251",
+        "motivo": null
+      },
+      {
+        "nome": "SUELEN THAIS DE OLIVEIRA",
+        "custcode": "1.348639553",
+        "motivo": null
+      },
+      {
+        "nome": "ROSELI DE LIMA",
+        "custcode": "1.348261753",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELICA DA CONCEIÇÃO MACHADO",
+        "custcode": "1.348431166",
+        "motivo": null
+      },
+      {
+        "nome": "GILMAR GOMES DA CRUZ",
+        "custcode": "1.348620756",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANE SIEBRE",
+        "custcode": "1.348622228",
+        "motivo": null
+      },
+      {
+        "nome": "JONATHAN BRUNO FERREIRA",
+        "custcode": "1.348699773",
+        "motivo": null
+      },
+      {
+        "nome": "MIKAELA FERREIRA VASCONCELOS",
+        "custcode": "1.348060828",
+        "motivo": null
+      },
+      {
+        "nome": "ADELCIO FERREIRA DA SILVA",
+        "custcode": "1.348414507",
+        "motivo": null
+      },
+      {
+        "nome": "ANA CAROLINA CIANFA",
+        "custcode": "1.348683433",
+        "motivo": null
+      },
+      {
+        "nome": "ALCIDES LETTA DO ESPIRITO SANTO",
+        "custcode": "1.348309743",
+        "motivo": null
+      },
+      {
+        "nome": "SALETE XAVIER ALVES",
+        "custcode": "1.348261922",
+        "motivo": null
+      },
+      {
+        "nome": "RONAN PADILHA",
+        "custcode": "1.347485095",
+        "motivo": null
+      },
+      {
+        "nome": "FABIANO COSTA DE AMORIM",
+        "custcode": "1.348567509",
+        "motivo": null
+      },
+      {
+        "nome": "ELGUER TARLE CAMPI",
+        "custcode": "1.348420619",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNA SALAES FERREIRA",
+        "custcode": "1.348466162",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS AMORIN SOARES DOS SANTOS",
+        "custcode": "1.348279653",
+        "motivo": null
+      },
+      {
+        "nome": "SONIA MARTINS DE OLIVEIRA",
+        "custcode": "1.348529690",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANO BATISTA",
+        "custcode": "1.348231257",
+        "motivo": null
+      },
+      {
+        "nome": "LENICE DA SILVA RIBAS DE SANTANA",
+        "custcode": "1.348357400",
+        "motivo": null
+      },
+      {
+        "nome": "ELIANE MENDES NUNES CORREA",
+        "custcode": "1.347921311",
+        "motivo": null
+      },
+      {
+        "nome": "FABIANO JOSE DOS SANTOS",
+        "custcode": "1.348241451",
+        "motivo": null
+      },
+      {
+        "nome": "DAYNON PATRICK FALSSBINDER DA ROCHA",
+        "custcode": "1.347681472",
+        "motivo": null
+      },
+      {
+        "nome": "FABIO ACCORDI",
+        "custcode": "1.348231421",
+        "motivo": null
+      },
+      {
+        "nome": "BENEDITA APARECIDA DA SILVA",
+        "custcode": "1.348726714",
+        "motivo": null
+      },
+      {
+        "nome": "NELSON RIBEIRO",
+        "custcode": "1.348652842",
+        "motivo": null
+      },
+      {
+        "nome": "GELSON RODRIGUES DE MORAIS",
+        "custcode": "1.348529700",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA DIMIR MACHADO FAGUNDES",
+        "custcode": "1.348525948",
+        "motivo": null
+      },
+      {
+        "nome": "VANESSA FERREIRA DIAS",
+        "custcode": "1.348099411",
+        "motivo": null
+      },
+      {
+        "nome": "VALDOMIRO ANTUNES DE LIMA",
+        "custcode": "1.348604531",
+        "motivo": null
+      },
+      {
+        "nome": "JEAN LAZZAROTTO NEDOPETALSKI",
+        "custcode": "1.348327676",
+        "motivo": null
+      },
+      {
+        "nome": "JAMILLI APARECIDA DE MELO TENORIO MARTINELLI",
+        "custcode": "1.348562826",
+        "motivo": null
+      },
+      {
+        "nome": "EMILY VITORIA BRANCO RODRIGUES",
+        "custcode": "1.348786255",
+        "motivo": null
+      },
+      {
+        "nome": "ALEX COELHO GOMES",
+        "custcode": "1.348526150",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNO RODRIGUES GUIMARAES",
+        "custcode": "1.348165194",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348142274",
+        "motivo": null
+      },
+      {
+        "nome": "VALMOR SEBASTIAO CARVALHO",
+        "custcode": "1.348529747",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIO BUENO DE GODOY",
+        "custcode": "1.348047750",
+        "motivo": null
+      },
+      {
+        "nome": "KAROLINE PADILHA SCHULZ",
+        "custcode": "1.348164848",
+        "motivo": null
+      },
+      {
+        "nome": "GERSON FRANCISCO RODRIGUEZ LEIVA",
+        "custcode": "1.348621021",
+        "motivo": null
+      },
+      {
+        "nome": "CLEUSA MARIA DE LOURDES DE OLIVEIRA",
+        "custcode": "1.348778341",
+        "motivo": null
+      },
+      {
+        "nome": "ANA PAULA DE SOUZA",
+        "custcode": "1.348563004",
+        "motivo": null
+      },
+      {
+        "nome": "PRISCILA VANINI",
+        "custcode": "1.348238103",
+        "motivo": null
+      },
+      {
+        "nome": "ROSELI DE FATIMA HEY",
+        "custcode": "1.348490105",
+        "motivo": null
+      },
+      {
+        "nome": "MATEUS VIANA",
+        "custcode": "1.348789209",
+        "motivo": null
+      },
+      {
+        "nome": "RAFAELA APARECIDA DE FRANCA",
+        "custcode": "1.348334926",
+        "motivo": null
+      },
+      {
+        "nome": "FLAVIA MARTINS DOS SANTOS LEMES",
+        "custcode": "1.348358759",
+        "motivo": null
+      },
+      {
+        "nome": "GERALDO MORAIS DA SILVA",
+        "custcode": "1.348425110",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS CARLOS FERREIRA",
+        "custcode": "1.347749853",
+        "motivo": null
+      },
+      {
+        "nome": "EDSON DIAS APARECIDO",
+        "custcode": "1.348622903",
+        "motivo": null
+      },
+      {
+        "nome": "JEFFERSON LUIZ SILVA PRODOSSIMO",
+        "custcode": "1.348293808",
+        "motivo": null
+      },
+      {
+        "nome": "MICHELE KELLI RODRIGUES PETERS",
+        "custcode": "1.348120137",
+        "motivo": null
+      },
+      {
+        "nome": "NIVEA LIMA DOS SANTOS",
+        "custcode": "1.348498255",
+        "motivo": null
+      },
+      {
+        "nome": "VERANICE PONTES",
+        "custcode": "1.348593928",
+        "motivo": null
+      },
+      {
+        "nome": "NEIL DO ROCIODA SILVA MOKDSE",
+        "custcode": "1.348684068",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIA FATIMA FARIAS",
+        "custcode": "1.348590301",
+        "motivo": null
+      },
+      {
+        "nome": "ADNA KEILA DE BARROS",
+        "custcode": "1.348367121",
+        "motivo": null
+      },
+      {
+        "nome": "RODRIGO PIRES LOURENCO",
+        "custcode": "1.348590225",
+        "motivo": null
+      },
+      {
+        "nome": "EDIEL GARCIA RIBEIRO",
+        "custcode": "1.348415664",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA LUZIA DA CRUZ",
+        "custcode": "1.348489206",
+        "motivo": null
+      },
+      {
+        "nome": "LEANNIS DEL VALLE PEREZ REYES",
+        "custcode": "1.348626691",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348690578",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS FRANCISCO DA SILVA",
+        "custcode": "1.348310781",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS DE MARCHI",
+        "custcode": "1.348334907",
+        "motivo": null
+      },
+      {
+        "nome": "KAUAN LUIZ DA SILVA",
+        "custcode": "1.347630702",
+        "motivo": null
+      },
+      {
+        "nome": "JEILMA BISPO DOS SANTOS",
+        "custcode": "1.348515477",
+        "motivo": null
+      },
+      {
+        "nome": "JOSIANE APARECIDA DE QUADROS COTTA",
+        "custcode": "1.348309571",
+        "motivo": null
+      },
+      {
+        "nome": "VALDIR JANATE",
+        "custcode": "1.348204536",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348528890",
+        "motivo": null
+      },
+      {
+        "nome": "ELOIZE CORDEIRO DOS SANTOS",
+        "custcode": "1.348334836",
+        "motivo": null
+      },
+      {
+        "nome": "WESLEM MENEZES",
+        "custcode": "1.348640844",
+        "motivo": null
+      },
+      {
+        "nome": "IVETE CORREA JUSTEN",
+        "custcode": "1.348772578",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTIANE ALVES LECHETA",
+        "custcode": "1.348562232",
+        "motivo": null
+      },
+      {
+        "nome": "CERVI RIBEIRO",
+        "custcode": "1.348640858",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZ HENRIQUE DE OLIVEIRA",
+        "custcode": "1.348357634",
+        "motivo": null
+      },
+      {
+        "nome": "IVO PALCZUK",
+        "custcode": "1.348231817",
+        "motivo": null
+      },
+      {
+        "nome": "ELIZANGELA APARECIDA DOS SANTOS",
+        "custcode": "1.348562974",
+        "motivo": null
+      },
+      {
+        "nome": "GERCILENE CARLA VIEIRA",
+        "custcode": "1.348562069",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO MARIA DA SILVA",
+        "custcode": "1.348293877",
+        "motivo": null
+      },
+      {
+        "nome": "EVA CRISTIANE DE OLIVEIRA KODINSKI",
+        "custcode": "1.348338495",
+        "motivo": null
+      },
+      {
+        "nome": "LUAN SAUER DE ARAUJO",
+        "custcode": "1.348606494",
+        "motivo": null
+      },
+      {
+        "nome": "EVELYN DA SILVA VAZ",
+        "custcode": "1.348178526",
+        "motivo": null
+      },
+      {
+        "nome": "HUDSON LIMA DA LUZ",
+        "custcode": "1.348388784",
+        "motivo": null
+      },
+      {
+        "nome": "LILIAN APARECIDA NEIS DOMINGOS",
+        "custcode": "1.348349862",
+        "motivo": null
+      },
+      {
+        "nome": "MIGUEL ALFONSO FLORES TENEPE",
+        "custcode": "1.348326890",
+        "motivo": null
+      },
+      {
+        "nome": "ALINE FERREIRA BRAGA",
+        "custcode": "1.348562912",
+        "motivo": null
+      },
+      {
+        "nome": "NOELI LAZZERI FERREIRA",
+        "custcode": "1.348489901",
+        "motivo": null
+      },
+      {
+        "nome": "ERIC CESAR LOUREIRO",
+        "custcode": "1.348527448",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO MATEUS MACIEL",
+        "custcode": "1.348490130",
+        "motivo": null
+      },
+      {
+        "nome": "DJEIMES BUENO DE LARA",
+        "custcode": "1.348524796",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE DE OLIVEIRA",
+        "custcode": "1.348309692",
+        "motivo": null
+      },
+      {
+        "nome": "CARMEN WEGERMANN",
+        "custcode": "1.348455758",
+        "motivo": null
+      },
+      {
+        "nome": "MARILENE CLARO DA COSTA",
+        "custcode": "1.348639409",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA APARECIDA BARRETO DOS SANTOS",
+        "custcode": "1.348645707",
+        "motivo": null
+      },
+      {
+        "nome": "ELENI DE FATIMA TEIXEIRA",
+        "custcode": "1.348603396",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANA BIER ZUCHETTO",
+        "custcode": "1.348356569",
+        "motivo": null
+      },
+      {
+        "nome": "FLAVIO HENRIQUE PANICHI",
+        "custcode": "1.348169974",
+        "motivo": null
+      },
+      {
+        "nome": "RUTE CARDOSO",
+        "custcode": "1.348457508",
+        "motivo": null
+      },
+      {
+        "nome": "MARCIA FERREIRA MOURA",
+        "custcode": "1.348243355",
+        "motivo": null
+      },
+      {
+        "nome": "VANDERLEI DA CONCEICAO DDE JESUS",
+        "custcode": "1.348515235",
+        "motivo": null
+      },
+      {
+        "nome": "SANDRA LIDIA DALFERTH",
+        "custcode": "1.348515334",
+        "motivo": null
+      },
+      {
+        "nome": "SOLANGE TONINI",
+        "custcode": "1.348605565",
+        "motivo": null
+      },
+      {
+        "nome": "ROSELEI CRISTINA FERREIRA MENEGUES",
+        "custcode": "1.348115191",
+        "motivo": null
+      },
+      {
+        "nome": "WELLINGTON LUIS DA SILVA",
+        "custcode": "1.348528641",
+        "motivo": null
+      },
+      {
+        "nome": "EDSON ARANTES",
+        "custcode": "1.348196642",
+        "motivo": null
+      },
+      {
+        "nome": "ANNY FRANCIELI PEREIRA DE OLIVEIRA",
+        "custcode": "1.348278190",
+        "motivo": null
+      },
+      {
+        "nome": "RICARDO SENK",
+        "custcode": "1.348414565",
+        "motivo": null
+      },
+      {
+        "nome": "JESSICA TAMIRIS DA SILVA",
+        "custcode": "1.348603484",
+        "motivo": null
+      },
+      {
+        "nome": "CERINEU DA SILVA",
+        "custcode": "1.348489751",
+        "motivo": null
+      },
+      {
+        "nome": "YNARA BRASIL MIGLIORINI",
+        "custcode": "1.348366286",
+        "motivo": null
+      },
+      {
+        "nome": "ELIZABETE HENRIQUE DA SILVA",
+        "custcode": "1.347690450",
+        "motivo": null
+      },
+      {
+        "nome": "JALESCA DA SILVA NASCIMENTO",
+        "custcode": "1.348276773",
+        "motivo": null
+      }
+    ],
+    "_atrasados": [
+      {
+        "nome": "ROBERTO SOUZA SANTOS",
+        "custcode": "1.348044520",
+        "motivo": null
+      },
+      {
+        "nome": "DIOGO CARLOS",
+        "custcode": "1.348489489",
+        "motivo": null
+      },
+      {
+        "nome": "SILVIO RODRIGUES",
+        "custcode": "1.348077121",
+        "motivo": null
+      },
+      {
+        "nome": "CARINA PAULA GARDA",
+        "custcode": "1.347756548",
+        "motivo": null
+      },
+      {
+        "nome": "THIAGO KAUFFMANN CLAUDIO",
+        "custcode": "1.347296816",
+        "motivo": null
+      },
+      {
+        "nome": "AGENOR ANTONIO DA CRUZ JUNIOR",
+        "custcode": "1.348772326",
+        "motivo": null
+      },
+      {
+        "nome": "CLENILSON DOS SANTOS TAVARES",
+        "custcode": "1.348076245",
+        "motivo": null
+      },
+      {
+        "nome": "VILMAR APARECIDO DOS REIS",
+        "custcode": "1.348640812",
+        "motivo": null
+      },
+      {
+        "nome": "RAQUEL SOUZA DOS SANTOS",
+        "custcode": "1.348119310",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348455873",
+        "motivo": null
+      },
+      {
+        "nome": "MIKELI REZENDE SANTOS CARNEIRO",
+        "custcode": "1.348455489",
+        "motivo": null
+      },
+      {
+        "nome": "JAIRO AGUIAR DA SILVA",
+        "custcode": "1.348241607",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA LUCIA MENDES",
+        "custcode": "1.347950005",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIO LUCAS PAES DA CRUZ",
+        "custcode": "1.348308455",
+        "motivo": null
+      },
+      {
+        "nome": "ROSE MARI BASTOS",
+        "custcode": "1.348195773",
+        "motivo": null
+      },
+      {
+        "nome": "GIOVANE DE LIMA",
+        "custcode": "1.348525007",
+        "motivo": null
+      },
+      {
+        "nome": "GISELE APARECIDA RODRIGUES DOS SANTOS",
+        "custcode": "1.348195339",
+        "motivo": null
+      },
+      {
+        "nome": "RODRIGO CORREA TAVEIRA",
+        "custcode": "1.348197326",
+        "motivo": null
+      },
+      {
+        "nome": "KELLY ALESSANDRA GOZZO",
+        "custcode": "1.348271722",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS DE MEDEIROS COSTA",
+        "custcode": "1.348462911",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348272151",
+        "motivo": null
+      },
+      {
+        "nome": "VALDEMIR LOPES DE SOUZA",
+        "custcode": "1.348071207",
+        "motivo": null
+      },
+      {
+        "nome": "WILLIAN ROBERT DA LUZ DOS SANTOS",
+        "custcode": "1.348562262",
+        "motivo": null
+      },
+      {
+        "nome": "SILMARA APARECIDA DA SILVA",
+        "custcode": "1.348326797",
+        "motivo": null
+      },
+      {
+        "nome": "PRECIDIA REIS GOMES",
+        "custcode": "1.348278594",
+        "motivo": null
+      },
+      {
+        "nome": "MISLENE DOS SANTOS RODRIGUES",
+        "custcode": "1.348490226",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDINEI MARIANO RIBEIRO",
+        "custcode": "1.348640578",
+        "motivo": null
+      },
+      {
+        "nome": "ALAN ROZER NASCIMENTO OLIVEIRA",
+        "custcode": "1.348165049",
+        "motivo": null
+      },
+      {
+        "nome": "DIEGO DOS SANTOS CARVALHO",
+        "custcode": "1.348295084",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDEMIR HENRIQUE PINTO",
+        "custcode": "1.348478289",
+        "motivo": null
+      },
+      {
+        "nome": "DIRCE EDIR BUENO",
+        "custcode": "1.348327655",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS MAURICIO DE SOUZA",
+        "custcode": "1.348358672",
+        "motivo": null
+      },
+      {
+        "nome": "SARA TAINA COUTO CARDOSO",
+        "custcode": "1.348177771",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA HELENA RODRIGUES DA SILVA",
+        "custcode": "1.348771896",
+        "motivo": null
+      },
+      {
+        "nome": "REINALVA DE SOUZA",
+        "custcode": "1.348309745",
+        "motivo": null
+      },
+      {
+        "nome": "52.059.639 KELVIN ALVES FERREIRA DE SOUZA",
+        "custcode": "1.348515108",
+        "motivo": null
+      },
+      {
+        "nome": "DERVIN FELIPE MORENO",
+        "custcode": "1.348447221",
+        "motivo": null
+      },
+      {
+        "nome": "LEOCADIO HENRIQUE ROCHA",
+        "custcode": "1.348201968",
+        "motivo": null
+      },
+      {
+        "nome": "DALVINA DE OLIVEIRA",
+        "custcode": "1.348293728",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA ROSA D AMARAL",
+        "custcode": "1.348690679",
+        "motivo": null
+      },
+      {
+        "nome": "RAFAEL SANTOS OLIVEIRA",
+        "custcode": "1.347798326",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA SOLEDAD ROJAS SILVERO",
+        "custcode": "1.347749577",
+        "motivo": null
+      },
+      {
+        "nome": "DIEGO SIQUEIRA LEAL",
+        "custcode": "1.348243941",
+        "motivo": null
+      },
+      {
+        "nome": "DOUGLAS FIDELES DE OLIVEIRA",
+        "custcode": "1.348477398",
+        "motivo": null
+      },
+      {
+        "nome": "DIEGO SAMUEL LOPEZ VERA",
+        "custcode": "1.347748562",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.347785002",
+        "motivo": null
+      },
+      {
+        "nome": "MARCIA PEREIRA MACEDO TENEDINE",
+        "custcode": "1.348309751",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO VITOR VIEIRA DA COSTA",
+        "custcode": "1.347343055",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE INACIO DA CRUZ",
+        "custcode": "1.347691891",
+        "motivo": null
+      },
+      {
+        "nome": "GUIMORVAL DE CARVALHO RAFFAELLI",
+        "custcode": "1.348356536",
+        "motivo": null
+      },
+      {
+        "nome": "ENIO ANTONIO DA SILVA",
+        "custcode": "1.348526513",
+        "motivo": null
+      },
+      {
+        "nome": "JEFERSON LEITE DOS SANTOS",
+        "custcode": "1.348415352",
+        "motivo": null
+      },
+      {
+        "nome": "VILMA DE OLIVERA SANTOS",
+        "custcode": "1.347882988",
+        "motivo": null
+      },
+      {
+        "nome": "ADEMAR CARDOSO",
+        "custcode": "1.348148226",
+        "motivo": null
+      },
+      {
+        "nome": "GLAUBER RONY DIAS DE CARVALHO",
+        "custcode": "1.348084565",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELA CAROLINE MARTINHACK MACIEL",
+        "custcode": "1.348293388",
+        "motivo": null
+      },
+      {
+        "nome": "LUVERSAN STAIZACK SOARES",
+        "custcode": "1.347838731",
+        "motivo": null
+      },
+      {
+        "nome": "PEDRO CORDEIRO MACHADO",
+        "custcode": "1.348415079",
+        "motivo": null
+      },
+      {
+        "nome": "HECTOR EULALIO SANCHEZ GONZALEZ",
+        "custcode": "1.347749745",
+        "motivo": null
+      },
+      {
+        "nome": "NORBELYS DEL CARMEN CORTEZ MARIN",
+        "custcode": "1.348699229",
+        "motivo": null
+      },
+      {
+        "nome": "ELISEU MEMLAK",
+        "custcode": "1.347781448",
+        "motivo": null
+      },
+      {
+        "nome": "SOELI SANTOS",
+        "custcode": "1.348279632",
+        "motivo": null
+      },
+      {
+        "nome": "SIDINEIA NUNES DE SOUZA",
+        "custcode": "1.348562884",
+        "motivo": null
+      },
+      {
+        "nome": "QUESIA DOS SANTOS NORBERTO",
+        "custcode": "1.348690084",
+        "motivo": null
+      },
+      {
+        "nome": "JHONATAN HENRIQUE MARQUES",
+        "custcode": "1.348077072",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANA PADILHA DOS SANTOS",
+        "custcode": "1.348740401",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRESA GANS",
+        "custcode": "1.348201356",
+        "motivo": null
+      },
+      {
+        "nome": "JEFFERSON JOSE ALVES",
+        "custcode": "1.348148974",
+        "motivo": null
+      },
+      {
+        "nome": "PAOLA MARIA JOSE TORRES DOMINGUEZ",
+        "custcode": "1.347652585",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELO ROBERTO BATISTA JUNIOR",
+        "custcode": "1.348308328",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIO MARCOS DA INHAIA",
+        "custcode": "1.348652857",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELITA ALEXANDRINO",
+        "custcode": "1.348740307",
+        "motivo": null
+      },
+      {
+        "nome": "KARINE DE FATIMA NUNES FERREIRA",
+        "custcode": "1.348334537",
+        "motivo": null
+      },
+      {
+        "nome": "VILMAR BICUDO",
+        "custcode": "1.348460900",
+        "motivo": null
+      },
+      {
+        "nome": "ONASSIS JOSE CHACOA",
+        "custcode": "1.347698706",
+        "motivo": null
+      },
+      {
+        "nome": "MAGNO MARTINS DOS SANTOS",
+        "custcode": "1.348149344",
+        "motivo": null
+      },
+      {
+        "nome": "JOHNATAN DA SILVA ARANTES",
+        "custcode": "1.348271416",
+        "motivo": null
+      },
+      {
+        "nome": "MARCOS FERREIRA",
+        "custcode": "1.347828392",
+        "motivo": null
+      },
+      {
+        "nome": "60.109.992 ANDRE MORAIS DE JESUS",
+        "custcode": "1.348420288",
+        "motivo": null
+      },
+      {
+        "nome": "DIRCEU OLIVEIRA",
+        "custcode": "1.348277751",
+        "motivo": null
+      },
+      {
+        "nome": "STEFANI APARECIDA CARNEIRO",
+        "custcode": "1.348337180",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANA DE LIMA",
+        "custcode": "1.348327810",
+        "motivo": null
+      },
+      {
+        "nome": "VERA LUCIA SANTOS",
+        "custcode": "1.348528700",
+        "motivo": null
+      },
+      {
+        "nome": "GILMAR CARDOSO",
+        "custcode": "1.348357535",
+        "motivo": null
+      },
+      {
+        "nome": "ANDREA SANTOS",
+        "custcode": "1.348107027",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE SILVA TORRES",
+        "custcode": "1.347765905",
+        "motivo": null
+      },
+      {
+        "nome": "ELAINE CRISTINA EWERT HELLVIG RODRIGUES",
+        "custcode": "1.348546298",
+        "motivo": null
+      },
+      {
+        "nome": "FELIPE DOS SANTOS BARBOSA",
+        "custcode": "1.348245263",
+        "motivo": null
+      },
+      {
+        "nome": "ALINE CRISTINA SOARES",
+        "custcode": "1.348455739",
+        "motivo": null
+      },
+      {
+        "nome": "ANA PAULA RODRIGUES",
+        "custcode": "1.348196014",
+        "motivo": null
+      },
+      {
+        "nome": "YARA KELLY DA SILVA RODRIGUES",
+        "custcode": "1.348246037",
+        "motivo": null
+      },
+      {
+        "nome": "ADAO PAULO FAGUNDES DOS SANTOS",
+        "custcode": "1.348621880",
+        "motivo": null
+      },
+      {
+        "nome": "CESAR LUIS KULCHESKI",
+        "custcode": "1.348238643",
+        "motivo": null
+      },
+      {
+        "nome": "CIBELE MAXIMIANO RODRIGUES",
+        "custcode": "1.348740356",
+        "motivo": null
+      },
+      {
+        "nome": "HERICK PACHECO REIS",
+        "custcode": "1.348621870",
+        "motivo": null
+      },
+      {
+        "nome": "ROMILDO APARECIDO PEDRO",
+        "custcode": "1.348789920",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ADILSON DOS SANTOS",
+        "custcode": "1.348308473",
+        "motivo": null
+      },
+      {
+        "nome": "RENA FERREIRA DO AMARAL",
+        "custcode": "1.348515822",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348562153",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS EDUARDO GALVANI",
+        "custcode": "1.348641670",
+        "motivo": null
+      },
+      {
+        "nome": "ANDERSON BERTAQUI",
+        "custcode": "1.348635497",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348725660",
+        "motivo": null
+      },
+      {
+        "nome": "CARLA GIOVANA FERREIRA ROCHA",
+        "custcode": "1.348241655",
+        "motivo": null
+      },
+      {
+        "nome": "ROSA CARDOSO DE AGUIAR QUEIROZ",
+        "custcode": "1.348046062",
+        "motivo": null
+      },
+      {
+        "nome": "FRANGEL JOSUÉ ACEVEDO",
+        "custcode": "1.348458617",
+        "motivo": null
+      },
+      {
+        "nome": "JACKSON HILBERT FERREIRA DE SOUZA",
+        "custcode": "1.348457519",
+        "motivo": null
+      },
+      {
+        "nome": "ROSIRYS DEL VALLE",
+        "custcode": "1.348652836",
+        "motivo": null
+      },
+      {
+        "nome": "PRISCILA VITOR SIMOES",
+        "custcode": "1.348047613",
+        "motivo": null
+      },
+      {
+        "nome": "RAFAEL MEDEIROS DE OLIVEIRA",
+        "custcode": "1.348194436",
+        "motivo": null
+      },
+      {
+        "nome": "TEREZA BANDEIRA CORDEIRO",
+        "custcode": "1.348683331",
+        "motivo": null
+      },
+      {
+        "nome": "ADEMIR JOSE TICIANI",
+        "custcode": "1.347638571",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIO ROBERTO NERY FRATTONI",
+        "custcode": "1.347798207",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZ DE ALMEIDA",
+        "custcode": "1.348043568",
+        "motivo": null
+      },
+      {
+        "nome": "MARCELO MARQUES",
+        "custcode": "1.347651783",
+        "motivo": null
+      },
+      {
+        "nome": "SUSANE CHRISTINE LEMES",
+        "custcode": "1.348562145",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANA LEVINO DE FARIA",
+        "custcode": "1.348115951",
+        "motivo": null
+      },
+      {
+        "nome": "SIRLEI DE LIMA",
+        "custcode": "1.348071162",
+        "motivo": null
+      },
+      {
+        "nome": "DILSON ANTONIO ALMEIDA",
+        "custcode": "1.348240555",
+        "motivo": null
+      },
+      {
+        "nome": "ROSNEI PRADO DO CARMO",
+        "custcode": "1.348237928",
+        "motivo": null
+      },
+      {
+        "nome": "JORCELI DA SILVA",
+        "custcode": "1.348742953",
+        "motivo": null
+      },
+      {
+        "nome": "MARA TEREZINHA DE SOUZA",
+        "custcode": "1.348448262",
+        "motivo": null
+      },
+      {
+        "nome": "DAYANE TERESA APARECIDA MELO DA SILVA",
+        "custcode": "1.348459581",
+        "motivo": null
+      },
+      {
+        "nome": "ANA CRISTINA KACZAN",
+        "custcode": "1.348456647",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ANTÔNIO PEREIRA",
+        "custcode": "1.348620993",
+        "motivo": null
+      },
+      {
+        "nome": "NICOLE DOS SANTOS SOARES",
+        "custcode": "1.348515678",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS HENRIQUE DE LIMA BUENO",
+        "custcode": "1.348562229",
+        "motivo": null
+      },
+      {
+        "nome": "ODAIR JOSE DE OLIVEIRA LIMA",
+        "custcode": "1.348563051",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS PUQUEVIS",
+        "custcode": "1.348652853",
+        "motivo": null
+      },
+      {
+        "nome": "LUCILEIA ALVES MACEDO",
+        "custcode": "1.348751576",
+        "motivo": null
+      },
+      {
+        "nome": "IGOR ANDRE HORN",
+        "custcode": "1.347756782",
+        "motivo": null
+      },
+      {
+        "nome": "CINTIA GABRIELE SILVA",
+        "custcode": "1.348568598",
+        "motivo": null
+      },
+      {
+        "nome": "JOICE LAINE ESTEVAM",
+        "custcode": "1.348261658",
+        "motivo": null
+      },
+      {
+        "nome": "JAIME GONCALVES DO NASCIMENTO",
+        "custcode": "1.348690688",
+        "motivo": null
+      },
+      {
+        "nome": "LALESKA NATAR BICUDO",
+        "custcode": "1.348699521",
+        "motivo": null
+      },
+      {
+        "nome": "JAQUELINE DO PRADO FERREIRA",
+        "custcode": "1.348741209",
+        "motivo": null
+      },
+      {
+        "nome": "ISABELA MATOZO",
+        "custcode": "1.348194449",
+        "motivo": null
+      },
+      {
+        "nome": "DEBORA BATISTA",
+        "custcode": "1.348334893",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIELE CAMILA VALERIANO SZABO",
+        "custcode": "1.348297204",
+        "motivo": null
+      },
+      {
+        "nome": "LEANDRO FAGUNDES MACHADO",
+        "custcode": "1.348176798",
+        "motivo": null
+      },
+      {
+        "nome": "VANDERLEI DE ALMEIDA",
+        "custcode": "1.348170443",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE GREGORIO MARTINEZ MEDIOMUNDO",
+        "custcode": "1.348309379",
+        "motivo": null
+      },
+      {
+        "nome": "SHEILA NICOLE PEREIRA DE ALMEIDA",
+        "custcode": "1.348309783",
+        "motivo": null
+      },
+      {
+        "nome": "LADIR TEREZINHA REMONTI CHAVES",
+        "custcode": "1.348309559",
+        "motivo": null
+      },
+      {
+        "nome": "ANA CAROLINA FERREIRA DE ANDRADE",
+        "custcode": "1.348180870",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNO LEAL BARBOSA",
+        "custcode": "1.348530584",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348645693",
+        "motivo": null
+      },
+      {
+        "nome": "SANANDI MENDES RODRIGUES",
+        "custcode": "1.348500262",
+        "motivo": null
+      },
+      {
+        "nome": "SANDRO RAMOS",
+        "custcode": "1.348626527",
+        "motivo": null
+      },
+      {
+        "nome": "NELSON MOURA DE LIMA",
+        "custcode": "1.348772383",
+        "motivo": null
+      },
+      {
+        "nome": "EVER ZARZA CASTILLO",
+        "custcode": "1.347763445",
+        "motivo": null
+      },
+      {
+        "nome": "POLIANA TOMAZ GARCIA",
+        "custcode": "1.348309753",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348044686",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.348425912",
+        "motivo": null
+      },
+      {
+        "nome": "FABIO DE LIMA FANT",
+        "custcode": "1.347798851",
+        "motivo": null
+      },
+      {
+        "nome": "ANA CLAUDIA RAMOS",
+        "custcode": "1.347881450",
+        "motivo": null
+      },
+      {
+        "nome": "JANAINA MIRELLA DO CARMO",
+        "custcode": "1.348044346",
+        "motivo": null
+      },
+      {
+        "nome": "TEREZINHA SUTIL DE LIMA",
+        "custcode": "1.348107144",
+        "motivo": null
+      },
+      {
+        "nome": "JAKSON NATANAEL ALVES DA SILVA MARTINS",
+        "custcode": "1.348044530",
+        "motivo": null
+      },
+      {
+        "nome": "JOICE FERREIRA VILAS BOAS",
+        "custcode": "1.348423483",
+        "motivo": null
+      }
+    ],
+    "congeladoEm": "2026-08-10T15:20:11.445Z"
+  },
+  "03/2026": {
+    "safra": "03/2026",
+    "janela": [
+      "03/2026",
+      "04/2026",
+      "05/2026",
+      "06/2026",
+      "07/2026"
+    ],
+    "dataCorte": "31/07/2026",
+    "dataReferencia": "31/07/2026",
+    "previa": false,
+    "oficial": false,
+    "congelado": true,
+    "totalClientes": 533,
+    "clientesOk": 295,
+    "percentual": 55.3,
+    "_ok": [
+      {
+        "nome": "CAMILA TRINDADE BARBOSA",
+        "custcode": "1.353818808",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE DOS SANTOS SANTOS PAISSENS",
+        "custcode": "1.353800139",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA SOLANGE CAMARGO DA SILVA",
+        "custcode": "1.353720006",
+        "motivo": null
+      },
+      {
+        "nome": "ANA LUCIA DE OLIVEIRA",
+        "custcode": "1.353338164",
+        "motivo": null
+      },
+      {
+        "nome": "ERASMO AGOSTINHO RODRIGUES DE ANDRADE",
+        "custcode": "1.353250071",
+        "motivo": null
+      },
+      {
+        "nome": "FELIPE APARECIDO IZAIAS DA SILVA",
+        "custcode": "1.353197363",
+        "motivo": null
+      },
+      {
+        "nome": "KELLY CRISTINE OLIVEIRA PEREIRA",
+        "custcode": "1.353304693",
+        "motivo": null
+      },
+      {
+        "nome": "ELIETE AVELINA DE CARVALHO",
+        "custcode": "1.353702620",
+        "motivo": null
+      },
+      {
+        "nome": "RODRIGO DE OLIVEIRA KUBIS",
+        "custcode": "1.353638894",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS MATHEUS MACHADO",
+        "custcode": "1.353642855",
+        "motivo": null
+      },
+      {
+        "nome": "EULADIO CARDOSO DE SAMPAIO",
+        "custcode": "1.353450543",
+        "motivo": null
+      },
+      {
+        "nome": "NAILET VANESA JIMENEZ RODRIGUEZ",
+        "custcode": "1.353725387",
+        "motivo": null
+      },
+      {
+        "nome": "JAIR CAMPOS JUNIOR",
+        "custcode": "1.353905262",
+        "motivo": null
+      },
+      {
+        "nome": "JHENIFER KAUANE DOS SANTOS",
+        "custcode": "1.353436980",
+        "motivo": null
+      },
+      {
+        "nome": "RICHARD GORNIAK",
+        "custcode": "1.353751082",
+        "motivo": null
+      },
+      {
+        "nome": "FRANCIELE MATOS GOMES",
+        "custcode": "1.353166450",
+        "motivo": null
+      },
+      {
+        "nome": "TIAGO RIBEIRO",
+        "custcode": "1.353811428",
+        "motivo": null
+      },
+      {
+        "nome": "DAVID ZANON NOGUEIRA",
+        "custcode": "1.353848175",
+        "motivo": null
+      },
+      {
+        "nome": "JAQUELINE RODRIGUES",
+        "custcode": "1.353263453",
+        "motivo": null
+      },
+      {
+        "nome": "KELI CRISTINA CARDOZO DE LIMA",
+        "custcode": "1.353638626",
+        "motivo": null
+      },
+      {
+        "nome": "ROSEMARI APARECIDA DE ALMEIDA",
+        "custcode": "1.353672435",
+        "motivo": null
+      },
+      {
+        "nome": "REINALDO GLUSCZKA",
+        "custcode": "1.353701728",
+        "motivo": null
+      },
+      {
+        "nome": "MARGARIDA FEROLDI AMELIO",
+        "custcode": "1.353463563",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA JOSE SANTOS ROSA",
+        "custcode": "1.353876920",
+        "motivo": null
+      },
+      {
+        "nome": "VENILDA DAL LAGO CAMILO",
+        "custcode": "1.353698518",
+        "motivo": null
+      },
+      {
+        "nome": "VILMA DE FATIMA DOS SANTOS",
+        "custcode": "1.353310224",
+        "motivo": null
+      },
+      {
+        "nome": "DEUSDETE APARECIDO SANTOS",
+        "custcode": "1.353840044",
+        "motivo": null
+      },
+      {
+        "nome": "ALAN ALVES DOS SANTOS",
+        "custcode": "1.353935000",
+        "motivo": null
+      },
+      {
+        "nome": "LUCINEIA RAIMUNDO",
+        "custcode": "1.353947607",
+        "motivo": null
+      },
+      {
+        "nome": "GIOVANNA JULLIE PEREIRA LIMA GOMES",
+        "custcode": "1.353166770",
+        "motivo": null
+      },
+      {
+        "nome": "OSCAR FERREIRA DE PAULA",
+        "custcode": "1.353240232",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ANTONIO BARRIOS BARRIOS",
+        "custcode": "1.353304069",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353332314",
+        "motivo": null
+      },
+      {
+        "nome": "LUCINETE DE OLIVEIRA SILVA",
+        "custcode": "1.353451874",
+        "motivo": null
+      },
+      {
+        "nome": "INDIANARA AGUIAR DA SILVA",
+        "custcode": "1.353362434",
+        "motivo": null
+      },
+      {
+        "nome": "JULIO DA SILVA FAGUNDES",
+        "custcode": "1.353849933",
+        "motivo": null
+      },
+      {
+        "nome": "DEIBSON GALDINO DA SILVA",
+        "custcode": "1.353687315",
+        "motivo": null
+      },
+      {
+        "nome": "ANDREILSON GONCALVES DO ROSARIO",
+        "custcode": "1.353947670",
+        "motivo": null
+      },
+      {
+        "nome": "ELISANGELA APARECIDA DE OLIVEIRA CORTE",
+        "custcode": "1.353344757",
+        "motivo": null
+      },
+      {
+        "nome": "MAIARA RUWER DA FONSECA",
+        "custcode": "1.353430424",
+        "motivo": null
+      },
+      {
+        "nome": "SILVANA DA SILVA LARA",
+        "custcode": "1.353456023",
+        "motivo": null
+      },
+      {
+        "nome": "SANDRO MOREIRA DE LIMA",
+        "custcode": "1.353554489",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353725352",
+        "motivo": null
+      },
+      {
+        "nome": "VINICIUS MATHEUS ALMEIDA DA SILVA",
+        "custcode": "1.353818740",
+        "motivo": null
+      },
+      {
+        "nome": "JANE MARIA PORTELA DAMAS PIRES",
+        "custcode": "1.353915837",
+        "motivo": null
+      },
+      {
+        "nome": "RONALDO GONCALVES DO ROSARIO",
+        "custcode": "1.353937369",
+        "motivo": null
+      },
+      {
+        "nome": "PAULO EDUARDO DA SILVA MATOS",
+        "custcode": "1.353870623",
+        "motivo": null
+      },
+      {
+        "nome": "NATALIA MIRANDA BRANDAO",
+        "custcode": "1.353606180",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA ESTELA FRANCO",
+        "custcode": "1.353692508",
+        "motivo": null
+      },
+      {
+        "nome": "EMERSON MARIANO DA SILVA",
+        "custcode": "1.353430571",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE RAMON MACHADO FIGUERA",
+        "custcode": "1.353907917",
+        "motivo": null
+      },
+      {
+        "nome": "HENRIQUE PEREIRA DOS SANTOS",
+        "custcode": "1.353263316",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIO ESCOBAR MENDOZA",
+        "custcode": "1.353551364",
+        "motivo": null
+      },
+      {
+        "nome": "NAIR AVELINA SARAMENTO",
+        "custcode": "1.353706135",
+        "motivo": null
+      },
+      {
+        "nome": "ISABEL CRISTINA MARTINS",
+        "custcode": "1.353279341",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRESSA APARECIDA DE SOUZA",
+        "custcode": "1.353464411",
+        "motivo": null
+      },
+      {
+        "nome": "55.482.397 TALITA ASSUSSENA EDUARDO",
+        "custcode": "1.353880535",
+        "motivo": null
+      },
+      {
+        "nome": "ANA JULIA DA CRUZ SANTOS",
+        "custcode": "1.353276918",
+        "motivo": null
+      },
+      {
+        "nome": "BALBINO BISPO DA SILVA",
+        "custcode": "1.353303271",
+        "motivo": null
+      },
+      {
+        "nome": "LEONARDO MELLO PEREIRA MICOSKI",
+        "custcode": "1.353669519",
+        "motivo": null
+      },
+      {
+        "nome": "PAMELA BUENO TESSARO DA SILVA",
+        "custcode": "1.353670957",
+        "motivo": null
+      },
+      {
+        "nome": "MARISA PLACIDO DOS SANTOS",
+        "custcode": "1.353231989",
+        "motivo": null
+      },
+      {
+        "nome": "MARLI MARIA DE SOUZA GIRARDELO",
+        "custcode": "1.353915046",
+        "motivo": null
+      },
+      {
+        "nome": "RYAN SARAIVA PEREIRA",
+        "custcode": "1.353338084",
+        "motivo": null
+      },
+      {
+        "nome": "ALEXEI GORT MOLINA",
+        "custcode": "1.353284988",
+        "motivo": null
+      },
+      {
+        "nome": "ROSANGELA MENEGONI",
+        "custcode": "1.353688841",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353430775",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRES FELIPE BADILO CALDON",
+        "custcode": "1.353889901",
+        "motivo": null
+      },
+      {
+        "nome": "JOCELIA DE LOURDES PEREIRA",
+        "custcode": "1.353647452",
+        "motivo": null
+      },
+      {
+        "nome": "ERICK MATHEUS MACHADO MENDES",
+        "custcode": "1.353519695",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO FRANCISCO VIEIRA FAGUNDES",
+        "custcode": "1.353329906",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIRENE DE SOUZA LIMA",
+        "custcode": "1.353876496",
+        "motivo": null
+      },
+      {
+        "nome": "SIMONE MOREIRA DE MELO",
+        "custcode": "1.353332595",
+        "motivo": null
+      },
+      {
+        "nome": "KALYANE DOS SANTOS MARTINS CORDEIRO",
+        "custcode": "1.353437357",
+        "motivo": null
+      },
+      {
+        "nome": "SIRLENE DE JESUS DE GODOIS",
+        "custcode": "1.353544465",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIEL DAUEK",
+        "custcode": "1.353513382",
+        "motivo": null
+      },
+      {
+        "nome": "GIOVANA MAIA",
+        "custcode": "1.353277963",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA DA SILVA",
+        "custcode": "1.353336520",
+        "motivo": null
+      },
+      {
+        "nome": "MATHEUS GUILHERME DE FRANCA ANTUNES",
+        "custcode": "1.353904409",
+        "motivo": null
+      },
+      {
+        "nome": "ROSILDA RIBEIRO DA SILVA",
+        "custcode": "1.353310771",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIO ALVES TEIXEIRA",
+        "custcode": "1.353571062",
+        "motivo": null
+      },
+      {
+        "nome": "IAN HIAGO DA SILVA",
+        "custcode": "1.353278010",
+        "motivo": null
+      },
+      {
+        "nome": "MARLIZE MARIAN",
+        "custcode": "1.353900686",
+        "motivo": null
+      },
+      {
+        "nome": "LIDIANE NEVES BERALDO",
+        "custcode": "1.353464843",
+        "motivo": null
+      },
+      {
+        "nome": "SILVANA BORGES PACHECO",
+        "custcode": "0.000000000",
+        "motivo": null
+      },
+      {
+        "nome": "ALAIDE GUIMARAES DA SILVA",
+        "custcode": "1.353605331",
+        "motivo": null
+      },
+      {
+        "nome": "SHIMENE DE FRANCA PEREIRA",
+        "custcode": "1.353948766",
+        "motivo": null
+      },
+      {
+        "nome": "FRANCELINA ALGUSTA DE ALMEIDA",
+        "custcode": "1.353522937",
+        "motivo": null
+      },
+      {
+        "nome": "INGRID VIRGINIA HOSPEDALES ROMERO",
+        "custcode": "1.353993322",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353234317",
+        "motivo": null
+      },
+      {
+        "nome": "EVA DA LUZ SANTOS",
+        "custcode": "1.353638833",
+        "motivo": null
+      },
+      {
+        "nome": "WUINDER ELOY CUMANA",
+        "custcode": "1.353920789",
+        "motivo": null
+      },
+      {
+        "nome": "KETHELIN GONCALVES",
+        "custcode": "1.353942785",
+        "motivo": null
+      },
+      {
+        "nome": "RAFAEL FERREIRA FRANCO",
+        "custcode": "1.353792946",
+        "motivo": null
+      },
+      {
+        "nome": "AVALOS SILVA DE AQUINO",
+        "custcode": "1.353818970",
+        "motivo": null
+      },
+      {
+        "nome": "ISETE DO ROCIO PORTES",
+        "custcode": "1.353327135",
+        "motivo": null
+      },
+      {
+        "nome": "HOELDON DE SOUSA DOMINGOS",
+        "custcode": "1.353612051",
+        "motivo": null
+      },
+      {
+        "nome": "CRYSTOFER ALEXANDRE CHICORA",
+        "custcode": "1.353551269",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNA ESTEFANI TEIXEIRA FARIAS",
+        "custcode": "1.353620517",
+        "motivo": null
+      },
+      {
+        "nome": "MARGARETE APARECIDA BRIZIDO",
+        "custcode": "1.353620506",
+        "motivo": null
+      },
+      {
+        "nome": "VANIA LUCIA ALVES DOS SANTOS",
+        "custcode": "1.353642972",
+        "motivo": null
+      },
+      {
+        "nome": "LAIS MISAELA GOMEZ FERREIRA",
+        "custcode": "1.353448213",
+        "motivo": null
+      },
+      {
+        "nome": "GLEIDSON SILVESTRE CLAUDINO",
+        "custcode": "1.353674586",
+        "motivo": null
+      },
+      {
+        "nome": "MARCOS KMITA",
+        "custcode": "1.353698843",
+        "motivo": null
+      },
+      {
+        "nome": "SIMONE ANANIAS DA SILVA",
+        "custcode": "1.353669586",
+        "motivo": null
+      },
+      {
+        "nome": "FABIO DE SOUZA GOMES",
+        "custcode": "1.353698891",
+        "motivo": null
+      },
+      {
+        "nome": "ISIS RODRIGUES BARBOSA",
+        "custcode": "1.353669651",
+        "motivo": null
+      },
+      {
+        "nome": "SONIA REGINA DOMINGUES",
+        "custcode": "1.353725129",
+        "motivo": null
+      },
+      {
+        "nome": "LUCY MARIA DE QUEIROZ",
+        "custcode": "1.353915098",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIO MIOTTO DO PILAR",
+        "custcode": "1.353818901",
+        "motivo": null
+      },
+      {
+        "nome": "BERNARDO GIOVANNI RODRIGUES DE LIMA",
+        "custcode": "1.353072424",
+        "motivo": null
+      },
+      {
+        "nome": "DAYANE CRISTINA ANDRADE DE ALMEIDA",
+        "custcode": "1.353361578",
+        "motivo": null
+      },
+      {
+        "nome": "RUBENS CARDOZO DE LIMA",
+        "custcode": "1.353635198",
+        "motivo": null
+      },
+      {
+        "nome": "MICHELE CRISTINA ROSENTHAL",
+        "custcode": "1.353246244",
+        "motivo": null
+      },
+      {
+        "nome": "LS SALGADOS",
+        "custcode": "1.353725370",
+        "motivo": null
+      },
+      {
+        "nome": "JOEL VIEIRA",
+        "custcode": "1.353812867",
+        "motivo": null
+      },
+      {
+        "nome": "JORGE DE SOUZA",
+        "custcode": "1.353887835",
+        "motivo": null
+      },
+      {
+        "nome": "ROSEMARY FERNANDES",
+        "custcode": "1.353620478",
+        "motivo": null
+      },
+      {
+        "nome": "MURILO CANDIDO DE ALMEIDA",
+        "custcode": "1.353361694",
+        "motivo": null
+      },
+      {
+        "nome": "SILMARA APARECIDA DOMINGUES",
+        "custcode": "1.353574857",
+        "motivo": null
+      },
+      {
+        "nome": "JULIO CESAR GONCALVES",
+        "custcode": "0.000000000",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE LOURENCO DE ALMEIDA",
+        "custcode": "1.353238395",
+        "motivo": null
+      },
+      {
+        "nome": "DENIZE CAVALHEIRO",
+        "custcode": "1.353724329",
+        "motivo": null
+      },
+      {
+        "nome": "AMANDA FRANCISCA SIQUEIRA DA SILVA",
+        "custcode": "1.353447588",
+        "motivo": null
+      },
+      {
+        "nome": "DANIEL FERNANDO DE OLIVEIRA",
+        "custcode": "1.353522863",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRESSA DE ASSIS FERREIRA",
+        "custcode": "1.353328190",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZ HENRIQUE REZENDE DE ARAUJO",
+        "custcode": "1.353541284",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS HENRIQUE AMARILIO MEDEIROS",
+        "custcode": "1.353303201",
+        "motivo": null
+      },
+      {
+        "nome": "TIAGO DOS SANTOS",
+        "custcode": "1.353702560",
+        "motivo": null
+      },
+      {
+        "nome": "QUITERIA PEREIRA LIMA",
+        "custcode": "1.353792221",
+        "motivo": null
+      },
+      {
+        "nome": "MARILENE PEREIRA DANTAS MARINHO",
+        "custcode": "1.353240097",
+        "motivo": null
+      },
+      {
+        "nome": "FLAVIA SOARES MONTEIRO",
+        "custcode": "1.353792019",
+        "motivo": null
+      },
+      {
+        "nome": "EZEQUIEL FERNANDES DE BARROS",
+        "custcode": "1.353698782",
+        "motivo": null
+      },
+      {
+        "nome": "JESUS ALBERTO MUJICA",
+        "custcode": "1.353649527",
+        "motivo": null
+      },
+      {
+        "nome": "JEFERSON SESQUE DA COSTA",
+        "custcode": "1.353606092",
+        "motivo": null
+      },
+      {
+        "nome": "ROQUE DE JESUS MACEDO",
+        "custcode": "1.353800424",
+        "motivo": null
+      },
+      {
+        "nome": "ANDREIA CALISTRO",
+        "custcode": "1.353783139",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIA SIMONE TEODORO",
+        "custcode": "1.353811385",
+        "motivo": null
+      },
+      {
+        "nome": "FELLIPE JOSE DE ALMEIDA",
+        "custcode": "1.353795749",
+        "motivo": null
+      },
+      {
+        "nome": "SILVINO ALVICIO STRIDER",
+        "custcode": "1.353510009",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS PAULINO DOS SANTOS MOREIRA",
+        "custcode": "1.353437419",
+        "motivo": null
+      },
+      {
+        "nome": "WILSON FELIX DE GODOI",
+        "custcode": "1.353719355",
+        "motivo": null
+      },
+      {
+        "nome": "EZAEL GUSTAVO PINHEIRO DOS SANTOS",
+        "custcode": "1.353467882",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE LUIZ CUNHA DE OLIVEIRA",
+        "custcode": "1.353796004",
+        "motivo": null
+      },
+      {
+        "nome": "SEBASTIAN MONTES BOTERO",
+        "custcode": "1.353914942",
+        "motivo": null
+      },
+      {
+        "nome": "ADILSON ARAUJO CAMARGO",
+        "custcode": "1.353980667",
+        "motivo": null
+      },
+      {
+        "nome": "LUCAS PEREIRA SOARES",
+        "custcode": "1.353497758",
+        "motivo": null
+      },
+      {
+        "nome": "SONIA MARIA FERREIRA",
+        "custcode": "1.353199850",
+        "motivo": null
+      },
+      {
+        "nome": "NATHASHA NATALIANY ARAUJO DOS SANTOS",
+        "custcode": "1.353753091",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE IVANILDO DA NOGUEIRA BARBOSA",
+        "custcode": "1.353789772",
+        "motivo": null
+      },
+      {
+        "nome": "FERNANDO DONIZETI CARVALHO",
+        "custcode": "1.353642886",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIEL ROCHA FABRIS",
+        "custcode": "1.353913570",
+        "motivo": null
+      },
+      {
+        "nome": "SEBASTIAO PEREIRA FILHO",
+        "custcode": "1.353317885",
+        "motivo": null
+      },
+      {
+        "nome": "SIMONETE MACEDO LOPES",
+        "custcode": "1.353542037",
+        "motivo": null
+      },
+      {
+        "nome": "DIONIFER DE FRANCA",
+        "custcode": "1.353338007",
+        "motivo": null
+      },
+      {
+        "nome": "YASLYN VALIZ ACOSTA",
+        "custcode": "1.353845771",
+        "motivo": null
+      },
+      {
+        "nome": "ADILSON PIRES FERREIRA",
+        "custcode": "1.353450339",
+        "motivo": null
+      },
+      {
+        "nome": "PEDRO DOS SANTOS FERREIRA",
+        "custcode": "1.353786823",
+        "motivo": null
+      },
+      {
+        "nome": "OSNI DOMINGOS LOPES DE LIMA",
+        "custcode": "1.353606183",
+        "motivo": null
+      },
+      {
+        "nome": "NEUZA MARTINS DA SILVA PIETRACZK",
+        "custcode": "1.353614206",
+        "motivo": null
+      },
+      {
+        "nome": "ELTON CALIXTO DE AZEVEDO",
+        "custcode": "1.353614523",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353588927",
+        "motivo": null
+      },
+      {
+        "nome": "ROSELI DA SILVA MONTE",
+        "custcode": "1.353851014",
+        "motivo": null
+      },
+      {
+        "nome": "PEDRO ALEXANDER ROJAS RAMOS",
+        "custcode": "1.353336550",
+        "motivo": null
+      },
+      {
+        "nome": "JULIA GRAZIELA MAYESKI DE CARVALHO",
+        "custcode": "1.353988943",
+        "motivo": null
+      },
+      {
+        "nome": "VANDERSON ROSA FREITAS PEREIRA",
+        "custcode": "1.353915664",
+        "motivo": null
+      },
+      {
+        "nome": "MARILENE PEREIRA DANTAS MARINHO",
+        "custcode": "1.353240231",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICIA ERICA MARTINIANO",
+        "custcode": "1.353436434",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANE PARECIDA SOARES DE RAMOS",
+        "custcode": "1.353758289",
+        "motivo": null
+      },
+      {
+        "nome": "DARCI PEREIRA",
+        "custcode": "1.353241405",
+        "motivo": null
+      },
+      {
+        "nome": "RUAN PABLO MUGUET TELES",
+        "custcode": "1.353725332",
+        "motivo": null
+      },
+      {
+        "nome": "CLEICIANE SOUZA RIBEIRO",
+        "custcode": "1.353757467",
+        "motivo": null
+      },
+      {
+        "nome": "VALDILEI HITNER PADILHA",
+        "custcode": "1.353878321",
+        "motivo": null
+      },
+      {
+        "nome": "SELMA DA SILVA SOPA",
+        "custcode": "1.353845973",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353428394",
+        "motivo": null
+      },
+      {
+        "nome": "SANDRO ALVES DOS SANTOS",
+        "custcode": "1.353901536",
+        "motivo": null
+      },
+      {
+        "nome": "IDOACLES CARVALHO ALMEIDA",
+        "custcode": "1.353994279",
+        "motivo": null
+      },
+      {
+        "nome": "RAFAELA DOS PASSOS MACANHAO",
+        "custcode": "1.354009416",
+        "motivo": null
+      },
+      {
+        "nome": "JUCIANE KOVALSKI",
+        "custcode": "1.353672635",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDETE DA ROCHA PEREIRA",
+        "custcode": "1.353605266",
+        "motivo": null
+      },
+      {
+        "nome": "JULIO CESAR DOS SANTOS",
+        "custcode": "1.353980728",
+        "motivo": null
+      },
+      {
+        "nome": "ANE KAROLINE DOS SANTOS",
+        "custcode": "1.353238457",
+        "motivo": null
+      },
+      {
+        "nome": "DIEGO PAVONI RAMOS",
+        "custcode": "1.353614344",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNA BATISTA",
+        "custcode": "1.353912642",
+        "motivo": null
+      },
+      {
+        "nome": "JOVALDIR JORGE PINTO",
+        "custcode": "1.353792085",
+        "motivo": null
+      },
+      {
+        "nome": "ELIANARA CORREA KRUTQUEVISKI",
+        "custcode": "1.353468836",
+        "motivo": null
+      },
+      {
+        "nome": "ALESSANDRO CHIODI",
+        "custcode": "1.353195238",
+        "motivo": null
+      },
+      {
+        "nome": "LIZANDRA HILGENBERG SIMIONATO",
+        "custcode": "1.353500192",
+        "motivo": null
+      },
+      {
+        "nome": "FRANCISCA RODRIGUES ANDRADE",
+        "custcode": "1.353791131",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE LUIS CAMPOS DE OLIVEIRA",
+        "custcode": "1.353306057",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ADILSON DA MAIA",
+        "custcode": "1.353703681",
+        "motivo": null
+      },
+      {
+        "nome": "ERICA SOARES HENRIQUE",
+        "custcode": "1.353677216",
+        "motivo": null
+      },
+      {
+        "nome": "ANDERSON VITORINO DE MATOS",
+        "custcode": "1.353603764",
+        "motivo": null
+      },
+      {
+        "nome": "ELIENE DE ALMEIDA",
+        "custcode": "1.353812670",
+        "motivo": null
+      },
+      {
+        "nome": "MARLENE ANGELINA FRANCA",
+        "custcode": "1.353500118",
+        "motivo": null
+      },
+      {
+        "nome": "MARILEIA BUENO MACEDO",
+        "custcode": "1.353281439",
+        "motivo": null
+      },
+      {
+        "nome": "RICHARD NATHAN DOMINGOS",
+        "custcode": "1.353354967",
+        "motivo": null
+      },
+      {
+        "nome": "SINEIA DE CASTRO FERREIRA BARTEZAL",
+        "custcode": "1.353818519",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE BARRETO",
+        "custcode": "1.353873882",
+        "motivo": null
+      },
+      {
+        "nome": "ANA CRISTINA XAVIER DA SILVA",
+        "custcode": "1.353796976",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELA STEFEN DA COSTA",
+        "custcode": "1.353934652",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTIANE DOS SANTOS",
+        "custcode": "1.353178816",
+        "motivo": null
+      },
+      {
+        "nome": "ELIENE SOARES DA SILVA",
+        "custcode": "1.353339458",
+        "motivo": null
+      },
+      {
+        "nome": "MARCELO SILVA DE LIMA",
+        "custcode": "1.353860268",
+        "motivo": null
+      },
+      {
+        "nome": "NILSON FERNANDO GUEDES GONCALVES JUNIOR",
+        "custcode": "1.353498543",
+        "motivo": null
+      },
+      {
+        "nome": "LUANA PEREIRA TONIELLO",
+        "custcode": "1.353811714",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTOPHER PEREIRA BARRETO",
+        "custcode": "1.353873827",
+        "motivo": null
+      },
+      {
+        "nome": "GISELI DE PAULA MARTINS",
+        "custcode": "1.353424473",
+        "motivo": null
+      },
+      {
+        "nome": "JUAREZ DOS SANTOS",
+        "custcode": "1.353922028",
+        "motivo": null
+      },
+      {
+        "nome": "TELMO LUIZ DOS SANTOS",
+        "custcode": "1.353905127",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS EDUARDO DE OLIVEIRA",
+        "custcode": "1.353339008",
+        "motivo": null
+      },
+      {
+        "nome": "EMANOEL MAURICIO RODRIGUES HOFFER",
+        "custcode": "1.353940819",
+        "motivo": null
+      },
+      {
+        "nome": "DANIEL EZEQUIEL DA SILVA",
+        "custcode": "1.353146091",
+        "motivo": null
+      },
+      {
+        "nome": "ADEMAR SILVA BARROS JUNIOR",
+        "custcode": "1.353262650",
+        "motivo": null
+      },
+      {
+        "nome": "VICTOR MATEUS TRINDADE RODRIGUES DE SOUSA",
+        "custcode": "1.353280058",
+        "motivo": null
+      },
+      {
+        "nome": "RYAN VARGAS CARDOSO",
+        "custcode": "1.353980631",
+        "motivo": null
+      },
+      {
+        "nome": "LARIANE DA SILVA ALVES",
+        "custcode": "1.353818557",
+        "motivo": null
+      },
+      {
+        "nome": "ALEX DE ALMEIDA",
+        "custcode": "1.353198244",
+        "motivo": null
+      },
+      {
+        "nome": "PAULO FERNANDO FERREIRA",
+        "custcode": "1.353874616",
+        "motivo": null
+      },
+      {
+        "nome": "MIRIAN APARECIDA DAVET",
+        "custcode": "1.353106792",
+        "motivo": null
+      },
+      {
+        "nome": "LORENI RODRIGUES DE MORAES",
+        "custcode": "1.353316934",
+        "motivo": null
+      },
+      {
+        "nome": "SANDYANO MOACIR MENDES",
+        "custcode": "1.353421991",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIA MARIA ARAUJO PARENTE",
+        "custcode": "1.353964292",
+        "motivo": null
+      },
+      {
+        "nome": "SURY ROSBELIS MONTANO OJEDA",
+        "custcode": "1.353509028",
+        "motivo": null
+      },
+      {
+        "nome": "NAIELE MORAES SILVEIRA",
+        "custcode": "1.353920701",
+        "motivo": null
+      },
+      {
+        "nome": "JURANEIDE REBOUÇAS DE SOUZA",
+        "custcode": "1.353981216",
+        "motivo": null
+      },
+      {
+        "nome": "EDUARDO HESSE FILHO LTDA",
+        "custcode": "1.353513542",
+        "motivo": null
+      },
+      {
+        "nome": "REBECA LILY KUNTZE",
+        "custcode": "1.353331262",
+        "motivo": null
+      },
+      {
+        "nome": "TIAGO NUNES",
+        "custcode": "1.353210891",
+        "motivo": null
+      },
+      {
+        "nome": "MARCIO DA ROSA PEREIRA",
+        "custcode": "1.353937344",
+        "motivo": null
+      },
+      {
+        "nome": "DIONES AUGUSTO RIBEIRO",
+        "custcode": "1.353295214",
+        "motivo": null
+      },
+      {
+        "nome": "RUAN BARBOSA BARROS",
+        "custcode": "1.353826551",
+        "motivo": null
+      },
+      {
+        "nome": "FERNANDO PATRICK GOMES",
+        "custcode": "1.353962789",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO CARLOS DE SOUZA CARDOSO",
+        "custcode": "1.353940138",
+        "motivo": null
+      },
+      {
+        "nome": "PAULO RODRIGUES",
+        "custcode": "1.353826698",
+        "motivo": null
+      },
+      {
+        "nome": "CLEUSA HELENA BORGES DA SILVA",
+        "custcode": "1.353919775",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA JUCELIA CARNEIRO",
+        "custcode": "1.353799344",
+        "motivo": null
+      },
+      {
+        "nome": "ANA PAULA ISMAEL",
+        "custcode": "1.353318113",
+        "motivo": null
+      },
+      {
+        "nome": "JHENIFFER APARECIDA CLAUDINO TRENTO",
+        "custcode": "1.353886872",
+        "motivo": null
+      },
+      {
+        "nome": "OSMAR MUNIZ JUNIOR",
+        "custcode": "1.353860231",
+        "motivo": null
+      },
+      {
+        "nome": "JOSIANE CORDEIRO",
+        "custcode": "1.353163478",
+        "motivo": null
+      },
+      {
+        "nome": "CINTHIA ZARDO",
+        "custcode": "1.353915940",
+        "motivo": null
+      },
+      {
+        "nome": "MARCIO SIDNEI DAMIN",
+        "custcode": "1.353177868",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANE CORREA DA LUZ",
+        "custcode": "1.353830281",
+        "motivo": null
+      },
+      {
+        "nome": "CAMILA MELLO MORAES RIBEIRO",
+        "custcode": "1.353845643",
+        "motivo": null
+      },
+      {
+        "nome": "PEDRO HENRIQUE DE MELO BRAGA",
+        "custcode": "1.353263032",
+        "motivo": null
+      },
+      {
+        "nome": "LILIBETH DE LOS ANGELES SIFONTES PEREZ",
+        "custcode": "1.353755938",
+        "motivo": null
+      },
+      {
+        "nome": "KAUE ALVES SILVA",
+        "custcode": "1.353812529",
+        "motivo": null
+      },
+      {
+        "nome": "FLAVIA APARECIDA RIBEIRO DA SILVA VARELA",
+        "custcode": "1.353940101",
+        "motivo": null
+      },
+      {
+        "nome": "EVANDRO DE OLIVEIRA NASCIMENTO",
+        "custcode": "1.353317918",
+        "motivo": null
+      },
+      {
+        "nome": "NILTOM DA CRUZ",
+        "custcode": "1.353829824",
+        "motivo": null
+      },
+      {
+        "nome": "JOSUE DOS SANTOS SOUSA",
+        "custcode": "1.353278897",
+        "motivo": null
+      },
+      {
+        "nome": "DIANA PRISCILA DA SILVA",
+        "custcode": "1.353906227",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA LUIZA BEZERRA DA SILVA",
+        "custcode": "1.353674015",
+        "motivo": null
+      },
+      {
+        "nome": "NAIR SOUZA DE OLIVEIRA",
+        "custcode": "1.353888738",
+        "motivo": null
+      },
+      {
+        "nome": "ARIOLI ESTER BORGES DE CARVALHO",
+        "custcode": "1.353811754",
+        "motivo": null
+      },
+      {
+        "nome": "RODRIGO DE SOUSA",
+        "custcode": "1.353812408",
+        "motivo": null
+      },
+      {
+        "nome": "EDER PRADE",
+        "custcode": "1.353437608",
+        "motivo": null
+      },
+      {
+        "nome": "NILVA DE LOURDES CORDOVA",
+        "custcode": "1.353937383",
+        "motivo": null
+      },
+      {
+        "nome": "ELIANE GOULART DA SILVA",
+        "custcode": "1.353129481",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA INACIA SILVA DE SOUZA",
+        "custcode": "1.353846536",
+        "motivo": null
+      },
+      {
+        "nome": "JONATHAN DA SILVA DE CHAVES",
+        "custcode": "1.353855583",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353923682",
+        "motivo": null
+      },
+      {
+        "nome": "VALDILENE PEREIRA DOS SANTOS LEMOS",
+        "custcode": "1.353247411",
+        "motivo": null
+      },
+      {
+        "nome": "CLODOALDO ANTONIO FONSECA",
+        "custcode": "1.353797644",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICIA PEREIRA LEMES",
+        "custcode": "1.353309873",
+        "motivo": null
+      },
+      {
+        "nome": "RAUL LUCIANO DOS SANTOS DA SILVA",
+        "custcode": "1.353211613",
+        "motivo": null
+      },
+      {
+        "nome": "SUSANA KIENEN ADAM",
+        "custcode": "1.353280712",
+        "motivo": null
+      },
+      {
+        "nome": "MARIEL WOLFF DO AMARAL",
+        "custcode": "1.353478788",
+        "motivo": null
+      },
+      {
+        "nome": "FLAVIO SILVA DE SOUSA",
+        "custcode": "1.353116182",
+        "motivo": null
+      },
+      {
+        "nome": "KEVIN AUGUSTO MARCOSO DOS SANTOS",
+        "custcode": "1.353318215",
+        "motivo": null
+      },
+      {
+        "nome": "MAIKEL LUAN KNEVITZ GONCALVES",
+        "custcode": "1.353483279",
+        "motivo": null
+      },
+      {
+        "nome": "JULIA CAMPOS GALPERIM",
+        "custcode": "1.353986414",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA EDUARDA DA COSTA COUTINHO",
+        "custcode": "1.353461293",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353325745",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS FREDERICO HIRDES",
+        "custcode": "1.353849779",
+        "motivo": null
+      },
+      {
+        "nome": "AIRTON PEREIRA BORGES",
+        "custcode": "1.353555638",
+        "motivo": null
+      },
+      {
+        "nome": "MIRIANE WOLFF ALVES",
+        "custcode": "1.353430459",
+        "motivo": null
+      },
+      {
+        "nome": "LEODERITE JORGE DA SILVA",
+        "custcode": "1.353486775",
+        "motivo": null
+      },
+      {
+        "nome": "JULIA SCHENATO AMARO",
+        "custcode": "1.353483517",
+        "motivo": null
+      },
+      {
+        "nome": "ANA PAULA PORTO RIOS",
+        "custcode": "1.353310205",
+        "motivo": null
+      },
+      {
+        "nome": "SUELEN DA SILVA LIMA",
+        "custcode": "1.353784045",
+        "motivo": null
+      },
+      {
+        "nome": "EZEQUIEL VINICIUS DE SOUZA BORGES",
+        "custcode": "1.353430378",
+        "motivo": null
+      },
+      {
+        "nome": "MARLIANE SALES",
+        "custcode": "1.353848305",
+        "motivo": null
+      },
+      {
+        "nome": "SIRLEI TERESINHA GALLE DOS SANTOS",
+        "custcode": "1.353849936",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS DIRCEU ANTUNES",
+        "custcode": "1.353858767",
+        "motivo": null
+      },
+      {
+        "nome": "YASMIN CHRISTINE FALCAO MONTEIRO",
+        "custcode": "1.353987314",
+        "motivo": null
+      },
+      {
+        "nome": "TEVIZ RIAN MAIA FLORES",
+        "custcode": "1.353990176",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTINA FABRI SILVANO",
+        "custcode": "1.353982463",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICIA DE SOUSA FRANCO",
+        "custcode": "1.353854708",
+        "motivo": null
+      },
+      {
+        "nome": "TAIRANA JORAS COSTA",
+        "custcode": "1.353921857",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA REGINA AZAMBUJS",
+        "custcode": "1.353434760",
+        "motivo": null
+      },
+      {
+        "nome": "MANOELA SIDNEY CUSTODIO",
+        "custcode": "1.353428109",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUER DA CUNHA",
+        "custcode": "1.353277065",
+        "motivo": null
+      },
+      {
+        "nome": "VITORIA CAROLINE SILVA DA ROSA",
+        "custcode": "1.353454096",
+        "motivo": null
+      }
+    ],
+    "_atrasados": [
+      {
+        "nome": "LAURA ALVES DOS SANTOS",
+        "custcode": "1.353905007",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA NILZA OLIVIO",
+        "custcode": "1.353784602",
+        "motivo": null
+      },
+      {
+        "nome": "DYONATHAN WILLIAN DA SILVA LUIZ",
+        "custcode": "1.353324913",
+        "motivo": null
+      },
+      {
+        "nome": "DIOGO DA SILVA",
+        "custcode": "1.353509419",
+        "motivo": null
+      },
+      {
+        "nome": "ELISEU MARTINS",
+        "custcode": "1.353310661",
+        "motivo": null
+      },
+      {
+        "nome": "MARJORI NATALI LIMA DOS SANTOS",
+        "custcode": "1.353202318",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIMARA DA COSTA MARTINS",
+        "custcode": "1.353430033",
+        "motivo": null
+      },
+      {
+        "nome": "KELLY CRISTINA DE OLIVEIRA",
+        "custcode": "1.353620528",
+        "motivo": null
+      },
+      {
+        "nome": "ACIR MONTES",
+        "custcode": "1.353261495",
+        "motivo": null
+      },
+      {
+        "nome": "ROSANA DE QUADROS DA LUZ",
+        "custcode": "1.353430072",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ALBERTO GONZALES RODRIGUES",
+        "custcode": "1.353796092",
+        "motivo": null
+      },
+      {
+        "nome": "VONIXX TELECOM LTDA",
+        "custcode": "1.353427369",
+        "motivo": null
+      },
+      {
+        "nome": "MARLI FLORENTINO PORTES DE MORAES",
+        "custcode": "1.353605251",
+        "motivo": null
+      },
+      {
+        "nome": "JAMILLY DE SOUSA COSTA",
+        "custcode": "1.353692585",
+        "motivo": null
+      },
+      {
+        "nome": "SWELEN DIANA SILVA",
+        "custcode": "1.353437425",
+        "motivo": null
+      },
+      {
+        "nome": "MARCELO LUIZ FERREIRA",
+        "custcode": "1.353882462",
+        "motivo": null
+      },
+      {
+        "nome": "PAULO RICARDO ZAHN",
+        "custcode": "1.353363399",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353437785",
+        "motivo": null
+      },
+      {
+        "nome": "VALDINEI VENCESLAU FERNANDES",
+        "custcode": "0.000000000",
+        "motivo": null
+      },
+      {
+        "nome": "SELMA GONCALVES MAJIOR",
+        "custcode": "1.353277856",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICIA GISELI DE PAULA",
+        "custcode": "1.353904977",
+        "motivo": null
+      },
+      {
+        "nome": "JOANI DE ALMEIDA",
+        "custcode": "1.353638878",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.352987830",
+        "motivo": null
+      },
+      {
+        "nome": "KATERINE SALAZAR DUANY",
+        "custcode": "1.353277047",
+        "motivo": null
+      },
+      {
+        "nome": "JOYCE CRISTINA MOREIRA",
+        "custcode": "1.353665136",
+        "motivo": null
+      },
+      {
+        "nome": "JESSICA RAYSSA DA SILVA",
+        "custcode": "1.353622109",
+        "motivo": null
+      },
+      {
+        "nome": "MARIONICE DOS SANTOS ORTIZ",
+        "custcode": "1.353568176",
+        "motivo": null
+      },
+      {
+        "nome": "KETLIN NAIARA ROCHA DE FRANCA",
+        "custcode": "1.353723455",
+        "motivo": null
+      },
+      {
+        "nome": "IZOLETE ALESSIO",
+        "custcode": "1.353329154",
+        "motivo": null
+      },
+      {
+        "nome": "JASON RODRIGUES CAMARGO",
+        "custcode": "1.353436917",
+        "motivo": null
+      },
+      {
+        "nome": "SIDINEI CELESTRINO",
+        "custcode": "1.353181541",
+        "motivo": null
+      },
+      {
+        "nome": "ANA IANKOSKI RUSSO",
+        "custcode": "1.353855558",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353671595",
+        "motivo": null
+      },
+      {
+        "nome": "MOURIVAL PEREIRA DOS SANTOS",
+        "custcode": "1.353277951",
+        "motivo": null
+      },
+      {
+        "nome": "42.379.665 JEFFERSON JHONNY DOS SANTOS",
+        "custcode": "1.354008045",
+        "motivo": null
+      },
+      {
+        "nome": "VALDECIR DE PAULA MOREIRA",
+        "custcode": "1.353987077",
+        "motivo": null
+      },
+      {
+        "nome": "RODRIGO SCHREINER",
+        "custcode": "1.353329698",
+        "motivo": null
+      },
+      {
+        "nome": "ALBERTO CARLOS DE AVILA",
+        "custcode": "1.353575115",
+        "motivo": null
+      },
+      {
+        "nome": "KALLYVAN BRENO SILVA DO ROSARIO",
+        "custcode": "1.353074629",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS ALBERTO BONASSOLI",
+        "custcode": "1.353795916",
+        "motivo": null
+      },
+      {
+        "nome": "TALITA CARINE DOS SANTOS MORAIS",
+        "custcode": "1.353499251",
+        "motivo": null
+      },
+      {
+        "nome": "CARLA ALESSANDRA DO AMARAL DOS SANTOS",
+        "custcode": "1.353308009",
+        "motivo": null
+      },
+      {
+        "nome": "VANESSA APARECIDA DE OLIVEIRA",
+        "custcode": "1.353450532",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353451251",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353682365",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIELE MILENA DA SILVA",
+        "custcode": "1.353734139",
+        "motivo": null
+      },
+      {
+        "nome": "DEIVIDI LIMA RAMOS DO NASCIMENTO",
+        "custcode": "1.353812869",
+        "motivo": null
+      },
+      {
+        "nome": "GENEROSA ALVES DE OLIVEIRA KESSLER",
+        "custcode": "1.353888368",
+        "motivo": null
+      },
+      {
+        "nome": "GEOVANE RAMOS",
+        "custcode": "1.353732851",
+        "motivo": null
+      },
+      {
+        "nome": "REGIANE VERAS DA SILVA",
+        "custcode": "1.353670865",
+        "motivo": null
+      },
+      {
+        "nome": "ERICA LUANA CARDOSO FORTES",
+        "custcode": "1.353606160",
+        "motivo": null
+      },
+      {
+        "nome": "JULIA CAMILY LOPES DE SOUZA",
+        "custcode": "1.353622099",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE HUMBERTO FRANCISCO DOS SANTOS",
+        "custcode": "1.353725834",
+        "motivo": null
+      },
+      {
+        "nome": "ELIZEU ALVES DA LAPA",
+        "custcode": "1.353719484",
+        "motivo": null
+      },
+      {
+        "nome": "ANDREA MARA SILVA PEREIRA",
+        "custcode": "1.353544436",
+        "motivo": null
+      },
+      {
+        "nome": "EDUARDA APARECIDA JACINTO",
+        "custcode": "1.353789691",
+        "motivo": null
+      },
+      {
+        "nome": "RENATA DA SILVA CELESTINO",
+        "custcode": "1.353845915",
+        "motivo": null
+      },
+      {
+        "nome": "MARLI SILVA DE OLIVEIRA",
+        "custcode": "1.353553820",
+        "motivo": null
+      },
+      {
+        "nome": "SUELI DIAS DIVINO",
+        "custcode": "1.353604810",
+        "motivo": null
+      },
+      {
+        "nome": "ANDREIA APARECIDA PEREIRA",
+        "custcode": "1.353437649",
+        "motivo": null
+      },
+      {
+        "nome": "FLAVIA CORDEIRO DA SILVA",
+        "custcode": "1.353845861",
+        "motivo": null
+      },
+      {
+        "nome": "VITOR JOSE RIBEIRO DOS SANTOS",
+        "custcode": "1.353643213",
+        "motivo": null
+      },
+      {
+        "nome": "REINALDO LUIS VALERIO",
+        "custcode": "1.353847485",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE VALMIRAN DA SILVA",
+        "custcode": "1.353486870",
+        "motivo": null
+      },
+      {
+        "nome": "JESSICA PAOLA DUARTE",
+        "custcode": "1.353719314",
+        "motivo": null
+      },
+      {
+        "nome": "VERA LUCIA LOURENCO GARCIA",
+        "custcode": "1.353672741",
+        "motivo": null
+      },
+      {
+        "nome": "VALDECI CORDEIRO",
+        "custcode": "1.353704476",
+        "motivo": null
+      },
+      {
+        "nome": "ALAN HENRIQUE DOS SANTOS MOURA",
+        "custcode": "1.353142687",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS FELIPE ALVES DA CRUZ",
+        "custcode": "1.353468906",
+        "motivo": null
+      },
+      {
+        "nome": "THAIS NUNES CORDEIRO",
+        "custcode": "1.353817465",
+        "motivo": null
+      },
+      {
+        "nome": "MARCOS ANTONIO DA LUZ FERREIRA DA COSTA",
+        "custcode": "1.353990848",
+        "motivo": null
+      },
+      {
+        "nome": "MOACYR VIANA JUNIOR",
+        "custcode": "1.353698674",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE ANTONIO ORTEGA PEREZ",
+        "custcode": "1.353552789",
+        "motivo": null
+      },
+      {
+        "nome": "JHENIFER SOARES ROSA",
+        "custcode": "1.353181530",
+        "motivo": null
+      },
+      {
+        "nome": "MARCIA KAOANE STRUGALA JONAS",
+        "custcode": "1.353371733",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTIAN ALEXANDRE GONZALEZ ENRIQUE",
+        "custcode": "1.353810302",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANO DE MELLO CREPALDI",
+        "custcode": "1.353634572",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICIA FERREIRA DE OLIVEIRA DOS SANTOS",
+        "custcode": "1.353363632",
+        "motivo": null
+      },
+      {
+        "nome": "LARISSA DOS SANTOS FRISANCO",
+        "custcode": "1.353343897",
+        "motivo": null
+      },
+      {
+        "nome": "NATAN NASCIMENTO",
+        "custcode": "1.353339195",
+        "motivo": null
+      },
+      {
+        "nome": "ROSELI DE FATIMA FERREIRA SOARES",
+        "custcode": "1.353362358",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353342562",
+        "motivo": null
+      },
+      {
+        "nome": "GIOVANNA KETHELEN ROCHA",
+        "custcode": "1.353904472",
+        "motivo": null
+      },
+      {
+        "nome": "LUANA CRISTINA DA SILVA",
+        "custcode": "1.353641445",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZ FELIPE LEAL DA SILVA",
+        "custcode": "1.353284319",
+        "motivo": null
+      },
+      {
+        "nome": "ANA CAROLINE DE LIMA",
+        "custcode": "1.353638188",
+        "motivo": null
+      },
+      {
+        "nome": "MATHEUS FERREIRA DE OLIVEIRA",
+        "custcode": "1.353394281",
+        "motivo": null
+      },
+      {
+        "nome": "IRIMAR CRISOSTOMO",
+        "custcode": "1.353674137",
+        "motivo": null
+      },
+      {
+        "nome": "MARIANA RAFAELA DE ANDRADE",
+        "custcode": "1.353267228",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353553297",
+        "motivo": null
+      },
+      {
+        "nome": "GENIVALDO APARECIDO BRAIZ",
+        "custcode": "1.353702541",
+        "motivo": null
+      },
+      {
+        "nome": "GABRIEL OLIVEIRA DA SILVA",
+        "custcode": "1.353846514",
+        "motivo": null
+      },
+      {
+        "nome": "THAYNA CRISTINE DOS SANTOS FONSECA",
+        "custcode": "1.353303205",
+        "motivo": null
+      },
+      {
+        "nome": "MARLY CARDOSO VARGAS",
+        "custcode": "1.353555506",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE IVANILDO LIMA",
+        "custcode": "1.353792104",
+        "motivo": null
+      },
+      {
+        "nome": "ROSANA DE FATIMA DA SILVA",
+        "custcode": "1.353266130",
+        "motivo": null
+      },
+      {
+        "nome": "WIVILAN DOS SANTOS FERREIRA",
+        "custcode": "1.353663747",
+        "motivo": null
+      },
+      {
+        "nome": "LUIR PEREIRA DOS SANTOS",
+        "custcode": "1.353343817",
+        "motivo": null
+      },
+      {
+        "nome": "ELSON MARALHO DIAS",
+        "custcode": "1.353551686",
+        "motivo": null
+      },
+      {
+        "nome": "JESSICA PEREIRA FEREIRA",
+        "custcode": "1.353845948",
+        "motivo": null
+      },
+      {
+        "nome": "TANIA MARA OLIVEIRA",
+        "custcode": "1.353608040",
+        "motivo": null
+      },
+      {
+        "nome": "ANGELUCIO SOARES ALVES",
+        "custcode": "1.353430000",
+        "motivo": null
+      },
+      {
+        "nome": "TIAGO FERREIRA DE SOUZA",
+        "custcode": "1.353944305",
+        "motivo": null
+      },
+      {
+        "nome": "EDSON ANDRESON DIAS PINHEIRO",
+        "custcode": "1.353371308",
+        "motivo": null
+      },
+      {
+        "nome": "ROBSON ANTUNES",
+        "custcode": "1.353636197",
+        "motivo": null
+      },
+      {
+        "nome": "ANA BEATRIZ STADLER BASSANI",
+        "custcode": "1.353821924",
+        "motivo": null
+      },
+      {
+        "nome": "GISLAINE DA MAIA",
+        "custcode": "1.353266008",
+        "motivo": null
+      },
+      {
+        "nome": "ANTONIO LIMA DE OLIVEIRA",
+        "custcode": "1.353202896",
+        "motivo": null
+      },
+      {
+        "nome": "AMANDA INGRID ARAUJO DOS REIS",
+        "custcode": "1.353915088",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNO FERNANDO GERLACH",
+        "custcode": "1.353177352",
+        "motivo": null
+      },
+      {
+        "nome": "DIANA REBECA LOPES DA SILVA",
+        "custcode": "1.353181453",
+        "motivo": null
+      },
+      {
+        "nome": "ELOYSA RUIZ ALMEIDA",
+        "custcode": "1.353361884",
+        "motivo": null
+      },
+      {
+        "nome": "JANAINA THAIS FERNANDES",
+        "custcode": "1.353496205",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353430170",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE RIBEIRO",
+        "custcode": "1.353552136",
+        "motivo": null
+      },
+      {
+        "nome": "STEPHANY CAROLINE DA SILVA ALVES",
+        "custcode": "1.353236021",
+        "motivo": null
+      },
+      {
+        "nome": "IGOR HENRIQUE RAMOS FERREIRA",
+        "custcode": "1.353200574",
+        "motivo": null
+      },
+      {
+        "nome": "SILVANO FREITAS",
+        "custcode": "1.353262413",
+        "motivo": null
+      },
+      {
+        "nome": "VANI GOMES DE MENEZES",
+        "custcode": "1.353936100",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE DOS PASSOS SANTOS",
+        "custcode": "1.353842093",
+        "motivo": null
+      },
+      {
+        "nome": "LORENA BATISTA DE ABREU",
+        "custcode": "1.353450554",
+        "motivo": null
+      },
+      {
+        "nome": "GILSO RIBEIRO NUNES",
+        "custcode": "1.353783155",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIA CALIXTO",
+        "custcode": "1.353980224",
+        "motivo": null
+      },
+      {
+        "nome": "IGREJA EVANGELICA DAS TESTEMUNHAS DE JESUS",
+        "custcode": "1.353725847",
+        "motivo": null
+      },
+      {
+        "nome": "MARCELO DE TARSO SOSA",
+        "custcode": "1.353507359",
+        "motivo": null
+      },
+      {
+        "nome": "JANAINA PIVOVAR DA COSTA",
+        "custcode": "1.353303670",
+        "motivo": null
+      },
+      {
+        "nome": "ANNA DELFINA DE CAMPOS",
+        "custcode": "1.353840085",
+        "motivo": null
+      },
+      {
+        "nome": "CELESTINA BUSKO",
+        "custcode": "1.353438157",
+        "motivo": null
+      },
+      {
+        "nome": "FATIMA DA SILVA SANTOS",
+        "custcode": "1.353995167",
+        "motivo": null
+      },
+      {
+        "nome": "KETLIN OLIVEIRA SILVA",
+        "custcode": "1.353277101",
+        "motivo": null
+      },
+      {
+        "nome": "GREICE CRISTIANE DA CONCEICAO",
+        "custcode": "1.353109874",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA LUZIA COSTA OLIVEIRA",
+        "custcode": "1.353262944",
+        "motivo": null
+      },
+      {
+        "nome": "VANIA DE OLIVEIRA SILVA",
+        "custcode": "1.353755347",
+        "motivo": null
+      },
+      {
+        "nome": "60.927.156 MARLI CAVALHEIRO DOS SANTOS",
+        "custcode": "1.353692538",
+        "motivo": null
+      },
+      {
+        "nome": "PRISCILA VANSUITA",
+        "custcode": "1.353613609",
+        "motivo": null
+      },
+      {
+        "nome": "KAREN CRISTINA KLUG MACHADO",
+        "custcode": "1.353177969",
+        "motivo": null
+      },
+      {
+        "nome": "EDERSON DE OLIVEIRA",
+        "custcode": "1.353906139",
+        "motivo": null
+      },
+      {
+        "nome": "NEUSA RODRIGUES FARIAS",
+        "custcode": "1.353873620",
+        "motivo": null
+      },
+      {
+        "nome": "ANTENOR CORREA",
+        "custcode": "1.353798670",
+        "motivo": null
+      },
+      {
+        "nome": "WILLIAN DA SILVA BUCH",
+        "custcode": "1.353279987",
+        "motivo": null
+      },
+      {
+        "nome": "ANANILDO SILVA DE SOUSA",
+        "custcode": "1.353332900",
+        "motivo": null
+      },
+      {
+        "nome": "MATHEUS EDUARDO DA SILVA",
+        "custcode": "1.353846486",
+        "motivo": null
+      },
+      {
+        "nome": "EDUARDO FIRMINO DE MARAFAGIO",
+        "custcode": "1.353210269",
+        "motivo": null
+      },
+      {
+        "nome": "GILSON FERNANDES",
+        "custcode": "1.353981109",
+        "motivo": null
+      },
+      {
+        "nome": "ROSSIANE MACHADO FERREIRA",
+        "custcode": "1.353734212",
+        "motivo": null
+      },
+      {
+        "nome": "ROSANE DA SILVA",
+        "custcode": "1.353846553",
+        "motivo": null
+      },
+      {
+        "nome": "ELAINE APARECIDA CLAUDINO",
+        "custcode": "1.353933304",
+        "motivo": null
+      },
+      {
+        "nome": "ELIZETE VARGAS JESUS",
+        "custcode": "1.353828794",
+        "motivo": null
+      },
+      {
+        "nome": "JOSE VINICIUS DE OLIVEIRA SANTOS",
+        "custcode": "1.353795912",
+        "motivo": null
+      },
+      {
+        "nome": "THAIS ALESSANDRA DOS SANTOS",
+        "custcode": "1.353429219",
+        "motivo": null
+      },
+      {
+        "nome": "ZENAIDE RIBEIRO",
+        "custcode": "1.353183336",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANE LUIZ CAMPOS",
+        "custcode": "1.353920123",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE TEIXEIRA FELIPE",
+        "custcode": "1.353247129",
+        "motivo": null
+      },
+      {
+        "nome": "FELIPHE STEFANIO FERREIRA DE JESUS",
+        "custcode": "1.353430812",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO MARIA DA SILVA",
+        "custcode": "1.353828485",
+        "motivo": null
+      },
+      {
+        "nome": "KAROLLYNE CRISTINA QUINOLI DIAS",
+        "custcode": "1.353944926",
+        "motivo": null
+      },
+      {
+        "nome": "RHARIEL PINTO DA SILVA",
+        "custcode": "1.353200882",
+        "motivo": null
+      },
+      {
+        "nome": "RODRIGO ANTONIO CABRAL",
+        "custcode": "1.353210887",
+        "motivo": null
+      },
+      {
+        "nome": "VALDELINA MARIA DOS PRAZERES",
+        "custcode": "1.353240692",
+        "motivo": null
+      },
+      {
+        "nome": "RUBENS DA SILVA CAMPOS FILHO",
+        "custcode": "1.353918047",
+        "motivo": null
+      },
+      {
+        "nome": "SUSEANE COSTA DOS SANTOS",
+        "custcode": "1.353860654",
+        "motivo": null
+      },
+      {
+        "nome": "LUSSANDRO FERNANDES PEREIRA",
+        "custcode": "1.353940082",
+        "motivo": null
+      },
+      {
+        "nome": "GILBERTO MIRIT SILVA",
+        "custcode": "1.353486708",
+        "motivo": null
+      },
+      {
+        "nome": "SEBASTIAO JOSE PEREIRA",
+        "custcode": "1.353940189",
+        "motivo": null
+      },
+      {
+        "nome": "DEBORA LUCIANA DA SILVA",
+        "custcode": "1.353166062",
+        "motivo": null
+      },
+      {
+        "nome": "ANDERSON SOUZA SANTANA",
+        "custcode": "1.353521928",
+        "motivo": null
+      },
+      {
+        "nome": "ALICE CASAIS DE ALMEIDA",
+        "custcode": "1.353460823",
+        "motivo": null
+      },
+      {
+        "nome": "LUIZ ALBERTO DA SILVA",
+        "custcode": "1.353940105",
+        "motivo": null
+      },
+      {
+        "nome": "DANIEL DE LIMA CARVALHO",
+        "custcode": "1.353552667",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA LUIZA AMARAL DE JESUS",
+        "custcode": "1.353342693",
+        "motivo": null
+      },
+      {
+        "nome": "ALDORI ALVES CORREA",
+        "custcode": "1.353902829",
+        "motivo": null
+      },
+      {
+        "nome": "REGINA STEL PEREIRA SCHLINDWEIN",
+        "custcode": "1.353826569",
+        "motivo": null
+      },
+      {
+        "nome": "VANESSA HELOISE TEIXEIRA DOS SANTOS",
+        "custcode": "1.353178793",
+        "motivo": null
+      },
+      {
+        "nome": "LUCIANO CASTRO PEREIRA",
+        "custcode": "1.353200870",
+        "motivo": null
+      },
+      {
+        "nome": "ALINE VITORIA DE SOUSA",
+        "custcode": "1.353146833",
+        "motivo": null
+      },
+      {
+        "nome": "RODOLFO JORGE DOS SANTOS RODRIGUES JUNIOR",
+        "custcode": "1.353424552",
+        "motivo": null
+      },
+      {
+        "nome": "INGRID DE FATIMA SILVA",
+        "custcode": "1.353884510",
+        "motivo": null
+      },
+      {
+        "nome": "ANDRE RIBEIRO DOS SANTOS",
+        "custcode": "1.353859573",
+        "motivo": null
+      },
+      {
+        "nome": "MAGDA RAQUEL DE SOUZA",
+        "custcode": "1.353147115",
+        "motivo": null
+      },
+      {
+        "nome": "GEOVANE PEREIRA DOS SANTOS",
+        "custcode": "1.353823855",
+        "motivo": null
+      },
+      {
+        "nome": "JAMES RICKY CORTES DA CUNHA",
+        "custcode": "1.353344381",
+        "motivo": null
+      },
+      {
+        "nome": "SUELEN APARECIDA STANQUEVICZ",
+        "custcode": "1.353485120",
+        "motivo": null
+      },
+      {
+        "nome": "MARCELI APARECIDA CARDOSO FOGACA",
+        "custcode": "1.353325826",
+        "motivo": null
+      },
+      {
+        "nome": "MAYCKON GARCIA GRIEBLER",
+        "custcode": "1.353860252",
+        "motivo": null
+      },
+      {
+        "nome": "IRENE RAFAELE PEREIRA ORIBES",
+        "custcode": "1.353982890",
+        "motivo": null
+      },
+      {
+        "nome": "CLEITON DE SOUZA ROSA",
+        "custcode": "1.353819437",
+        "motivo": null
+      },
+      {
+        "nome": "PATRICK DIEGO DE SOUZA BOUCAO",
+        "custcode": "1.353901249",
+        "motivo": null
+      },
+      {
+        "nome": "TANIA MASIERO",
+        "custcode": "1.353990141",
+        "motivo": null
+      },
+      {
+        "nome": "DIVA DE FATIMA RIBEIRO DA CRUZ",
+        "custcode": "1.353145973",
+        "motivo": null
+      },
+      {
+        "nome": "ABRAAO DE JESUS LIMA",
+        "custcode": "1.353183058",
+        "motivo": null
+      },
+      {
+        "nome": "CAMILA DA SILVA FERREIRA",
+        "custcode": "1.353730755",
+        "motivo": null
+      },
+      {
+        "nome": "CARLOS EDUARDO THOMAS DOS SANTOS",
+        "custcode": "1.353450086",
+        "motivo": null
+      },
+      {
+        "nome": "CAROLINA CARVALHO NAYMAIER",
+        "custcode": "1.353485687",
+        "motivo": null
+      },
+      {
+        "nome": "SANDRO RODRIGUES DA SILVA",
+        "custcode": "1.353458472",
+        "motivo": null
+      },
+      {
+        "nome": "ROSA MARIA DA SILVA",
+        "custcode": "1.353752954",
+        "motivo": null
+      },
+      {
+        "nome": null,
+        "custcode": "1.353456611",
+        "motivo": null
+      },
+      {
+        "nome": "NELSI DE ARAUJO CARVALHO",
+        "custcode": "1.353820820",
+        "motivo": null
+      },
+      {
+        "nome": "RAQUEL DOS SANTOS",
+        "custcode": "1.353648494",
+        "motivo": null
+      },
+      {
+        "nome": "KELLY CRISTINA DE ANDRADE",
+        "custcode": "1.353202873",
+        "motivo": null
+      },
+      {
+        "nome": "NILTON RENNER",
+        "custcode": "1.353135058",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANO DA SILVA",
+        "custcode": "1.353494884",
+        "motivo": null
+      },
+      {
+        "nome": "EDERSON FERNANDO DOS SANTOS BRATZ",
+        "custcode": "1.353646656",
+        "motivo": null
+      },
+      {
+        "nome": "PEDRO HENRIQUE LOPES DUARTE",
+        "custcode": "1.353343682",
+        "motivo": null
+      },
+      {
+        "nome": "RICARDO FRAGA DOS SANTOS",
+        "custcode": "1.353358401",
+        "motivo": null
+      },
+      {
+        "nome": "JUREMA MACIEL DA SILVA",
+        "custcode": "1.353647802",
+        "motivo": null
+      },
+      {
+        "nome": "AUGUSTO HERMES DA SILVA",
+        "custcode": "1.353344835",
+        "motivo": null
+      },
+      {
+        "nome": "ADRIANO RODRIGUES MACHADO",
+        "custcode": "1.353327214",
+        "motivo": null
+      },
+      {
+        "nome": "DOUGLAS VASCONCELOS TOBIN",
+        "custcode": "1.353883395",
+        "motivo": null
+      },
+      {
+        "nome": "BRENDA SA BIFANO MARIA",
+        "custcode": "1.353915386",
+        "motivo": null
+      },
+      {
+        "nome": "GISLAINE IGNACIO DA SILVA",
+        "custcode": "1.353687158",
+        "motivo": null
+      },
+      {
+        "nome": "HELAINE DA ROSA SIMON",
+        "custcode": "1.353964946",
+        "motivo": null
+      },
+      {
+        "nome": "AMANDA DA SILVA GUEDES",
+        "custcode": "1.353344430",
+        "motivo": null
+      },
+      {
+        "nome": "ELISANGELA SALLES DE AGUIAR SIMOES",
+        "custcode": "1.353674095",
+        "motivo": null
+      },
+      {
+        "nome": "VINICIUS DA ROSA SOUZA",
+        "custcode": "1.353555926",
+        "motivo": null
+      },
+      {
+        "nome": "PAULO EMERSON PRESTES SEFRIM",
+        "custcode": "1.353469176",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS FELIPE JARDIM SILVADOR",
+        "custcode": "1.353883818",
+        "motivo": null
+      },
+      {
+        "nome": "MARILENE FABIOLA DO CARMO SILVA MARTINY",
+        "custcode": "1.353196189",
+        "motivo": null
+      },
+      {
+        "nome": "53.369.701 CARLOS HENRIQUE DE JESUS CHAVES",
+        "custcode": "1.353792826",
+        "motivo": null
+      },
+      {
+        "nome": "MARCELO PAZ DA SILVA",
+        "custcode": "1.353448231",
+        "motivo": null
+      },
+      {
+        "nome": "FERNANDA CARDOSO FIGUEIREDO",
+        "custcode": "1.353616488",
+        "motivo": null
+      },
+      {
+        "nome": "CRISTIANO BUENO RODRIGUES",
+        "custcode": "1.353198159",
+        "motivo": null
+      },
+      {
+        "nome": "LUIS FERNANDO OLIVEIRA DOS SANTOS",
+        "custcode": "1.353430854",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNA DA CONCEICAO",
+        "custcode": "1.353468829",
+        "motivo": null
+      },
+      {
+        "nome": "ELEMAR CASTRO CARVALHO",
+        "custcode": "1.353569844",
+        "motivo": null
+      },
+      {
+        "nome": "CLARA ANGELITA CANDIDA FONTOURA OLIVEIRA",
+        "custcode": "1.353796241",
+        "motivo": null
+      },
+      {
+        "nome": "OHANA CARDOSO DOS SANTOS NUNES",
+        "custcode": "1.353492032",
+        "motivo": null
+      },
+      {
+        "nome": "DOUGLAS ALENCAR DE ANDRADE",
+        "custcode": "1.353343691",
+        "motivo": null
+      },
+      {
+        "nome": "LUAN RODRIGUES LOPES",
+        "custcode": "1.353826514",
+        "motivo": null
+      },
+      {
+        "nome": "JANETE BENICE MARQUES LOUREIRO",
+        "custcode": "1.353677719",
+        "motivo": null
+      },
+      {
+        "nome": "MAYARA MACHADO DOS PASSOS",
+        "custcode": "1.353915363",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO ALEXANDRE DE MORAES PINTO",
+        "custcode": "1.353687694",
+        "motivo": null
+      },
+      {
+        "nome": "VANESSA KAMINSKI FERREIRA",
+        "custcode": "1.353813155",
+        "motivo": null
+      },
+      {
+        "nome": "GUSTAVO DE OLIVEIRA VILLASBOAS",
+        "custcode": "1.353692701",
+        "motivo": null
+      },
+      {
+        "nome": "FERNANDA DA SILVA FREITAS",
+        "custcode": "1.353884402",
+        "motivo": null
+      },
+      {
+        "nome": "JOAO BATISTA DOS SANTOS",
+        "custcode": "1.353457156",
+        "motivo": null
+      },
+      {
+        "nome": "MARIA EDUARDA BARRETO DOS SANTOS",
+        "custcode": "1.353555913",
+        "motivo": null
+      },
+      {
+        "nome": "BRUNA VITORIA DA CRUZ MAIA",
+        "custcode": "1.353356830",
+        "motivo": null
+      },
+      {
+        "nome": "CLAUDIOMIRO DO NASCIMENTO",
+        "custcode": "1.353915869",
+        "motivo": null
+      }
+    ],
+    "congeladoEm": "2026-08-10T18:36:40.172Z"
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "SC2": {
+    "ultimoRun": "2026-08-10T20:32:50.436Z",
+    "total": 94,
+    "sucesso": 93
+  },
+  "PR2": {
+    "ultimoRun": "2026-08-10T20:32:40.019Z",
+    "total": 95,
+    "sucesso": 93
+  },
+  "SC": {
+    "ultimoRun": "2026-08-10T19:24:46.116Z",
+    "total": 15,
+    "sucesso": 14
+  },
+  "RS2": {
+    "ultimoRun": "2026-08-10T20:32:18.534Z",
+    "total": 100,
+    "sucesso": 98
+  },
+  "PR": {
+    "ultimoRun": "2026-08-10T20:29:26.965Z",
+    "total": 91,
+    "sucesso": 89
+  },
+  "RS": {
+    "ultimoRun": "2026-08-10T20:33:14.239Z",
+    "total": 98,
+    "sucesso": 95
+  }
+}

@@ -13729,7 +13729,7 @@
     "nome": "LUANA FLORSINO",
     "cpf": "089.679.049-59",
     "contatoPrincipal": "5545999888272",
-    "contatoResponsavel": "550",
+    "contatoResponsavel": "55550",
     "os": "1-1693292576772",
     "mesGrossManual": "10/2025"
   },
@@ -43857,13 +43857,13 @@
     "mesGrossManual": "05/2026"
   },
   {
-    "vendedor": "INDICADOR PAULO BOTTURA",
+    "os": "1-1759420021206",
     "nome": "JOSMAR DE OLIVEIRA",
     "cpf": "385.391.959-68",
     "contatoPrincipal": "5549998091720",
     "contatoResponsavel": "5549999691322",
-    "os": "1-1760373668111",
-    "mesGrossManual": "05/2026"
+    "mesGrossManual": "05/2026",
+    "vendedor": ""
   },
   {
     "vendedor": "INDICADOR ELIEZER",
@@ -44190,13 +44190,13 @@
     "mesGrossManual": "05/2026"
   },
   {
-    "vendedor": "RAFAEL MEDEIROS",
+    "os": "1-1760574585953",
     "nome": "SONIA APARECIDA PEREIRA",
     "cpf": "671.111.149-49",
     "contatoPrincipal": "5549998132593",
     "contatoResponsavel": "5549999566234",
-    "os": "1-1760574050217",
-    "mesGrossManual": "05/2026"
+    "mesGrossManual": "05/2026",
+    "vendedor": ""
   },
   {
     "vendedor": "INDICADOR ELIEZER",
@@ -44208,13 +44208,13 @@
     "mesGrossManual": "05/2026"
   },
   {
-    "vendedor": "KELVIN MURILO",
+    "os": "1-1760754587725",
     "nome": "MARCIA ORGANEK DOS SANTOS",
     "cpf": "097.398.549-66",
     "contatoPrincipal": "5541998155376",
     "contatoResponsavel": "5541999197398",
-    "os": "1-1760768940396",
-    "mesGrossManual": "05/2026"
+    "mesGrossManual": "05/2026",
+    "vendedor": ""
   },
   {
     "vendedor": "FABIANA",
@@ -45036,13 +45036,13 @@
     "mesGrossManual": "05/2026"
   },
   {
-    "vendedor": "INDICADOR ELIEZER",
+    "os": "1-1764987856069",
     "nome": "LEANDRO RODRIGUES SILVA",
     "cpf": "49.213.866/0001-70",
     "contatoPrincipal": "5551989728524",
     "contatoResponsavel": "5551993479197",
-    "os": "1-1764931438787",
-    "mesGrossManual": "05/2026"
+    "mesGrossManual": "05/2026",
+    "vendedor": ""
   },
   {
     "vendedor": "EDON GUSTAVO",
@@ -49635,24 +49635,6 @@
     "vendedor": ""
   },
   {
-    "os": "1-1760754587725",
-    "nome": "MARCIA ORGANEK DOS SANTOS",
-    "cpf": "097.398.549-66",
-    "contatoPrincipal": "5541998155376",
-    "contatoResponsavel": "5541999197398",
-    "mesGrossManual": "05/2026",
-    "vendedor": ""
-  },
-  {
-    "os": "1-1759420021206",
-    "nome": "JOSMAR DE OLIVEIRA",
-    "cpf": "385.391.959-68",
-    "contatoPrincipal": "5549998091720",
-    "contatoResponsavel": "5549999691322",
-    "mesGrossManual": "05/2026",
-    "vendedor": ""
-  },
-  {
     "os": "1-1761864109059",
     "nome": "MARTA BEATRIZ ADLERRODRIGUES",
     "cpf": "386.007.739-20",
@@ -49671,21 +49653,13 @@
     "vendedor": ""
   },
   {
-    "os": "1-1760574585953",
-    "nome": "SONIA APARECIDA PEREIRA",
-    "cpf": "671.111.149-49",
-    "contatoPrincipal": "5549998132593",
-    "contatoResponsavel": "5549999566234",
-    "mesGrossManual": "05/2026",
-    "vendedor": ""
-  },
-  {
-    "os": "1-1764987856069",
-    "nome": "LEANDRO RODRIGUES SILVA",
-    "cpf": "49.213.866/0001-70",
-    "contatoPrincipal": "5551989728524",
-    "contatoResponsavel": "5551993479197",
-    "mesGrossManual": "05/2026",
-    "vendedor": ""
+    "os": "1-1691546092349",
+    "nome": "",
+    "cpf": "",
+    "contatoPrincipal": null,
+    "contatoResponsavel": null,
+    "mesGrossManual": null,
+    "vendedor": "",
+    "custcode": "1.348165255"
   }
 ]

@@ -1,0 +1,2936 @@
+[
+  {
+    "os": "1-1708291772894",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709142858186",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710375682985",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709835168379",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708866795416",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708994682314",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707045432697",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710688318889",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1706968508551",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708855501701",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709859180221",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709130806298",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707585816277",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710175350621",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710393453856",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710111813856",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709957570382",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710107878529",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708292739530",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707582867648",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710635747788",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707819362802",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709561983601",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709784840451",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708973221245",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708439645632",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710173548739",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709793841010",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708278314219",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708542074643",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710673900609",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707069827692",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707447766186",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710389183512",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709935766406",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1707273162552",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709838950778",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708732704207",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708986101080",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709636741491",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708976963348",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710549218972",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707582469453",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707041131518",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710384447742",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707080214824",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708238149335",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706771115398",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707382680392",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710169116724",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707252335141",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707364797371",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710290661441",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709147136341",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708498007792",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707250631743",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709547878574",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710259416392",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706722522530",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709944334560",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708895218977",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710132393451",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710304847091",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710425457697",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707640038406",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709250445923",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709045707153",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708883624797",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710317226237",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709143286291",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709235018065",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708495900222",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709676298135",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707451949853",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707256139808",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707582551095",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710632765841",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707076597927",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707236054996",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709836029792",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708871106658",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710558029778",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707966136202",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708277923946",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708983800692",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "DOWNGRADE"
+  },
+  {
+    "os": "1-1709959326750",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708694533909",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1708999388362",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707038183648",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706758623576",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710290131757",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1707839866568",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708731802730",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709786448798",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707575810617",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707217177923",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710177412595",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710313944266",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708525705897",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1708492568791",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710499629789",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710261302569",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707196509697",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707058690211",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707276493794",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709819953069",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710408084386",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710569599148",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708433184032",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710313924100",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710629109109",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710169336546",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708873168734",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707218537126",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710314683263",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710677727387",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710163196910",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709155829086",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710157332959",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709688076866",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1707235569304",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "RECOMPRA_GROSS"
+  },
+  {
+    "os": "1-1710163613267",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707389715958",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709503653011",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709821746944",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708826435300",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708282497729",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710511806380",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710163490891",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708689666715",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708506467205",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710678163212",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709808742030",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710683035908",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709538855806",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708632484871",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710248133139",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "DOWNGRADE"
+  },
+  {
+    "os": "1-1708808748905",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710330641251",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708737631078",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710373632233",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710275013210",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708736677528",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710400677686",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709925948051",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707264331944",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1707633056271",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707608280470",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707960409843",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707982829912",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709161115946",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707052464087",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708727657839",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710560279196",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710158057737",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710152670829",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710322285359",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709133372009",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710314140923",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710560970092",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1705815018438",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707793871543",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707221406280",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707878270952",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709050081553",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709643771955",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707418771506",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707644645519",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709516273602",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707860626892",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709655528181",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710501475508",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707853420857",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707036841554",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707419076533",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709833763232",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709563675975",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710685373148",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708857035874",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710252362662",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709508266095",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707060561373",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709681149869",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1707250303597",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706740536187",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707069336256",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709189639155",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709310020192",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708651211692",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709567742502",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708998172946",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707042640097",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708699008901",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709953946882",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708501393998",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709459746711",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708677145091",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710189856665",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1708447881026",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707379071656",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710533492202",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710180116443",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709536713910",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707605067257",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707444087586",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708812138753",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707662181526",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1706867696393",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710385416124",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710284940270",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1707054970324",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707067892316",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710540928618",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706470677272",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710552960855",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710559257029",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709541480165",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706726098342",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707101602425",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709137508748",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1708995056389",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710681032213",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708863612130",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707060642675",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710432471657",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710272559491",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708712497314",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708277986706",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708489804778",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708278313285",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710559264226",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710248192452",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709846223200",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709790915136",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707775702428",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709861777961",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707046054816",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707267986506",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709041612607",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710193814405",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706349298240",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706323321276",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708651391549",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707023672733",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707824655016",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710330074970",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709647515074",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1707211968919",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709684216455",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710149376826",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708257931999",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708492037108",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709162012384",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710397203218",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710564546091",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709840719562",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709957870089",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "RECOMPRA_GROSS"
+  },
+  {
+    "os": "1-1709818847644",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710260802267",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706730089239",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709653396180",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709795601905",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710690276149",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708218937997",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709152720463",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707079471295",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708243108488",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709828813398",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707057747454",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707574898317",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706503414829",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707848203028",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707066331288",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "RECOMPRA_GROSS"
+  },
+  {
+    "os": "1-1710157940323",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710279925991",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710172881335",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707384988202",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709162010668",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707623632186",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708830874723",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709699317005",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709680220630",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710287105315",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707833854744",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707841824037",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708639397484",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710572245292",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709573407371",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709511612789",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709801133198",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707093924119",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707638772440",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1707278668129",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710256710466",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707576322137",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709939793008",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710185775500",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709667290052",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708973221894",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707217404866",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707442337693",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709927669825",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709048423777",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710389100857",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708269237839",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709043661238",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "DOWNGRADE"
+  },
+  {
+    "os": "1-1709693099120",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709154058416",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708288845293",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710113635326",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707600147856",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707054695739",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710280931823",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1707851019356",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709697806383",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707986889455",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710166471560",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710121096204",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708843205697",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708736960228",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706851622702",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709675355665",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708845412139",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710513463093",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709824808005",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706485328498",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707453047810",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707368525003",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709385371406",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707978156402",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708869142265",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708811360775",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710510251776",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710541889490",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710314185153",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706507385313",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708725286686",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707264849437",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708834282865",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708866588600",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706773426795",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710115079897",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709503259866",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706717205549",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708690562091",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708436946112",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710569575675",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710640757468",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708820335547",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710306685935",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710517146686",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708896937732",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710419228989",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1707453045366",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710436358984",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710431812420",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710545319590",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710329092992",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709835434110",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709631035176",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709127413781",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709637256033",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707572696046",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708830207134",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707576444995",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710383491677",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708886364095",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708228355522",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707860243106",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707259852012",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707419777540",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709710952779",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708538529733",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709510615451",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707251990893",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707797382157",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709934459489",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "RECOMPRA_GROSS"
+  },
+  {
+    "os": "1-1707405605287",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708657242025",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "DOWNGRADE"
+  },
+  {
+    "os": "1-1707632701637",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707579450697",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709509764381",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709690306862",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710444358868",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707381596706",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708302373213",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1710131723344",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708881498317",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708293920380",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707775085122",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709533406475",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1708872488792",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707432527081",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706860619928",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708895083767",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708664197802",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708835010348",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709512240921",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708461169113",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708503864970",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710560848816",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707842485731",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708443176500",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709942783221",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709040623373",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708253149054",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709683392399",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710659867738",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708857445955",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707096475009",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706860630030",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707087942273",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707084983323",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707991741110",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1706476528808",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707843136086",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707053842491",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707087044945",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707263285004",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708674802427",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707095849347",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708464509894",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710143997276",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708669365250",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710432035393",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709673825187",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710379165036",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710119643526",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710448365055",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707593950801",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709635741924",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709639795149",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707069574147",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1709693845054",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708828611970",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710625663882",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708718285271",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707601711714",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706713219561",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709668142384",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710674040299",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708268749712",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706747302759",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710553138592",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707424483724",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707575162061",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708699956974",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710409250529",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710175464072",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706724040731",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709054827567",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709129639937",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707797555318",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707575040128",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSPENSO"
+  },
+  {
+    "os": "1-1710304270374",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710185987816",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708670631041",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709142789891",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707038870605",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707222543719",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708707865079",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706742320925",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709975899594",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709142724539",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709558329252",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1709798457453",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707958886730",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1709120116044",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708835174421",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709825621798",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710386468204",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710301377216",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708532937574",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707861578497",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1708546049100",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710386447695",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1710161865506",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "SUSP_FRAUDE"
+  },
+  {
+    "os": "1-1710435788368",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709653318915",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1707798826994",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709052741580",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "CHURN_VOL"
+  },
+  {
+    "os": "1-1708689894707",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710282306722",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1709150813126",
+    "mesGross": "02/2026",
+    "eleg": false,
+    "motivo": "INADIMPLENTE"
+  },
+  {
+    "os": "1-1708528162700",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1706716425132",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707265806561",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1710134051483",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  },
+  {
+    "os": "1-1707273486397",
+    "mesGross": "02/2026",
+    "eleg": true,
+    "motivo": "GROSS COM QUALIDADE"
+  }
+]

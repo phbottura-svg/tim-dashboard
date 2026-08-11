@@ -1,0 +1,212 @@
+[
+  {
+    "recebidoEm": "2026-07-28T20:13:57.644Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:13:57.925Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar c�digo boleto",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:13:58.180Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 9999
+      },
+      "sender": {
+        "phone_number": "+5541900000000"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:23:12.138Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:24:44.698Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar c�digo boleto",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:24:46.040Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 7777
+      },
+      "sender": {
+        "phone_number": "+5541900000000"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:24:47.401Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Falar com Atendente",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:24:48.740Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Bom dia",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:28:29.748Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar c�digo boleto",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:28:31.117Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-28T20:35:56.062Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar código boleto",
+      "conversation": {
+        "id": 4155
+      },
+      "sender": {
+        "phone_number": "+5541996965606"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-29T14:48:50.621Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 555
+      },
+      "sender": {
+        "phone_number": "+5541999998888"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-29T14:51:01.755Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar chave Pix",
+      "conversation": {
+        "id": 666
+      },
+      "sender": {
+        "phone_number": "+5541977776666"
+      }
+    }
+  },
+  {
+    "recebidoEm": "2026-07-29T14:51:02.569Z",
+    "body": {
+      "event": "message_created",
+      "message_type": "incoming",
+      "content_type": "text",
+      "content": "Copiar código boleto",
+      "conversation": {
+        "id": 555
+      },
+      "sender": {
+        "phone_number": "+5541999998888"
+      }
+    }
+  }
+]

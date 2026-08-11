@@ -2291,6 +2291,9 @@ app.post('/api/comando/disparar', apenasLocal, (req, res) => {
   const args = ['disparar-faturas.js', relatorio, `--delay=${delay}`, `--lote=${lote}`, `--pausa-lote=${pausaLote}`];
   if (limite > 0) args.push(`--limit=${limite}`);
   if (req.body?.forcar) args.push('--forcar');
+  // Por padrão quem tem fatura vencida recebe só a vencida; marcar "todas as
+  // faturas" volta a enviar também as a vencer desses clientes.
+  if (req.body?.todasFaturas) args.push('--todas-faturas');
   emitirEvento('disparo', { msg: `📤 Iniciando disparo: ${escolhido}${limite > 0 ? ` (limite: ${limite})` : ''}`, status: 'rodando' });
   processoDisparo = spawn('node', args, { cwd: PLAYWRIGHT_PATH });
   // Salvar PID para recuperação após restart do servidor

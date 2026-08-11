@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   carregarHistoricoRobos();
 });
 
-const DISPARO_CAMPOS = ['disparo-forcar', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
+const DISPARO_CAMPOS = ['disparo-forcar', 'disparo-todas-faturas', 'disparo-delay', 'disparo-lote', 'disparo-pausa-lote', 'disparo-limite'];
 
 function restaurarEstadoDisparo() {
   for (const id of DISPARO_CAMPOS) {
@@ -1797,7 +1797,7 @@ async function dispararFaturas() {
   try {
     const d = await fetch('/api/comando/disparar', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ relatorio, limite: limite || undefined, delay, lote, pausaLote, forcar: document.getElementById('disparo-forcar')?.checked || false }),
+      body: JSON.stringify({ relatorio, limite: limite || undefined, delay, lote, pausaLote, forcar: document.getElementById('disparo-forcar')?.checked || false, todasFaturas: document.getElementById('disparo-todas-faturas')?.checked || false }),
     }).then(r => r.json());
     if (d.erro) adicionarLog('Erro: ' + d.erro, 'disparo-log');
     else { adicionarLog('Disparando: ' + d.relatorio, 'disparo-log'); atualizarBotoesDisparo(true); }

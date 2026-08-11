@@ -547,6 +547,9 @@
         <label class="filtro-toggle" style="border-color:var(--vermelho); color:var(--vermelho)" title="Reenvia mesmo para quem já recebeu, em qualquer dia anterior">
           <input type="checkbox" id="disparo-forcar" style="accent-color:var(--vermelho)" onchange="salvarEstadoDisparo(); atualizarInfoRelatorio()"> Reenviar já disparados
         </label>
+        <label class="filtro-toggle" title="Desmarcado (padrão): quem tem fatura vencida recebe SÓ a vencida. Marcado: envia também as faturas a vencer desses clientes.">
+          <input type="checkbox" id="disparo-todas-faturas" onchange="salvarEstadoDisparo(); atualizarInfoRelatorio()"> Enviar também faturas a vencer
+        </label>
         <button class="btn btn-primary" id="btn-disparar" onclick="dispararFaturas()">📤 Disparar WhatsApp</button>
         <button class="btn btn-danger" id="btn-parar-disparo" onclick="pararDisparo()" style="display:none">⏹ Parar Disparo</button>
       </div>

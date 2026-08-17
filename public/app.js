@@ -1678,7 +1678,10 @@ async function atualizarInfoRelatorio() {
     const hojeMsg = d.disparadosHojeMsg || 0;
     const hojeStr = hojeMsg > 0 ? ` <span style="color:var(--verde);font-size:11px">(+${hojeMsg} hoje)</span>` : '';
     if (info) {
-      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${dispMsg} / ${totalMsg} msgs disparadas${hojeStr} · ⏳ ${pendMsg} pendentes`
+      const desdeStr = d.baseEm
+        ? ` <span style="font-size:11px;color:var(--cinza,#8a94a8)">(desta base, gerada ${new Date(d.baseEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })})</span>`
+        : '';
+      info.innerHTML = `📋 ${d.total} cliente(s) · 📨 ${dispMsg} / ${totalMsg} msgs disparadas${hojeStr}${desdeStr} · ⏳ ${pendMsg} pendentes`
         + (fatStr ? `<br>📊 ${fatStr}` : '');
       info.style.color = pendMsg > 0 ? 'var(--azul-c)' : 'var(--verde)';
     }

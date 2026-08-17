@@ -2157,20 +2157,27 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     let totalDisparos = 0;
     for (const r of sucesso) totalDisparos += pdfsDoCliente(r, todasFaturas).length;
 
+    // "Já enviado" conta só o que saiu DEPOIS de a base ser gerada — igual ao
+    // disparador. Antes somava o histórico inteiro (desde junho) e os números não
+    // tinham relação com o relatório selecionado.
+    const mData = arquivo.match(/(\d{4})-(\d{2})-(\d{2})_(\d{2})-(\d{2})/);
+    const baseEm = mData
+      ? new Date(+mData[1], +mData[2] - 1, +mData[3], +mData[4], +mData[5]).getTime()
+      : (fs.statSync(filePath).mtimeMs || 0);
+    const inicioHoje = new Date(); inicioHoje.setHours(0, 0, 0, 0);
+
     const jaEnviadosPdfs = new Set();
-    const hoje = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
     const hojePdfs = new Set();
     if (fs.existsSync(DISPARO_LOG_PATH)) {
       const logFiles = fs.readdirSync(DISPARO_LOG_PATH).filter(f => f.endsWith('.json')).sort();
       for (const f of logFiles) {
         try {
           const entries = JSON.parse(fs.readFileSync(path.join(DISPARO_LOG_PATH, f), 'utf8'));
-          const eHoje = f.startsWith(`disparo_${hoje}`) || f === 'disparo_parcial.json';
           for (const e of (Array.isArray(entries) ? entries : [])) {
-            if (e.status === 'enviado' && e.pdf) {
-              jaEnviadosPdfs.add(e.pdf);
-              if (eHoje) hojePdfs.add(e.pdf);
-            }
+            if (e.status !== 'enviado' || !e.pdf) continue;
+            const t = e.timestamp ? new Date(e.timestamp).getTime() : 0;
+            if (t >= baseEm) jaEnviadosPdfs.add(e.pdf);
+            if (t >= inicioHoje.getTime()) hojePdfs.add(e.pdf);
           }
         } catch {}
       }
@@ -2197,7 +2204,7 @@ app.get('/api/relatorios/info/:arquivo', (req, res) => {
     }
 
     res.json({
-      total: totalClientes, totalDisparos, disparados, disparadosMsg, disparadosHojeMsg,
+      total: totalClientes, totalDisparos, disparados, disparadosMsg, disparadosHojeMsg, baseEm,
       pendentes: totalClientes - disparados, linhas: rows.length,
       clientesUmaFatura, clientesDuasFaturas, clientesTresMaisFaturas,
     });

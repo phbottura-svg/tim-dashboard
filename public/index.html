@@ -276,9 +276,16 @@
       <select id="tabela-filtro-safra" class="filtro-select-sm" onchange="buscarTabela()">
         <option value="">Todas Safras</option>
       </select>
-      <select id="tabela-filtro-vencimento" class="filtro-select-sm" onchange="buscarTabela()">
-        <option value="">Todos Vencimentos</option>
-      </select>
+      <div id="venc-multi" class="venc-multi">
+        <button type="button" id="venc-multi-btn" class="filtro-select-sm venc-multi-btn" onclick="toggleVencMenu(event)">Todos Vencimentos ▾</button>
+        <div id="venc-multi-menu" class="venc-multi-menu" hidden>
+          <div class="venc-multi-top">
+            <span id="venc-multi-count">Selecione as datas</span>
+            <button type="button" class="venc-multi-clear" onclick="vencMultiLimpar()">Limpar</button>
+          </div>
+          <div id="venc-multi-lista" class="venc-multi-lista"></div>
+        </div>
+      </div>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-churn" onchange="buscarTabela()"> Churn</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-sem-match" onchange="buscarTabela()"> Sem Match</label>
       <label class="filtro-toggle filtro-acionaveis"><input type="checkbox" id="tabela-filtro-acionaveis" onchange="buscarTabela()"> ⚡ Acionáveis</label>

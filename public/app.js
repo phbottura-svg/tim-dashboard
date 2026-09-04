@@ -133,8 +133,8 @@ async function enviarFilaParaRobo() {
   if (ufTabela) p.set('uf', ufTabela);
   const safra = document.getElementById('tabela-filtro-safra')?.value;
   if (safra) p.set('safra', safra);
-  const vencimento = document.getElementById('tabela-filtro-vencimento')?.value;
-  if (vencimento) p.set('dataVencimento', vencimento);
+  const vencimentos = getVencimentosSelecionados();
+  if (vencimentos.length) p.set('dataVencimento', vencimentos.join(','));
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
@@ -566,17 +566,58 @@ async function carregarOpcoesFiltros() {
         selSafra.appendChild(o);
       });
     }
-    const selVenc = document.getElementById('tabela-filtro-vencimento');
-    if (selVenc) {
-      selVenc.innerHTML = '<option value="">Todos Vencimentos</option>';
-      d.datasVencimento?.forEach(v => {
-        const o = document.createElement('option');
-        o.value = v; o.textContent = v;
-        selVenc.appendChild(o);
+    const listaVenc = document.getElementById('venc-multi-lista');
+    if (listaVenc) {
+      const selecionadasAntes = new Set(getVencimentosSelecionados());
+      listaVenc.innerHTML = '';
+      (d.datasVencimento || []).forEach(v => {
+        const lab = document.createElement('label');
+        lab.className = 'venc-multi-item';
+        const chk = document.createElement('input');
+        chk.type = 'checkbox';
+        chk.value = v;
+        chk.checked = selecionadasAntes.has(v);
+        chk.addEventListener('change', () => { atualizarLabelVenc(); buscarTabela(); });
+        lab.appendChild(chk);
+        lab.appendChild(document.createTextNode(' ' + v));
+        listaVenc.appendChild(lab);
       });
+      atualizarLabelVenc();
     }
   } catch {}
 }
+
+// ─── Filtro de Vencimentos (seleção múltipla) ────────────────────────────────
+
+function getVencimentosSelecionados() {
+  return Array.from(document.querySelectorAll('#venc-multi-lista input:checked')).map(c => c.value);
+}
+
+function atualizarLabelVenc() {
+  const btn = document.getElementById('venc-multi-btn');
+  if (!btn) return;
+  const sel = getVencimentosSelecionados();
+  btn.textContent = (sel.length === 0 ? 'Todos Vencimentos' : `${sel.length} data(s) selecionada(s)`) + ' ▾';
+}
+
+function toggleVencMenu(e) {
+  e.stopPropagation();
+  const menu = document.getElementById('venc-multi-menu');
+  if (menu) menu.hidden = !menu.hidden;
+}
+
+function vencMultiLimpar() {
+  document.querySelectorAll('#venc-multi-lista input:checked').forEach(c => { c.checked = false; });
+  atualizarLabelVenc();
+  buscarTabela();
+}
+
+// Fecha o menu ao clicar fora
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('venc-multi');
+  const menu = document.getElementById('venc-multi-menu');
+  if (wrap && menu && !menu.hidden && !wrap.contains(e.target)) menu.hidden = true;
+});
 
 function coletarFiltros() {
   const p = new URLSearchParams();
@@ -760,7 +801,7 @@ async function importarSonar(input, estado) {
     const d = await r.json();
     if (d.erro) mostrarMsg(`❌ Erro ${estado}: ` + d.erro, 'erro');
     else {
-      mostrarMsg(`✅ ${estado}: ${d.total} registros importados · ${d.cruzados} cruzamentos`, 'ok');
+      mostrarMsg(`✅ ${estado}: ${d.noArquivo} no arquivo · ${d.preservados} preservadas (${d.osPreservadas} OS que sairam da TIM) · ${d.total} na base · ${d.cruzados} cruzamentos`, 'ok');
       await carregarStatusImportacao();
       await carregarOpcoesFiltrosReset();
       await carregarTudo();
@@ -1078,8 +1119,8 @@ async function carregarTabela() {
   if (ufTabela) p.set('uf', ufTabela);
   const safra = document.getElementById('tabela-filtro-safra')?.value;
   if (safra) p.set('safra', safra);
-  const vencimento = document.getElementById('tabela-filtro-vencimento')?.value;
-  if (vencimento) p.set('dataVencimento', vencimento);
+  const vencimentos = getVencimentosSelecionados();
+  if (vencimentos.length) p.set('dataVencimento', vencimentos.join(','));
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
@@ -1199,8 +1240,11 @@ function onIqCheckbox(qual) {
 }
 
 function limparTodosFiltros() {
-  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-vencimento'];
+  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  // Limpa a seleção múltipla de vencimentos
+  document.querySelectorAll('#venc-multi-lista input:checked').forEach(c => { c.checked = false; });
+  if (typeof atualizarLabelVenc === 'function') atualizarLabelVenc();
   const topo = document.getElementById('filtro-mesGross');
   const atalho = document.getElementById('tabela-filtro-mesgross');
   if (topo) topo.value = '';

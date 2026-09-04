@@ -233,6 +233,26 @@ function salvarJSON(filePath, data) {
   fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
 }
 
+// Copia o arquivo antes de sobrescrever. Guarda as 10 ultimas versoes de cada
+// base — da pra voltar atras de uma importacao errada sem a pasta crescer sem fim.
+function backupJSON(filePath) {
+  try {
+    if (!fs.existsSync(filePath)) return null;
+    const dir = path.join(DATA_PATH, 'backups');
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    const base = path.basename(filePath, '.json');
+    const ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+    const destino = path.join(dir, `${base}.${ts}.json`);
+    fs.copyFileSync(filePath, destino);
+    fs.readdirSync(dir)
+      .filter(f => f.startsWith(base + '.') && f.endsWith('.json'))
+      .sort()
+      .slice(0, -10)
+      .forEach(f => { try { fs.unlinkSync(path.join(dir, f)); } catch {} });
+    return destino;
+  } catch { return null; }
+}
+
 // ─── SSE ─────────────────────────────────────────────────────────────────────
 
 app.get('/api/eventos', (req, res) => {
@@ -793,17 +813,22 @@ app.get('/api/iq-safra', (req, res) => {
 function aplicarFiltros(lista, q) {
   let l = lista;
   if (q.safra)         l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));
-  if (q.dataVencimento) l = l.filter(c => {
-    const faturas = (c.faturas || []).filter(f => f.dataVencimento);
-    if (!faturas.length) return false;
-    const ultima = faturas[faturas.length - 1];
-    // Última fatura deve ter a data selecionada e estar INADIMPLENTE
-    if (ultima.dataVencimento !== q.dataVencimento) return false;
-    if (ultima.status !== 'INADIMPLENTE') return false;
-    // Todas as faturas anteriores devem estar ADIMPLENTES
-    const anteriores = faturas.slice(0, -1);
-    return anteriores.every(f => f.status === 'ADIMPLENTE');
-  });
+  if (q.dataVencimento) {
+    // Aceita UMA ou VÁRIAS datas (separadas por vírgula) — cliente entra se a
+    // última fatura casar com QUALQUER uma das datas selecionadas.
+    const datasAlvo = new Set(String(q.dataVencimento).split(',').map(s => s.trim()).filter(Boolean));
+    l = l.filter(c => {
+      const faturas = (c.faturas || []).filter(f => f.dataVencimento);
+      if (!faturas.length) return false;
+      const ultima = faturas[faturas.length - 1];
+      // Última fatura deve ter UMA das datas selecionadas e estar INADIMPLENTE
+      if (!datasAlvo.has(ultima.dataVencimento)) return false;
+      if (ultima.status !== 'INADIMPLENTE') return false;
+      // Todas as faturas anteriores devem estar ADIMPLENTES
+      const anteriores = faturas.slice(0, -1);
+      return anteriores.every(f => f.status === 'ADIMPLENTE');
+    });
+  }
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));
   if (q.uf)       l = l.filter(c => c.uf === q.uf);
@@ -1003,6 +1028,31 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
   }
 });
 
+// A Sonar so mantem cada venda por 12 meses depois do Mes Gross: quando a safra
+// completa 1 ano, a TIM tira do relatorio TODOS os clientes dela de uma vez (a
+// safra 07/2025 sumiu no export de julho/2026, a 08/2025 no de agosto/2026 — 369
+// clientes e 2.998 faturas). Importar substituindo o arquivo apagava esse
+// historico junto, inclusive faturas em aberto que ainda importam pra cobranca e
+// clawback. Por isso a importacao mescla em vez de trocar: a fatura que vem no
+// arquivo novo atualiza a que ja existia (status de pagamento so evolui, nunca
+// regride) e o que nao vier no arquivo fica preservado. Chave: OS + numero da
+// fatura. O efeito colateral aceito e que fatura removida pela TIM por correcao
+// tambem sobrevive — some do relatorio deles, permanece aqui.
+function mesclarSonar(antigos, novos) {
+  const chave = r => `${r.os}|${r.numeroFatura ?? ''}`;
+  const idx = new Map();
+  antigos.forEach(r => idx.set(chave(r), r));
+  let atualizados = 0, adicionados = 0;
+  novos.forEach(r => {
+    if (idx.has(chave(r))) atualizados++; else adicionados++;
+    idx.set(chave(r), r);
+  });
+  const osNovas = new Set(novos.map(r => r.os));
+  const osPreservadas = [...new Set(antigos.map(r => r.os))].filter(os => !osNovas.has(os)).length;
+  const registros = [...idx.values()];
+  return { registros, adicionados, atualizados, preservados: registros.length - novos.length, osPreservadas };
+}
+
 // ─── Importar Sonar CSV ───────────────────────────────────────────────────────
 
 app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
@@ -1054,14 +1104,40 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
       status: calcularStatus(r['STATUS PAGAMENTO'], r['DATA VENCIMENTO']),
     })).filter(r => r.os);
 
-    salvarJSON(BASE_SONAR[estado], processados);
+    const anteriores = lerJSON(BASE_SONAR[estado], []);
+    const merge = mesclarSonar(anteriores, processados);
+    backupJSON(BASE_SONAR[estado]);
+    salvarJSON(BASE_SONAR[estado], merge.registros);
+
     const meta = lerJSON(SONAR_META_PATH, {});
     if (!meta.sonar) meta.sonar = {};
-    meta.sonar[estado] = { total: processados.length, importadoEm: new Date().toISOString() };
+    meta.sonar[estado] = {
+      total: merge.registros.length,
+      noArquivo: processados.length,
+      adicionados: merge.adicionados,
+      atualizados: merge.atualizados,
+      preservados: merge.preservados,
+      osPreservadas: merge.osPreservadas,
+      importadoEm: new Date().toISOString(),
+    };
     salvarJSON(SONAR_META_PATH, meta);
 
     const baseCruzada = cruzarBases();
-    res.json({ ok: true, estado, total: processados.length, cruzados: baseCruzada.filter(c => c.cruzado).length });
+    emitirEvento('cache', {
+      msg: `Sonar ${estado}: ${processados.length} faturas no arquivo, ${merge.preservados} preservadas de importacoes anteriores (${merge.osPreservadas} OS que a TIM ja removeu)`,
+      ts: new Date().toISOString(),
+    });
+    res.json({
+      ok: true,
+      estado,
+      total: merge.registros.length,
+      noArquivo: processados.length,
+      adicionados: merge.adicionados,
+      atualizados: merge.atualizados,
+      preservados: merge.preservados,
+      osPreservadas: merge.osPreservadas,
+      cruzados: baseCruzada.filter(c => c.cruzado).length,
+    });
   } catch (err) {
     res.status(500).json({ erro: err.message });
   }

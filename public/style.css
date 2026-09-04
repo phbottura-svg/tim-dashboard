@@ -542,6 +542,39 @@ textarea:-webkit-autofill {
   transition: border-color 0.2s;
 }
 .filtro-select-sm:focus { border-color: var(--azul); }
+
+/* Filtro de Vencimentos com seleção múltipla (checkboxes) */
+.venc-multi { position: relative; display: inline-block; }
+.venc-multi-btn { text-align: left; min-width: 170px; }
+.venc-multi-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  z-index: 50;
+  width: 220px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+  padding: 8px;
+}
+.venc-multi-top {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 11px; color: var(--dim); padding: 2px 4px 8px;
+  border-bottom: 1px solid var(--border); margin-bottom: 6px;
+}
+.venc-multi-clear {
+  background: none; border: none; color: var(--azul-c, #60a5fa);
+  cursor: pointer; font-size: 11px; padding: 0;
+}
+.venc-multi-lista { max-height: 260px; overflow-y: auto; display: flex; flex-direction: column; gap: 2px; }
+.venc-multi-item {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 12px; color: var(--texto);
+  padding: 5px 6px; border-radius: 6px; cursor: pointer;
+}
+.venc-multi-item:hover { background: var(--bg3); }
+.venc-multi-item input { cursor: pointer; }
 .filtro-toggle {
   display: flex; align-items: center; gap: 5px;
   font-size: 12px; color: var(--dim);

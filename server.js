@@ -881,8 +881,12 @@ function aplicarFiltros(lista, q) {
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));
   if (q.uf)       l = l.filter(c => c.uf === q.uf);
   if (q.vendedor) l = l.filter(c => c.vendedor === q.vendedor);
-  if (q.status)   l = l.filter(c => q.status.split(',').includes(c.status));
-  if (q.statusTabela) l = l.filter(c => c.status === q.statusTabela);
+  // !c.churn nos dois: mesma regra dos cards do topo (Adimplentes/Inadimplentes
+  // excluem churn). Sem isso, um cliente cancelado cujo status da última fatura
+  // ficou "ADIMPLENTE" aparecia no filtro Adimplente mesmo sendo churn — os
+  // números da tabela não batiam com os cards (ver card "Churn", categoria à parte).
+  if (q.status)   l = l.filter(c => q.status.split(',').includes(c.status) && !c.churn);
+  if (q.statusTabela) l = l.filter(c => c.status === q.statusTabela && !c.churn);
   if (q.contatos === '2') l = l.filter(c => (c.contatos?.length || 0) >= 2);
   if (q.contatos === '1') l = l.filter(c => (c.contatos?.length || 0) === 1);
   if (q.churn === '1') l = l.filter(c => c.churn);

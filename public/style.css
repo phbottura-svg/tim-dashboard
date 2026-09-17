@@ -387,6 +387,9 @@ textarea:-webkit-autofill {
 .kpi-laranja { border-color: rgba(255,145,66,0.35); }
 .kpi-laranja .kpi-value { color: var(--laranja); }
 
+.kpi-cinza { border-color: rgba(136,146,164,0.3); }
+.kpi-cinza .kpi-value { color: var(--dim); }
+
 .kpi-pct .kpi-value { font-size: 26px; color: var(--verde); }
 .kpi-ts .kpi-value { color: var(--azul-c); }
 .kpi-hora { font-size: 28px !important; }

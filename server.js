@@ -1320,6 +1320,11 @@ app.get('/api/resumo', (req, res) => {
     const inadimplentes = f.filter(c => c.status === 'INADIMPLENTE' && !c.churn).length;
     // PAGO_ATRASO conta como adimplente aqui — já foi pago, só que fora do prazo.
     const adimplentes = f.filter(c => (c.status === 'ADIMPLENTE' || c.status === 'PAGO_ATRASO') && !c.churn).length;
+    // Cliente sem nenhuma fatura cruzada com o Sonar (status SEM DADOS) não é
+    // adimplente, inadimplente nem churn — ficava "escondido" nos cards antes
+    // (o total não fechava com a soma dos 3). Por subtração pra nunca deixar
+    // de fechar, mesmo se aparecer algum status novo no futuro.
+    const semDados = total - adimplentes - inadimplentes - churn;
 
     // IQ da safra selecionada no filtro "Mês Gross" do topo (card ao lado de
     // Fatura 1). Sem um mês especifico escolhido não há uma janela única de
@@ -1352,10 +1357,11 @@ app.get('/api/resumo', (req, res) => {
     }
 
     res.json({
-      total, adimplentes, inadimplentes, churn,
+      total, adimplentes, inadimplentes, churn, semDados,
       com2Contatos, soSoPrincipal, semCruzamento, totalFaturasPdf,
       pctAdimplentes: total > 0 ? +(adimplentes / total * 100).toFixed(1) : 0,
       pctInadimplentes: total > 0 ? +(inadimplentes / total * 100).toFixed(1) : 0,
+      pctSemDados: total > 0 ? +(semDados / total * 100).toFixed(1) : 0,
       faturaStats,
       iqSafra,
       iqVendedor,

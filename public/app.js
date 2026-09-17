@@ -936,6 +936,8 @@ async function carregarResumo() {
     setText('v-inadimplentes', fmt(d.inadimplentes));
     setText('v-pct-inadim', pct(d.inadimplentes, d.total) + ' do total');
     setText('v-churn', fmt(d.churn));
+    setText('v-sem-dados', fmt(d.semDados));
+    setText('v-pct-sem-dados', pct(d.semDados, d.total) + ' do total');
     setText('v-com2', fmt(d.com2Contatos));
     setText('v-pct-com2', pct(d.com2Contatos, d.total) + ' da base');
     setText('v-so1', fmt(d.soSoPrincipal));

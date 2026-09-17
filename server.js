@@ -1332,6 +1332,25 @@ app.get('/api/resumo', (req, res) => {
       delete iqSafra._atrasados;
     }
 
+    // IQ do vendedor selecionado, na mesma safra do card acima — mesmo cálculo
+    // de calcularIQPorVendedor, só que devolvendo a linha de UM vendedor em vez
+    // da lista inteira. Só existe quando Mês Gross E Vendedor estão escolhidos.
+    let iqVendedor = null;
+    if (req.query.mesGross && req.query.vendedor) {
+      const porVendedor = calcularIQPorVendedor(req.query.mesGross);
+      const linha = porVendedor.ranking.find(v => v.vendedor === req.query.vendedor);
+      if (linha) {
+        iqVendedor = {
+          ...linha,
+          safra: porVendedor.safra,
+          oficial: porVendedor.oficial,
+          previa: porVendedor.previa,
+          congelado: porVendedor.congelado,
+          dataCorte: porVendedor.dataCorte,
+        };
+      }
+    }
+
     res.json({
       total, adimplentes, inadimplentes, churn,
       com2Contatos, soSoPrincipal, semCruzamento, totalFaturasPdf,
@@ -1339,6 +1358,7 @@ app.get('/api/resumo', (req, res) => {
       pctInadimplentes: total > 0 ? +(inadimplentes / total * 100).toFixed(1) : 0,
       faturaStats,
       iqSafra,
+      iqVendedor,
       ultimaAtualizacao: meta.ultimaAtualizacao || null,
     });
   } catch (err) { res.status(500).json({ erro: err.message }); }

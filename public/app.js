@@ -968,6 +968,34 @@ async function carregarResumo() {
       </div>`;
     })();
 
+    // Card do IQ do VENDEDOR selecionado (ao lado do IQ da safra) — só aparece
+    // quando o filtro "Vendedor" está escolhido junto do Mês Gross. Mesma
+    // regra de cálculo, só que devolvendo o número de um vendedor só.
+    const cardIQVendedor = (() => {
+      const vendedorSel = document.getElementById('filtro-vendedor')?.value;
+      if (!vendedorSel) return '';
+      const r = d.iqVendedor;
+      if (!r) {
+        const temMes = !!document.getElementById('filtro-mesGross')?.value;
+        return `<div class="kpi kpi-iq" title="IQ do vendedor na safra selecionada">
+          <div class="kpi-label">🎯 IQ ${vendedorSel}</div>
+          <div class="kpi-value">—</div>
+          <div class="kpi-sub">${temMes ? 'sem clientes desse vendedor nessa safra' : 'selecione um Mês Gross'}</div>
+        </div>`;
+      }
+      const corIQ = r.percentual >= 80 ? 'kpi-verde' : r.percentual >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
+      const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM'
+        : r.previa ? ' · prévia (safra em andamento)'
+        : r.congelado ? ' · 🔒 estimativa travada'
+        : ' · estimativa por atraso';
+      const amostraTxt = r.amostraBaixa ? ' · ⚠️ amostra baixa' : '';
+      return `<div class="kpi ${corIQ}" title="Corte em ${r.dataCorte}">
+        <div class="kpi-label">🎯 IQ ${r.vendedor}</div>
+        <div class="kpi-value">${r.percentual}%</div>
+        <div class="kpi-sub">${fmt(r.ok)} de ${fmt(r.total)} dentro do IQ${fonteTxt}${amostraTxt}</div>
+      </div>`;
+    })();
+
     // Cards dinâmicos por fatura
     const grid = document.getElementById('kpi-faturas-grid');
     if (grid && d.faturaStats) {
@@ -980,7 +1008,7 @@ async function carregarResumo() {
           <div class="kpi-sub">${fmt(s.pagas)} pagas · ${fmt(s.naoPagas)} não pagas · ${fmt(s.total)} clientes</div>
         </div>`;
       }).join('');
-      grid.innerHTML = cardIQ + cardsFatura;
+      grid.innerHTML = cardIQ + cardIQVendedor + cardsFatura;
     }
   } catch (err) { console.error('Erro resumo:', err); }
 }

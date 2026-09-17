@@ -612,8 +612,8 @@ function calcularIQSafra(safra) {
     totalClientes: cohort.length,
     clientesOk: ok.length,
     percentual: cohort.length ? Math.round((ok.length / cohort.length) * 1000) / 10 : null,
-    _ok: ok.map(c => ({ nome: c.nome, custcode: c.custcode, motivo: oficialPorOS?.[c.os]?.motivo || null })),
-    _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode, motivo: oficialPorOS?.[c.os]?.motivo || null })),
+    _ok: ok.map(c => ({ nome: c.nome, custcode: c.custcode, vendedor: c.vendedor || null, motivo: oficialPorOS?.[c.os]?.motivo || null })),
+    _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode, vendedor: c.vendedor || null, motivo: oficialPorOS?.[c.os]?.motivo || null })),
   };
 
   if (elegivelParaTravar) {
@@ -625,6 +625,43 @@ function calcularIQSafra(safra) {
   }
 
   return resultado;
+}
+
+// IQ por vendedor dentro de uma safra — reaproveita o MESMO cálculo de
+// calcularIQSafra (_ok/_atrasados), então nunca diverge do card "IQ Safra"
+// nem do filtro Dentro/Fora do IQ da tabela: é a mesma lista, só reagrupada
+// por vendedor em vez de somada no total. minAmostra sinaliza vendedores com
+// poucos clientes na safra, onde 1 atraso já derruba o percentual muito —
+// não exclui, só marca pra quem for ler saber que a amostra é pequena.
+function calcularIQPorVendedor(safra, minAmostra = 3) {
+  const r = calcularIQSafra(safra);
+  const porVendedor = {};
+  const add = (vendedor, dentro) => {
+    const nome = vendedor || '(sem vendedor)';
+    if (!porVendedor[nome]) porVendedor[nome] = { vendedor: nome, total: 0, ok: 0 };
+    porVendedor[nome].total++;
+    if (dentro) porVendedor[nome].ok++;
+  };
+  (r._ok || []).forEach(c => add(c.vendedor, true));
+  (r._atrasados || []).forEach(c => add(c.vendedor, false));
+
+  const ranking = Object.values(porVendedor).map(v => ({
+    ...v,
+    atrasados: v.total - v.ok,
+    percentual: Math.round((v.ok / v.total) * 1000) / 10,
+    amostraBaixa: v.total < minAmostra,
+  })).sort((a, b) => a.percentual - b.percentual || b.total - a.total);
+
+  return {
+    safra,
+    dataCorte: r.dataCorte,
+    dataReferencia: r.dataReferencia,
+    previa: r.previa,
+    oficial: r.oficial,
+    congelado: r.congelado,
+    minAmostra,
+    ranking,
+  };
 }
 
 // Diagnóstico: abre o número do IQ de uma safra qualquer (com ou sem
@@ -807,6 +844,17 @@ app.get('/api/iq-safra', (req, res) => {
     const resultado = calcularIQSafra(safra);
     if (req.query.detalhe !== '1') { delete resultado._ok; delete resultado._atrasados; }
     res.json(resultado);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+app.get('/api/iq-safra/vendedores', (req, res) => {
+  try {
+    const { safra } = req.query;
+    if (!safra || !/^\d{2}\/\d{4}$/.test(safra)) {
+      return res.status(400).json({ erro: 'Informe a safra no formato MM/YYYY' });
+    }
+    const minAmostra = Number(req.query.minAmostra) || 3;
+    res.json(calcularIQPorVendedor(safra, minAmostra));
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

@@ -1010,6 +1010,7 @@ async function carregarGraficos() {
     carregarEstados(p),
     carregarEvolucao(p),
     carregarVendedores(p),
+    carregarIQVendedores(),
     carregarDisparos(p),
     carregarRobo(p),
   ]);
@@ -1081,6 +1082,33 @@ async function carregarVendedores(p) {
       datasets: [{ label: 'Inadimplentes', data: d.valores, backgroundColor: 'rgba(255,61,87,0.8)', borderRadius: 4 }],
     }, { indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#8892a4' }, grid: { color: 'rgba(30,30,74,0.8)' } }, y: { ticks: { color: '#8892a4', font: { size: 10 } }, grid: { display: false } } } });
   } catch {}
+}
+
+async function carregarIQVendedores() {
+  const div = document.getElementById('iq-vendedores-tabela');
+  const sub = document.getElementById('iq-vendedores-sub');
+  if (!div) return;
+  const safra = document.getElementById('filtro-mesGross')?.value;
+  if (!safra) {
+    div.innerHTML = '';
+    if (sub) sub.textContent = 'selecione um Mês Gross no filtro pra ver o IQ de cada vendedor naquela safra';
+    return;
+  }
+  try {
+    const d = await fetch('/api/iq-safra/vendedores?safra=' + encodeURIComponent(safra)).then(r => r.json());
+    if (d.erro || !d.ranking) { div.innerHTML = ''; if (sub) sub.textContent = d.erro || 'sem dados'; return; }
+    const fonteTxt = d.oficial ? '✅ fechamento oficial TIM' : d.previa ? 'prévia (safra em andamento)' : d.congelado ? '🔒 estimativa travada' : 'estimativa por atraso';
+    if (sub) sub.textContent = `safra ${d.safra} · ${fonteTxt} · pior IQ primeiro`;
+    if (!d.ranking.length) { div.innerHTML = '<p class="dim">Nenhum vendedor com cliente nessa safra.</p>'; return; }
+    div.innerHTML = `<table class="tabela-simples">
+      <thead><tr><th>Vendedor</th><th>IQ</th><th>Dentro</th><th>Fora</th><th>Total</th></tr></thead>
+      <tbody>${d.ranking.map(v => {
+        const cor = v.percentual >= 80 ? 'txt-verde' : v.percentual >= 50 ? 'txt-amarelo' : 'txt-vermelho';
+        const amostra = v.amostraBaixa ? ` <span class="tag-amostra-baixa" title="Amostra pequena (menos de ${d.minAmostra}) — 1 atraso pesa muito no %">amostra baixa</span>` : '';
+        return `<tr><td>${v.vendedor}${amostra}</td><td class="${cor}"><b>${v.percentual}%</b></td><td>${v.ok}</td><td>${v.atrasados}</td><td>${v.total}</td></tr>`;
+      }).join('')}</tbody>
+    </table>`;
+  } catch { div.innerHTML = ''; if (sub) sub.textContent = 'erro ao carregar'; }
 }
 
 async function carregarDisparos(p) {

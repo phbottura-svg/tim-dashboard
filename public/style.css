@@ -1425,3 +1425,22 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
   margin-top: 6px;
 }
 .btn-limpar:hover { background: var(--vermelho); color: #fff; }
+
+/* ─── IQ por Vendedor ──────────────────────────────────────────────────────── */
+.tabela-iq-vendedores { max-height: 320px; overflow-y: auto; }
+.tabela-simples { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tabela-simples th {
+  text-align: left; padding: 6px 10px; color: var(--dim);
+  font-weight: 600; font-size: 11px; text-transform: uppercase;
+  border-bottom: 1px solid var(--bg3);
+  position: sticky; top: 0; background: var(--bg2);
+}
+.tabela-simples td { padding: 6px 10px; border-bottom: 1px solid rgba(136,146,164,0.1); }
+.tabela-simples tbody tr:hover { background: rgba(136,146,164,0.06); }
+.txt-verde    { color: var(--verde); }
+.txt-amarelo  { color: var(--amarelo); }
+.txt-vermelho { color: var(--vermelho); }
+.tag-amostra-baixa {
+  font-size: 10px; color: var(--dim); border: 1px solid rgba(136,146,164,0.3);
+  border-radius: 4px; padding: 1px 5px; margin-left: 4px; white-space: nowrap;
+}

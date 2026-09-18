@@ -970,31 +970,43 @@ async function carregarResumo() {
       </div>`;
     })();
 
-    // Card do IQ do VENDEDOR selecionado (ao lado do IQ da safra) — só aparece
-    // quando o filtro "Vendedor" está escolhido junto do Mês Gross. Mesma
-    // regra de cálculo, só que devolvendo o número de um vendedor só.
+    // Card do IQ do VENDEDOR selecionado (ao lado do IQ da safra). Com Mês
+    // Gross escolhido junto, mostra o IQ NAQUELA safra. Sem Mês Gross, o
+    // backend já devolve a média geral (todas as safras em que ele vendeu)
+    // em vez de nada — só fica vazio se o vendedor não tiver nenhum cliente
+    // no IQ (custcode zerado etc).
     const cardIQVendedor = (() => {
       const vendedorSel = document.getElementById('filtro-vendedor')?.value;
       if (!vendedorSel) return '';
       const r = d.iqVendedor;
       if (!r) {
         const temMes = !!document.getElementById('filtro-mesGross')?.value;
-        return `<div class="kpi kpi-iq" title="IQ do vendedor na safra selecionada">
+        return `<div class="kpi kpi-iq" title="IQ do vendedor">
           <div class="kpi-label">🎯 IQ ${vendedorSel}</div>
           <div class="kpi-value">—</div>
-          <div class="kpi-sub">${temMes ? 'sem clientes desse vendedor nessa safra' : 'selecione um Mês Gross'}</div>
+          <div class="kpi-sub">${temMes ? 'sem clientes desse vendedor nessa safra' : 'sem clientes desse vendedor no IQ'}</div>
         </div>`;
       }
       const corIQ = r.percentual >= 80 ? 'kpi-verde' : r.percentual >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
-      const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM'
-        : r.previa ? ' · prévia (safra em andamento)'
-        : r.congelado ? ' · 🔒 estimativa travada'
-        : ' · estimativa por atraso';
       const amostraTxt = r.amostraBaixa ? ' · ⚠️ amostra baixa' : '';
-      return `<div class="kpi ${corIQ}" title="Corte em ${r.dataCorte}">
-        <div class="kpi-label">🎯 IQ ${r.vendedor}</div>
+      const rotulo = r.geral ? `🎯 IQ ${r.vendedor} (geral)` : `🎯 IQ ${r.vendedor} — ${r.safra}`;
+      let subTxt, tituloTxt;
+      if (r.geral) {
+        const abertasTxt = r.safrasAbertas ? ` (${r.safrasFechadas} fechada(s) + ${r.safrasAbertas} em andamento)` : '';
+        subTxt = `${fmt(r.ok)} de ${fmt(r.total)} dentro do IQ · média de ${r.safrasComVenda} safra(s)${abertasTxt}${amostraTxt}`;
+        tituloTxt = 'Soma o cohort do vendedor em todas as safras — selecione um Mês Gross pra ver uma safra só';
+      } else {
+        const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM'
+          : r.previa ? ' · prévia (safra em andamento)'
+          : r.congelado ? ' · 🔒 estimativa travada'
+          : ' · estimativa por atraso';
+        subTxt = `${fmt(r.ok)} de ${fmt(r.total)} dentro do IQ${fonteTxt}${amostraTxt}`;
+        tituloTxt = `Corte em ${r.dataCorte}`;
+      }
+      return `<div class="kpi ${corIQ}" title="${tituloTxt}">
+        <div class="kpi-label">${rotulo}</div>
         <div class="kpi-value">${r.percentual}%</div>
-        <div class="kpi-sub">${fmt(r.ok)} de ${fmt(r.total)} dentro do IQ${fonteTxt}${amostraTxt}</div>
+        <div class="kpi-sub">${subTxt}</div>
       </div>`;
     })();
 

@@ -565,7 +565,10 @@ function clienteForaDoIQ(cliente, janelaSet, dataReferencia, oficialPorOS) {
   });
 }
 
-function calcularIQSafra(safra) {
+// todosParam: opcional — passa a base já carregada pra não reler do disco
+// (calcularIQVendedorGeral chama isso ~14x seguidas, uma por safra; reler o
+// base-cruzada.json inteiro a cada vez levava ~1,7s por requisição).
+function calcularIQSafra(safra, todosParam) {
   const { janela, janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
   const oficialPorOS = carregarCestaOficialPorSafra(safra);
   // Só trava quem não tem fechamento oficial (esse sempre manda, é sempre
@@ -578,7 +581,7 @@ function calcularIQSafra(safra) {
     if (congelados[safra]) return congelados[safra];
   }
 
-  const todos = lerJSON(BASE_CRUZADA_PATH, []);
+  const todos = todosParam || lerJSON(BASE_CRUZADA_PATH, []);
   let cohort;
   if (oficialPorOS) {
     // Fechamento oficial da TIM já chegou pra essa safra — ele é quem manda quem
@@ -633,8 +636,8 @@ function calcularIQSafra(safra) {
 // por vendedor em vez de somada no total. minAmostra sinaliza vendedores com
 // poucos clientes na safra, onde 1 atraso já derruba o percentual muito —
 // não exclui, só marca pra quem for ler saber que a amostra é pequena.
-function calcularIQPorVendedor(safra, minAmostra = 3) {
-  const r = calcularIQSafra(safra);
+function calcularIQPorVendedor(safra, minAmostra = 3, todosParam) {
+  const r = calcularIQSafra(safra, todosParam);
   const porVendedor = {};
   const add = (vendedor, dentro) => {
     const nome = vendedor || '(sem vendedor)';
@@ -661,6 +664,34 @@ function calcularIQPorVendedor(safra, minAmostra = 3) {
     congelado: r.congelado,
     minAmostra,
     ranking,
+  };
+}
+
+// IQ médio do vendedor somando TODAS as safras em que ele tem cliente — usado
+// quando o filtro Vendedor está escolhido mas SEM Mês Gross (sem uma safra
+// única não dá pra abrir uma janela de 5 meses só; em vez de não mostrar
+// nada, soma o cohort de cada safra onde ele aparece). Reaproveita
+// calcularIQPorVendedor safra a safra, então cada safra individual continua
+// batendo com o que a Tabela de Clientes mostra.
+function calcularIQVendedorGeral(vendedor, minAmostra = 3) {
+  const todos = lerJSON(BASE_CRUZADA_PATH, []);
+  const safras = [...new Set(todos.map(c => c.mesGross).filter(Boolean))];
+  let total = 0, ok = 0, safrasComVenda = 0, safrasFechadas = 0, safrasAbertas = 0;
+  for (const safra of safras) {
+    const r = calcularIQPorVendedor(safra, minAmostra, todos);
+    const linha = r.ranking.find(v => v.vendedor === vendedor);
+    if (!linha) continue;
+    total += linha.total;
+    ok += linha.ok;
+    safrasComVenda++;
+    if (r.previa) safrasAbertas++; else safrasFechadas++;
+  }
+  if (total === 0) return null;
+  return {
+    vendedor, total, ok, atrasados: total - ok,
+    percentual: Math.round((ok / total) * 1000) / 10,
+    amostraBaixa: total < minAmostra,
+    geral: true, safrasComVenda, safrasFechadas, safrasAbertas,
   };
 }
 
@@ -1361,22 +1392,28 @@ app.get('/api/resumo', (req, res) => {
       delete iqSafra._atrasados;
     }
 
-    // IQ do vendedor selecionado, na mesma safra do card acima — mesmo cálculo
-    // de calcularIQPorVendedor, só que devolvendo a linha de UM vendedor em vez
-    // da lista inteira. Só existe quando Mês Gross E Vendedor estão escolhidos.
+    // IQ do vendedor selecionado. Com Mês Gross escolhido junto, mostra o IQ
+    // NAQUELA safra (mesmo cálculo de calcularIQPorVendedor, devolvendo a
+    // linha de UM vendedor). Sem Mês Gross, mostra a MÉDIA GERAL do vendedor
+    // somando todas as safras em que ele vendeu — assim o card não fica vazio
+    // só porque nenhum mês foi escolhido.
     let iqVendedor = null;
-    if (req.query.mesGross && req.query.vendedor) {
-      const porVendedor = calcularIQPorVendedor(req.query.mesGross);
-      const linha = porVendedor.ranking.find(v => v.vendedor === req.query.vendedor);
-      if (linha) {
-        iqVendedor = {
-          ...linha,
-          safra: porVendedor.safra,
-          oficial: porVendedor.oficial,
-          previa: porVendedor.previa,
-          congelado: porVendedor.congelado,
-          dataCorte: porVendedor.dataCorte,
-        };
+    if (req.query.vendedor) {
+      if (req.query.mesGross) {
+        const porVendedor = calcularIQPorVendedor(req.query.mesGross);
+        const linha = porVendedor.ranking.find(v => v.vendedor === req.query.vendedor);
+        if (linha) {
+          iqVendedor = {
+            ...linha,
+            safra: porVendedor.safra,
+            oficial: porVendedor.oficial,
+            previa: porVendedor.previa,
+            congelado: porVendedor.congelado,
+            dataCorte: porVendedor.dataCorte,
+          };
+        }
+      } else {
+        iqVendedor = calcularIQVendedorGeral(req.query.vendedor);
       }
     }
 

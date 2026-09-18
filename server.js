@@ -1050,22 +1050,42 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
     clientes.forEach(c => { if (osSet.has(c.os)) osDups.push(c.os); else osSet.add(c.os); });
     if (osDups.length) warnings.push(`${osDups.length} OS duplicadas encontradas`);
 
-    // Mescla com base existente por CPF — atualiza quem já existe, adiciona quem é novo
+    // Mescla com base existente por CPF OU OS — nunca descarta quem já existe,
+    // mesmo sem CPF preenchido (ex: cliente completado na aba Ajustes só com
+    // nome+OS, sem CPF). ANTES: só carregava pra frente quem tinha CPF
+    // (`if (c.cpf) mapaExistente[c.cpf] = c`) — qualquer correção manual feita
+    // sem CPF era descartada silenciosamente na importação seguinte. Esse bug
+    // apagou correções reais da aba Ajustes; agora indexa por CPF e por OS,
+    // então uma correção sem CPF sobrevive enquanto ninguém trouxer um OS
+    // diferente pro mesmo CPF (ou vice-versa).
     const baseExistente = lerJSON(BASE_CLIENTES_PATH, []);
-    const mapaExistente = {};
-    baseExistente.forEach(c => { if (c.cpf) mapaExistente[c.cpf] = c; });
+    const porCpf = {}, porOs = {};
+    baseExistente.forEach(c => {
+      if (c.cpf) porCpf[c.cpf] = c;
+      if (c.os)  porOs[c.os]  = c;
+    });
     let adicionados = 0, atualizados = 0;
+    const consumidos = new Set();
+    const resultado = [];
     clientes.forEach(novo => {
-      if (novo.cpf && mapaExistente[novo.cpf]) {
-        mapaExistente[novo.cpf] = { ...mapaExistente[novo.cpf], ...novo };
+      const existente = (novo.cpf && porCpf[novo.cpf]) || (novo.os && porOs[novo.os]) || null;
+      if (existente) {
+        resultado.push({ ...existente, ...novo });
+        consumidos.add(existente);
         atualizados++;
       } else {
-        mapaExistente[novo.cpf || novo.os] = novo;
+        resultado.push(novo);
         adicionados++;
       }
     });
-    const clientesMesclados = Object.values(mapaExistente);
+    // Preserva quem já existia e não veio nesta importação (planilha parcial,
+    // ex: só clientes de um mês) — não é pra sumir, é só não fez parte deste arquivo.
+    baseExistente.forEach(c => { if (!consumidos.has(c)) resultado.push(c); });
+    const clientesMesclados = resultado;
 
+    // Backup antes de sobrescrever — mesma proteção que a base Sonar já tinha,
+    // faltava aqui (foi como perdemos correções sem rede de segurança).
+    backupJSON(BASE_CLIENTES_PATH);
     salvarJSON(BASE_CLIENTES_PATH, clientesMesclados);
     const meta = lerJSON(SONAR_META_PATH, {});
     if (!meta.clientes) meta.clientes = {};

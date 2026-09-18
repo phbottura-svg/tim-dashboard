@@ -568,7 +568,11 @@ function clienteForaDoIQ(cliente, janelaSet, dataReferencia, oficialPorOS) {
 // todosParam: opcional — passa a base já carregada pra não reler do disco
 // (calcularIQVendedorGeral chama isso ~14x seguidas, uma por safra; reler o
 // base-cruzada.json inteiro a cada vez levava ~1,7s por requisição).
-function calcularIQSafra(safra, todosParam) {
+// uf: opcional — restringe o cohort a um estado (PR/SC/RS). O congelamento
+// (cache) só vale pro número da empresa inteira, então É IGNORADO (nunca lido
+// nem gravado) quando uf é passado — senão devolveria/sobrescreveria o
+// congelado geral com um número filtrado, corrompendo o cache de todo mundo.
+function calcularIQSafra(safra, todosParam, uf) {
   const { janela, janelaSet, dataCorte, dataReferencia, previa } = referenciaSafra(safra);
   const oficialPorOS = carregarCestaOficialPorSafra(safra);
   // Só trava quem não tem fechamento oficial (esse sempre manda, é sempre
@@ -576,25 +580,26 @@ function calcularIQSafra(safra, todosParam) {
   // safra em andamento (prévia) continua recalculando normal a cada request.
   const elegivelParaTravar = !oficialPorOS && !previa;
 
-  if (elegivelParaTravar) {
+  if (elegivelParaTravar && !uf) {
     const congelados = lerJSON(IQ_CONGELADO_PATH, {});
     if (congelados[safra]) return congelados[safra];
   }
 
   const todos = todosParam || lerJSON(BASE_CRUZADA_PATH, []);
+  const base = uf ? todos.filter(c => c.uf === uf) : todos;
   let cohort;
   if (oficialPorOS) {
     // Fechamento oficial da TIM já chegou pra essa safra — ele é quem manda quem
     // entra na conta, não a nossa aproximação por fatura (pega cliente suspenso
     // por fraude/downgrade/recompra que às vezes nem gera fatura na Sonar).
-    cohort = todos.filter(c => oficialPorOS[c.os]);
+    cohort = base.filter(c => oficialPorOS[c.os]);
   } else {
     // Sem fechamento oficial ainda: prévia por atraso. totalFaturas > 0 exclui
     // clientes importados que ainda não têm nenhuma fatura no Sonar (ver
     // cruzarBases) — sem essa trava eles passariam trivialmente no IQ (não há
     // como estar em atraso sem fatura nenhuma) e inflariam o percentual com
     // quem nem começou a ser cobrado ainda.
-    cohort = todos.filter(c => c.mesGross === safra && c.totalFaturas > 0);
+    cohort = base.filter(c => c.mesGross === safra && c.totalFaturas > 0);
   }
 
   const ok = [], atrasados = [];
@@ -619,7 +624,7 @@ function calcularIQSafra(safra, todosParam) {
     _atrasados: atrasados.map(c => ({ nome: c.nome, custcode: c.custcode, vendedor: c.vendedor || null, motivo: oficialPorOS?.[c.os]?.motivo || null })),
   };
 
-  if (elegivelParaTravar) {
+  if (elegivelParaTravar && !uf) {
     resultado.congelado = true;
     resultado.congeladoEm = new Date().toISOString();
     const congelados = lerJSON(IQ_CONGELADO_PATH, {});
@@ -636,8 +641,8 @@ function calcularIQSafra(safra, todosParam) {
 // por vendedor em vez de somada no total. minAmostra sinaliza vendedores com
 // poucos clientes na safra, onde 1 atraso já derruba o percentual muito —
 // não exclui, só marca pra quem for ler saber que a amostra é pequena.
-function calcularIQPorVendedor(safra, minAmostra = 3, todosParam) {
-  const r = calcularIQSafra(safra, todosParam);
+function calcularIQPorVendedor(safra, minAmostra = 3, todosParam, uf) {
+  const r = calcularIQSafra(safra, todosParam, uf);
   const porVendedor = {};
   const add = (vendedor, dentro) => {
     const nome = vendedor || '(sem vendedor)';
@@ -675,13 +680,13 @@ function calcularIQPorVendedor(safra, minAmostra = 3, todosParam) {
 // cima (79,2% "misturado" vs 65,6% real, só de safra fechada). Os clientes em
 // safra aberta não somem: ficam à parte em totalAbertas, informativo, sem
 // contar no %.
-function calcularIQVendedorGeral(vendedor, minAmostra = 3) {
+function calcularIQVendedorGeral(vendedor, minAmostra = 3, uf) {
   const todos = lerJSON(BASE_CRUZADA_PATH, []);
   const safras = [...new Set(todos.map(c => c.mesGross).filter(Boolean))];
   let total = 0, ok = 0, safrasFechadas = 0;
   let totalAbertas = 0, safrasAbertas = 0;
   for (const safra of safras) {
-    const r = calcularIQPorVendedor(safra, minAmostra, todos);
+    const r = calcularIQPorVendedor(safra, minAmostra, todos, uf);
     const linha = r.ranking.find(v => v.vendedor === vendedor);
     if (!linha) continue;
     if (r.previa) {
@@ -1400,10 +1405,12 @@ app.get('/api/resumo', (req, res) => {
     // IQ da safra selecionada no filtro "Mês Gross" do topo (card ao lado de
     // Fatura 1). Sem um mês especifico escolhido não há uma janela única de
     // 5 meses para calcular, então fica null. As listas de detalhe (_ok/
-    // _atrasados) não interessam aqui — só ao endpoint /api/iq-safra.
+    // _atrasados) não interessam aqui — só ao endpoint /api/iq-safra. Respeita
+    // o filtro de Estado, se um estiver escolhido (ver uf em calcularIQSafra).
+    const ufFiltro = req.query.estado || undefined;
     let iqSafra = null;
     if (req.query.mesGross) {
-      iqSafra = calcularIQSafra(req.query.mesGross);
+      iqSafra = calcularIQSafra(req.query.mesGross, undefined, ufFiltro);
       delete iqSafra._ok;
       delete iqSafra._atrasados;
     }
@@ -1412,11 +1419,11 @@ app.get('/api/resumo', (req, res) => {
     // NAQUELA safra (mesmo cálculo de calcularIQPorVendedor, devolvendo a
     // linha de UM vendedor). Sem Mês Gross, mostra a MÉDIA GERAL do vendedor
     // somando todas as safras em que ele vendeu — assim o card não fica vazio
-    // só porque nenhum mês foi escolhido.
+    // só porque nenhum mês foi escolhido. Os dois respeitam o filtro de Estado.
     let iqVendedor = null;
     if (req.query.vendedor) {
       if (req.query.mesGross) {
-        const porVendedor = calcularIQPorVendedor(req.query.mesGross);
+        const porVendedor = calcularIQPorVendedor(req.query.mesGross, 3, undefined, ufFiltro);
         const linha = porVendedor.ranking.find(v => v.vendedor === req.query.vendedor);
         if (linha) {
           iqVendedor = {
@@ -1429,7 +1436,7 @@ app.get('/api/resumo', (req, res) => {
           };
         }
       } else {
-        iqVendedor = calcularIQVendedorGeral(req.query.vendedor);
+        iqVendedor = calcularIQVendedorGeral(req.query.vendedor, 3, ufFiltro);
       }
     }
 

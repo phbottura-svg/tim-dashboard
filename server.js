@@ -46,6 +46,16 @@ const CESTA_OFICIAL_PATH = path.join(DATA_PATH, 'cesta-oficial.json');
 // pra sempre e o IQ delas fica cada vez mais errado com o tempo.
 const IQ_CONGELADO_PATH = path.join(DATA_PATH, 'iq-safra-congelado.json');
 
+// Snapshot de safra com FECHAMENTO OFICIAL da TIM — diferente do congelado
+// acima: safra oficial nunca usa aquele cache (sempre recalcula ao vivo, pra
+// pegar correção que a TIM mande depois). Mas a Sonar só guarda cada venda 12
+// meses após o Mês Gross — quando o prazo estoura, o cliente inteiro some do
+// base-cruzada.json (é construído a partir da Sonar), e o recálculo ao vivo
+// acharia zero gente pra contar. Este snapshot guarda o último resultado bom
+// de cada safra oficial pra usar de fallback quando isso acontecer, em vez do
+// card virar "0 clientes" no mês seguinte ao sumiço.
+const IQ_OFICIAL_SNAPSHOT_PATH = path.join(DATA_PATH, 'iq-safra-oficial-snapshot.json');
+
 [DATA_PATH, PDFS_PATH].forEach(p => { if (!fs.existsSync(p)) fs.mkdirSync(p, { recursive: true }); });
 
 function salvarHistoricoRobo(estado) {
@@ -602,6 +612,15 @@ function calcularIQSafra(safra, todosParam, uf) {
     cohort = base.filter(c => c.mesGross === safra && c.totalFaturas > 0);
   }
 
+  // Fallback: safra oficial cujo cohort ao vivo veio vazio — normalmente
+  // sinal de que a Sonar já derrubou os clientes dessa safra (retenção de 12
+  // meses), não que a safra ficou vazia de verdade. Usa o último snapshot bom
+  // salvo em vez de reportar "0 clientes" pra uma safra que já fechou.
+  if (oficialPorOS && !uf && cohort.length === 0) {
+    const snapshots = lerJSON(IQ_OFICIAL_SNAPSHOT_PATH, {});
+    if (snapshots[safra]) return snapshots[safra];
+  }
+
   const ok = [], atrasados = [];
   for (const c of cohort) {
     (clienteForaDoIQ(c, janelaSet, dataReferencia, oficialPorOS) ? atrasados : ok).push(c);
@@ -630,6 +649,17 @@ function calcularIQSafra(safra, todosParam, uf) {
     const congelados = lerJSON(IQ_CONGELADO_PATH, {});
     congelados[safra] = resultado;
     salvarJSON(IQ_CONGELADO_PATH, congelados);
+  }
+
+  // Safra oficial com cohort real (não veio do fallback acima) — atualiza o
+  // snapshot. Enquanto a Sonar ainda tem os clientes, isso mantém o snapshot
+  // sempre fresco (pega correção que a TIM mande no arquivo oficial); quando
+  // a Sonar derrubar os clientes dessa safra, o fallback acima passa a usar
+  // este último snapshot salvo em vez de mostrar "0 clientes".
+  if (oficialPorOS && !uf && cohort.length > 0) {
+    const snapshots = lerJSON(IQ_OFICIAL_SNAPSHOT_PATH, {});
+    snapshots[safra] = resultado;
+    salvarJSON(IQ_OFICIAL_SNAPSHOT_PATH, snapshots);
   }
 
   return resultado;

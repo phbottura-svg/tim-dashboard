@@ -987,14 +987,27 @@ async function carregarResumo() {
           <div class="kpi-sub">${temMes ? 'sem clientes desse vendedor nessa safra' : 'sem clientes desse vendedor no IQ'}</div>
         </div>`;
       }
+      // Vendedor só tem cliente em safra ainda aberta (prévia) — sem nenhuma
+      // safra fechada não dá pra calcular um % confiável (o cohort inteiro
+      // mostraria ~100% só por ainda não ter dado tempo de atrasar).
+      if (r.geral && r.semSafraFechada) {
+        return `<div class="kpi kpi-cinza" title="Este vendedor só tem venda em safra(s) ainda em andamento — nenhuma fechou pra medir de verdade ainda">
+          <div class="kpi-label">🎯 IQ ${r.vendedor} (geral)</div>
+          <div class="kpi-value">—</div>
+          <div class="kpi-sub">ainda sem safra fechada · ${fmt(r.totalAbertas)} cliente(s) em ${r.safrasAbertas} safra(s) em andamento — muito cedo pra avaliar</div>
+        </div>`;
+      }
       const corIQ = r.percentual >= 80 ? 'kpi-verde' : r.percentual >= 50 ? 'kpi-amarelo' : 'kpi-vermelho';
       const amostraTxt = r.amostraBaixa ? ' · ⚠️ amostra baixa' : '';
       const rotulo = r.geral ? `🎯 IQ ${r.vendedor} (geral)` : `🎯 IQ ${r.vendedor} — ${r.safra}`;
       let subTxt, tituloTxt;
       if (r.geral) {
-        const abertasTxt = r.safrasAbertas ? ` (${r.safrasFechadas} fechada(s) + ${r.safrasAbertas} em andamento)` : '';
-        subTxt = `${fmt(r.ok)} de ${fmt(r.total)} dentro do IQ · média de ${r.safrasComVenda} safra(s)${abertasTxt}${amostraTxt}`;
-        tituloTxt = 'Soma o cohort do vendedor em todas as safras — selecione um Mês Gross pra ver uma safra só';
+        // Só safra FECHADA entra no %; safra aberta fica à parte, informativa,
+        // pra não maquiar a média pra cima com o "100%" artificial de quem
+        // ainda não teve tempo de atrasar.
+        const abertasTxt = r.totalAbertas ? ` · +${fmt(r.totalAbertas)} cliente(s) em safra aberta (não contam ainda)` : '';
+        subTxt = `${fmt(r.ok)} de ${fmt(r.total)} dentro do IQ · ${r.safrasFechadas} safra(s) fechada(s)${abertasTxt}${amostraTxt}`;
+        tituloTxt = 'Média só das safras já fechadas — safra em andamento não entra no % (ainda não teve tempo de atrasar). Selecione um Mês Gross pra ver uma safra só.';
       } else {
         const fonteTxt = r.oficial ? ' · ✅ fechamento oficial TIM'
           : r.previa ? ' · prévia (safra em andamento)'

@@ -667,31 +667,47 @@ function calcularIQPorVendedor(safra, minAmostra = 3, todosParam) {
   };
 }
 
-// IQ médio do vendedor somando TODAS as safras em que ele tem cliente — usado
-// quando o filtro Vendedor está escolhido mas SEM Mês Gross (sem uma safra
-// única não dá pra abrir uma janela de 5 meses só; em vez de não mostrar
-// nada, soma o cohort de cada safra onde ele aparece). Reaproveita
-// calcularIQPorVendedor safra a safra, então cada safra individual continua
-// batendo com o que a Tabela de Clientes mostra.
+// IQ médio do vendedor somando as safras FECHADAS em que ele tem cliente —
+// usado quando o filtro Vendedor está escolhido mas SEM Mês Gross. Só entra
+// safra fechada (oficial, congelada ou estimativa) no percentual: safra em
+// andamento (prévia) mostra ~100% só porque ainda não deu tempo de nenhuma
+// fatura completar 30 dias de atraso — misturar isso maquiava a média pra
+// cima (79,2% "misturado" vs 65,6% real, só de safra fechada). Os clientes em
+// safra aberta não somem: ficam à parte em totalAbertas, informativo, sem
+// contar no %.
 function calcularIQVendedorGeral(vendedor, minAmostra = 3) {
   const todos = lerJSON(BASE_CRUZADA_PATH, []);
   const safras = [...new Set(todos.map(c => c.mesGross).filter(Boolean))];
-  let total = 0, ok = 0, safrasComVenda = 0, safrasFechadas = 0, safrasAbertas = 0;
+  let total = 0, ok = 0, safrasFechadas = 0;
+  let totalAbertas = 0, safrasAbertas = 0;
   for (const safra of safras) {
     const r = calcularIQPorVendedor(safra, minAmostra, todos);
     const linha = r.ranking.find(v => v.vendedor === vendedor);
     if (!linha) continue;
-    total += linha.total;
-    ok += linha.ok;
-    safrasComVenda++;
-    if (r.previa) safrasAbertas++; else safrasFechadas++;
+    if (r.previa) {
+      totalAbertas += linha.total;
+      safrasAbertas++;
+    } else {
+      total += linha.total;
+      ok += linha.ok;
+      safrasFechadas++;
+    }
   }
-  if (total === 0) return null;
+  if (total === 0 && totalAbertas === 0) return null; // vendedor sem nenhum cliente no IQ
+
+  if (total === 0) {
+    // Só tem cliente em safra ainda aberta — cedo demais pra ter um % confiável.
+    return {
+      vendedor, total: 0, ok: 0, atrasados: 0, percentual: null,
+      geral: true, semSafraFechada: true, safrasFechadas: 0, safrasAbertas, totalAbertas,
+    };
+  }
+
   return {
     vendedor, total, ok, atrasados: total - ok,
     percentual: Math.round((ok / total) * 1000) / 10,
     amostraBaixa: total < minAmostra,
-    geral: true, safrasComVenda, safrasFechadas, safrasAbertas,
+    geral: true, safrasFechadas, safrasAbertas, totalAbertas,
   };
 }
 

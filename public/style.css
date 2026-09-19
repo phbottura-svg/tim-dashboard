@@ -333,6 +333,20 @@ textarea:-webkit-autofill {
   transition: border-color 0.2s;
 }
 .filtro-grupo select:focus { border-color: var(--azul); }
+.filtro-grupo .filtro-input-busca {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--texto);
+  padding: 7px 10px;
+  font-size: 13px;
+  font-family: var(--fonte);
+  outline: none;
+  min-width: 150px;
+  transition: border-color 0.2s;
+}
+.filtro-grupo .filtro-input-busca:focus { border-color: var(--azul); }
+.filtro-grupo .filtro-input-busca::placeholder { color: var(--label); }
 
 /* ─── Tab content ──────────────────────────────────────────────────────────── */
 .tab-content { display: none; }

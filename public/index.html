@@ -160,9 +160,10 @@
     </div>
     <div class="filtro-grupo">
       <label>Vendedor</label>
-      <select id="filtro-vendedor" onchange="aplicarFiltros()">
-        <option value="">Todos</option>
-      </select>
+      <input type="text" id="filtro-vendedor" list="lista-vendedores" class="filtro-input-busca"
+        placeholder="Todos" autocomplete="off" onchange="aplicarFiltros()"
+        oninput="if(!this.value) aplicarFiltros()">
+      <datalist id="lista-vendedores"></datalist>
     </div>
     <div class="filtro-grupo">
       <label>Estado</label>

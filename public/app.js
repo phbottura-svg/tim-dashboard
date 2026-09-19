@@ -545,12 +545,14 @@ async function carregarOpcoesFiltros() {
       o.value = s; o.textContent = s; selMes.appendChild(o);
       if (selMesAtalho) selMesAtalho.appendChild(o.cloneNode(true));
     });
-    const selVend = document.getElementById('filtro-vendedor');
-    selVend.innerHTML = '<option value="">Todos Vendedores</option>';
-    d.vendedores?.forEach(v => {
-      const o = document.createElement('option');
-      o.value = v; o.textContent = v; selVend.appendChild(o);
-    });
+    const listaVend = document.getElementById('lista-vendedores');
+    if (listaVend) {
+      listaVend.innerHTML = '';
+      d.vendedores?.forEach(v => {
+        const o = document.createElement('option');
+        o.value = v; listaVend.appendChild(o);
+      });
+    }
     const selEst = document.getElementById('filtro-estado');
     selEst.innerHTML = '<option value="">Todas UFs</option>';
     d.estados?.forEach(e => {
@@ -657,15 +659,16 @@ async function mudarMesGrossAtalho(valor) {
 // se ele continuar valendo na nova lista.
 async function atualizarVendedoresPorMesGross(mesGross) {
   const sel = document.getElementById('filtro-vendedor');
-  if (!sel) return;
+  const listaVend = document.getElementById('lista-vendedores');
+  if (!sel || !listaVend) return;
   const atual = sel.value;
   try {
     const qs = mesGross ? '?mesGross=' + encodeURIComponent(mesGross) : '';
     const d = await fetch('/api/filtros/opcoes' + qs).then(r => r.json());
-    sel.innerHTML = '<option value="">Todos Vendedores</option>';
+    listaVend.innerHTML = '';
     d.vendedores?.forEach(v => {
       const o = document.createElement('option');
-      o.value = v; o.textContent = v; sel.appendChild(o);
+      o.value = v; listaVend.appendChild(o);
     });
     sel.value = (atual && d.vendedores?.includes(atual)) ? atual : '';
   } catch {}
@@ -912,10 +915,15 @@ function fmtTs(iso, completo = false) {
 
 async function carregarOpcoesFiltrosReset() {
   // Recria os selects de filtros com novas opções
-  ['filtro-mesGross', 'filtro-vendedor', 'filtro-estado'].forEach(id => {
+  ['filtro-mesGross', 'filtro-estado'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.innerHTML = '<option value="">Todos</option>';
   });
+  // filtro-vendedor agora é input+datalist, não select — reseta os dois
+  const inputVend = document.getElementById('filtro-vendedor');
+  if (inputVend) inputVend.value = '';
+  const listaVend = document.getElementById('lista-vendedores');
+  if (listaVend) listaVend.innerHTML = '';
   const atalho = document.getElementById('tabela-filtro-mesgross');
   if (atalho) atalho.innerHTML = '<option value="">Todos Meses Gross</option>';
   await carregarOpcoesFiltros();

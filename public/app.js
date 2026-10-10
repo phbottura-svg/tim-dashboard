@@ -804,7 +804,7 @@ async function importarSonar(input, estado) {
     const d = await r.json();
     if (d.erro) mostrarMsg(`❌ Erro ${estado}: ` + d.erro, 'erro');
     else {
-      mostrarMsg(`✅ ${estado}: ${d.noArquivo} no arquivo · ${d.preservados} preservadas (${d.osPreservadas} OS que sairam da TIM) · ${d.total} na base · ${d.cruzados} cruzamentos`, 'ok');
+      mostrarMsg(`✅ ${estado}: ${d.clientesNoArquivo} clientes / ${d.noArquivo} faturas no arquivo · ${d.preservados} faturas preservadas (${d.osPreservadas} OS que sairam da TIM) · ${d.clientes} clientes / ${d.total} faturas na base · ${d.cruzados} cruzamentos`, 'ok');
       await carregarStatusImportacao();
       await carregarOpcoesFiltrosReset();
       await carregarTudo();
@@ -859,9 +859,9 @@ async function carregarStatusImportacao() {
         const s = d.sonar[est];
         const emoji = badgeEmoji(s.status);
         const baseTs = s.ultimaAtualizacaoBase ? ` · base atualizada em ${s.ultimaAtualizacaoBase}` : '';
-        el.textContent = `${emoji} ${est} — ${s.total} reg${baseTs}`;
+        el.textContent = `${emoji} ${est} — ${s.clientes ?? '?'} clientes · ${s.total} faturas${baseTs}`;
         el.className = `importar-status status-${s.status}`;
-        el.title = s.importadoEm ? `Importado em ${fmtTs(s.importadoEm)}` : '';
+        el.title = s.importadoEm ? `Importado em ${fmtTs(s.importadoEm)} · arquivo: ${s.clientesNoArquivo} clientes / ${s.noArquivo} faturas · ${s.preservados} faturas preservadas de importações anteriores` : '';
       }
     });
 

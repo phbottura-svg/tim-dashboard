@@ -229,6 +229,7 @@ let processoRobo = null;
 let processoDisparo = null;
 let sseClients = [];
 const processoEstado = { PR: null, SC: null, RS: null, PR2: null, SC2: null, RS2: null };
+const UFS_SONAR = ['PR', 'SC', 'RS'];
 const ESTADOS_VALIDOS = ['PR', 'SC', 'RS', 'PR2', 'SC2', 'RS2'];
 
 // ─── JSON helpers ─────────────────────────────────────────────────────────────
@@ -1192,7 +1193,18 @@ app.post('/api/importar-clientes', uploadMemory.single('arquivo'), (req, res) =>
 // regride) e o que nao vier no arquivo fica preservado. Chave: OS + numero da
 // fatura. O efeito colateral aceito e que fatura removida pela TIM por correcao
 // tambem sobrevive — some do relatorio deles, permanece aqui.
-function mesclarSonar(antigos, novos) {
+function mesclarSonar(antigos, novos, estado) {
+  // Preserva so linhas antigas do MESMO estado: linha de PR/SC/RS de outro
+  // estado que tenha caido aqui por importacao errada e descartada.
+  let descartadosOutroEstado = 0;
+  const uf = estado && estado.slice(0, 2);
+  if (uf) {
+    antigos = antigos.filter(r => {
+      const outro = UFS_SONAR.includes(r.uf) && r.uf !== uf;
+      if (outro) descartadosOutroEstado++;
+      return !outro;
+    });
+  }
   const chave = r => `${r.os}|${r.numeroFatura ?? ''}`;
   const idx = new Map();
   antigos.forEach(r => idx.set(chave(r), r));
@@ -1204,7 +1216,8 @@ function mesclarSonar(antigos, novos) {
   const osNovas = new Set(novos.map(r => r.os));
   const osPreservadas = [...new Set(antigos.map(r => r.os))].filter(os => !osNovas.has(os)).length;
   const registros = [...idx.values()];
-  return { registros, adicionados, atualizados, preservados: registros.length - novos.length, osPreservadas };
+  const clientes = new Set(registros.map(r => r.os)).size;
+  return { registros, adicionados, atualizados, preservados: registros.length - novos.length, osPreservadas, descartadosOutroEstado, clientes };
 }
 
 // ─── Importar Sonar CSV ───────────────────────────────────────────────────────
@@ -1235,9 +1248,11 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
     }
 
     const ufsNoArquivo = [...new Set(registros.map(r => r['UF']).filter(Boolean))];
-    if (ufsNoArquivo.length > 0 && !ufsNoArquivo.includes(estado)) {
+    const ufEstado = estado.slice(0, 2);
+    const doEstado = registros.filter(r => r['UF'] === ufEstado).length;
+    if (ufsNoArquivo.length > 0 && (!ufsNoArquivo.includes(ufEstado) || doEstado < registros.length * 0.5)) {
       return res.status(400).json({
-        erro: `Arquivo contém UF: ${ufsNoArquivo.join(', ')}. Esperado: ${estado}. Verifique se selecionou o arquivo correto.`,
+        erro: `Arquivo contém UF: ${ufsNoArquivo.join(', ')} (${doEstado} de ${registros.length} linhas são ${ufEstado}). Esperado: ${ufEstado}. Verifique se selecionou o arquivo correto.`,
       });
     }
 
@@ -1256,10 +1271,10 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
       loginVendedor: r['LOGIN VENDEDOR'] || null,
       ultimaAtualizacao: r['ÚLTIMA DATA ATUALIZAÇÃO'] || null,
       status: calcularStatus(r['STATUS PAGAMENTO'], r['DATA VENCIMENTO']),
-    })).filter(r => r.os);
+    })).filter(r => r.os && !(UFS_SONAR.includes(r.uf) && r.uf !== ufEstado));
 
     const anteriores = lerJSON(BASE_SONAR[estado], []);
-    const merge = mesclarSonar(anteriores, processados);
+    const merge = mesclarSonar(anteriores, processados, estado);
     backupJSON(BASE_SONAR[estado]);
     salvarJSON(BASE_SONAR[estado], merge.registros);
 
@@ -1272,6 +1287,9 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
       atualizados: merge.atualizados,
       preservados: merge.preservados,
       osPreservadas: merge.osPreservadas,
+      clientes: merge.clientes,
+      clientesNoArquivo: new Set(processados.map(r => r.os)).size,
+      descartadosOutroEstado: merge.descartadosOutroEstado,
       importadoEm: new Date().toISOString(),
     };
     salvarJSON(SONAR_META_PATH, meta);
@@ -1290,6 +1308,9 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
       atualizados: merge.atualizados,
       preservados: merge.preservados,
       osPreservadas: merge.osPreservadas,
+      clientes: merge.clientes,
+      clientesNoArquivo: new Set(processados.map(r => r.os)).size,
+      descartadosOutroEstado: merge.descartadosOutroEstado,
       cruzados: baseCruzada.filter(c => c.cruzado).length,
     });
   } catch (err) {
@@ -1381,9 +1402,9 @@ app.get('/api/importacao/status', (req, res) => {
         status: statusImport(meta.clientes?.importadoEm),
       },
       sonar: {
-        PR: { total: meta.sonar?.PR?.total || 0, importadoEm: meta.sonar?.PR?.importadoEm || null, status: statusImport(meta.sonar?.PR?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('PR') },
-        SC: { total: meta.sonar?.SC?.total || 0, importadoEm: meta.sonar?.SC?.importadoEm || null, status: statusImport(meta.sonar?.SC?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('SC') },
-        RS: { total: meta.sonar?.RS?.total || 0, importadoEm: meta.sonar?.RS?.importadoEm || null, status: statusImport(meta.sonar?.RS?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('RS') },
+        PR: { total: meta.sonar?.PR?.total || 0, clientes: meta.sonar?.PR?.clientes ?? new Set(lerJSON(BASE_SONAR.PR, []).map(r => r.os)).size, noArquivo: meta.sonar?.PR?.noArquivo || 0, clientesNoArquivo: meta.sonar?.PR?.clientesNoArquivo || 0, preservados: meta.sonar?.PR?.preservados || 0, importadoEm: meta.sonar?.PR?.importadoEm || null, status: statusImport(meta.sonar?.PR?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('PR') },
+        SC: { total: meta.sonar?.SC?.total || 0, clientes: meta.sonar?.SC?.clientes ?? new Set(lerJSON(BASE_SONAR.SC, []).map(r => r.os)).size, noArquivo: meta.sonar?.SC?.noArquivo || 0, clientesNoArquivo: meta.sonar?.SC?.clientesNoArquivo || 0, preservados: meta.sonar?.SC?.preservados || 0, importadoEm: meta.sonar?.SC?.importadoEm || null, status: statusImport(meta.sonar?.SC?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('SC') },
+        RS: { total: meta.sonar?.RS?.total || 0, clientes: meta.sonar?.RS?.clientes ?? new Set(lerJSON(BASE_SONAR.RS, []).map(r => r.os)).size, noArquivo: meta.sonar?.RS?.noArquivo || 0, clientesNoArquivo: meta.sonar?.RS?.clientesNoArquivo || 0, preservados: meta.sonar?.RS?.preservados || 0, importadoEm: meta.sonar?.RS?.importadoEm || null, status: statusImport(meta.sonar?.RS?.importadoEm), ultimaAtualizacaoBase: ultimaAtualizacaoBase('RS') },
       },
       cruzamento: {
         total: baseSonar.length,

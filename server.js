@@ -2752,21 +2752,22 @@ function chavesTelefone(telefone) {
 }
 
 // Um cliente com várias faturas em aberto recebe uma mensagem por fatura, todas
-// com os mesmos botões, e o Chatwoot não diz em qual delas o clique aconteceu.
-// Por isso guardamos todas as faturas da rodada e respondemos com todos os
-// códigos identificados, em vez de arriscar devolver o de outra cobrança.
+// com os mesmos botões. Cada envio guarda o wamid da mensagem; o clique informa
+// a qual wamid responde (in_reply_to_external_id) e devolvemos só aquela fatura.
+// Sem wamid (envios antigos ou webhook sem o campo), cai para todas as recentes,
+// em vez de arriscar devolver o código de outra cobrança.
 // 45 dias (não 24h) porque o cliente não paga na hora que recebe a mensagem —
 // no uso real ele clica no botão dias depois; com 24h o sistema "esquecia" a
 // fatura enviada e respondia "não encontramos" pra quem só demorou pra pagar.
 const JANELA_ENVIOS_MS = 45 * 24 * 60 * 60 * 1000;
 
 app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
-  const { telefone, arquivo, vencimento, mesRef } = req.body || {};
+  const { telefone, arquivo, vencimento, mesRef, wamid } = req.body || {};
   if (!telefone || !arquivo) return res.status(400).json({ erro: 'Campos "telefone" e "arquivo" obrigatórios' });
 
   const envios = lerJSON(FATURA_ENVIOS_PATH, {});
   const agora = Date.now();
-  const novo = { arquivo, vencimento: vencimento || null, mesRef: mesRef || null, enviadoEm: new Date(agora).toISOString() };
+  const novo = { arquivo, vencimento: vencimento || null, mesRef: mesRef || null, wamid: wamid || null, enviadoEm: new Date(agora).toISOString() };
 
   for (const chave of chavesTelefone(telefone)) {
     const anteriores = (envios[chave]?.faturas || [])
@@ -2853,7 +2854,19 @@ app.post('/webhook/chatwoot', (req, res) => {
   const telefone = body.sender?.phone_number;
   if (!conversaId) return;
 
-  const faturas = faturasDoTelefone(telefone);
+  let faturas = faturasDoTelefone(telefone);
+
+  // O clique no botão de um template carrega o ID da mensagem original (wamid)
+  // em in_reply_to_external_id. Com ele, devolvemos só a fatura clicada.
+  const wamidClique = body.content_attributes?.in_reply_to_external_id;
+  if (wamidClique) {
+    const exata = faturas.filter(f => f.wamid && f.wamid === wamidClique);
+    if (exata.length) faturas = exata;
+    else console.log(`⚠️ Clique de ${telefone} respondendo ao wamid ${wamidClique}, sem fatura registrada com esse ID — usando todas as recentes`);
+  } else {
+    console.log(`⚠️ Clique de ${telefone} sem in_reply_to_external_id — usando todas as faturas recentes (${faturas.length})`);
+  }
+
   const todosCodigos = lerJSON(FATURA_CODIGOS_PATH, {});
 
   const encontrados = faturas

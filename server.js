@@ -945,20 +945,10 @@ function aplicarFiltros(lista, q) {
   let l = lista;
   if (q.safra)         l = l.filter(c => safraParaMeses(q.safra).includes(c.mesGross));
   if (q.dataVencimento) {
-    // Aceita UMA ou VÁRIAS datas (separadas por vírgula) — cliente entra se a
-    // última fatura casar com QUALQUER uma das datas selecionadas.
+    // Aceita UMA ou VÁRIAS datas (separadas por vírgula) — cliente entra se tiver
+    // uma fatura INADIMPLENTE com QUALQUER uma das datas, em qualquer posição.
     const datasAlvo = new Set(String(q.dataVencimento).split(',').map(s => s.trim()).filter(Boolean));
-    l = l.filter(c => {
-      const faturas = (c.faturas || []).filter(f => f.dataVencimento);
-      if (!faturas.length) return false;
-      const ultima = faturas[faturas.length - 1];
-      // Última fatura deve ter UMA das datas selecionadas e estar INADIMPLENTE
-      if (!datasAlvo.has(ultima.dataVencimento)) return false;
-      if (ultima.status !== 'INADIMPLENTE') return false;
-      // Todas as faturas anteriores devem estar ADIMPLENTES
-      const anteriores = faturas.slice(0, -1);
-      return anteriores.every(f => f.status === 'ADIMPLENTE');
-    });
+    l = l.filter(c => (c.faturas || []).some(f => datasAlvo.has(String(f.dataVencimento || '').trim()) && f.status === 'INADIMPLENTE'));
   }
   if (q.mesGross) l = l.filter(c => c.mesGross === q.mesGross);
   if (q.estado)   l = l.filter(c => q.estado.split(',').includes(c.uf));

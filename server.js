@@ -1329,6 +1329,158 @@ function marcarCobrancaPorDisparo(telefone) {
   return true;
 }
 
+// ── Lembrete PREVENTIVO: fatura enviada ANTES de vencer ──
+// O Sonar nunca traz fatura a vencer; o portal (robô) traz. A tela monta a base do robô com
+// quem vai vencer nos próximos dias e costuma atrasar (o próximo vencimento é previsto pelo dia
+// fixo de cada cliente — ver preventivo() em lib/risco-iq.js). NADA é enviado daqui: o robô baixa
+// as faturas e o disparo manda, como sempre. O arquivo guarda quem já recebeu (uma vez por
+// cliente por mês de vencimento) e serve para medir depois se pagaram em dia.
+const RISCO_PREVENTIVO_PATH = path.join(DATA_PATH, 'risco-iq-preventivo.json');
+const PREVENTIVO_VALIDADE_MS = 10 * 24 * 3600 * 1000;   // base entregue ao robô vale 10 dias para marcar envios
+const PREVENTIVO_GUARDA_MS = 120 * 24 * 3600 * 1000;    // quanto tempo lembramos de quem já recebeu
+
+const lerPreventivo = () => lerJSON(RISCO_PREVENTIVO_PATH, { atual: null, pendente: null, historico: [], enviados: {} });
+const mesAnoDe = d => `${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
+function filtrosPreventivo(b) {
+  const q = {};
+  for (const k of ['safra', 'estado', 'vendedor', 'hoje']) if (b[k]) q[k] = String(b[k]);
+  for (const k of ['diasAntes', 'atrasoMin']) if (b[k] !== undefined && b[k] !== '') q[k] = b[k];
+  for (const k of ['somenteIQ', 'incluirFechadas']) if (b[k] !== undefined) q[k] = b[k];
+  return q;
+}
+
+function montarPreventivo(b) {
+  const arq = lerPreventivo();
+  const jaEnviados = new Set(Object.keys(arq.enviados || {}));
+  const r = criarServicoRisco().preventivo(lerJSON(BASE_CRUZADA_PATH, []), filtrosPreventivo(b), { jaEnviados });
+  const mapa = {};   // chave de telefone → OS (caminho de volta)
+  const vencs = {};  // OS → vencimento previsto
+  for (const c of r.clientes) {
+    vencs[c.os] = c.vencPrevisto;
+    for (const tel of [c.contato, c.contato2]) {
+      for (const k of chavesTelefone(limparTelefone(tel))) if (!mapa[k]) mapa[k] = c.os;
+    }
+  }
+  return { r, mapa, vencs };
+}
+
+app.post('/api/risco-iq/preventivo', (req, res) => {
+  try {
+    const b = req.body || {};
+    const { r, mapa, vencs } = montarPreventivo(b);
+    const base = {
+      parametros: r.parametros, referencia: r.referencia, total: r.total, porVencimento: r.porVencimento,
+      porUf: r.porUf, porSafra: r.porSafra, excluidos: r.excluidos,
+    };
+    if (!b.confirmar) {
+      const amostra = r.clientes.slice(0, 8).map(c => ({ nome: c.nome, safra: c.safra, uf: c.uf, vencPrevisto: c.vencPrevisto, dias: c.dias, atrasoMax: c.atrasoMax }));
+      return res.json({ preview: true, ...base, amostra });
+    }
+    if (!r.total) return res.status(400).json({ erro: 'Nenhum cliente elegível com esses parâmetros.' });
+
+    // Fica "pendente" até a tela confirmar que a base chegou ao PC do robô (ver /ativar).
+    const arq = lerPreventivo();
+    arq.pendente = {
+      id: String(Date.now()), criadoEm: new Date().toISOString(), autor: req.session?.usuario?.nome || 'Sistema',
+      parametros: r.parametros, total: r.total, excluidos: r.excluidos, porVencimento: r.porVencimento, mapa, vencs, marcados: {},
+    };
+    salvarJSON(RISCO_PREVENTIVO_PATH, arq);
+    res.json({
+      ok: true, id: arq.pendente.id, ...base,
+      clientes: r.clientes.map(c => ({ nome: c.nome, cpf: c.cpf, custcode: c.custcode, contato: c.contato, mesGross: c.mesGross })),
+    });
+  } catch (err) { res.status(err.status || 500).json({ erro: err.message }); }
+});
+
+app.post('/api/risco-iq/preventivo/:id/ativar', (req, res) => {
+  try {
+    const arq = lerPreventivo();
+    if (!arq.pendente || arq.pendente.id !== req.params.id) {
+      return res.status(404).json({ erro: 'Base preventiva não encontrada (pode ter sido substituída por uma mais nova).' });
+    }
+    if (arq.atual) arq.historico = [resumoPreventivo(arq.atual), ...(arq.historico || [])].slice(0, 30);
+    arq.atual = { ...arq.pendente, ativadaEm: new Date().toISOString() };
+    arq.pendente = null;
+    salvarJSON(RISCO_PREVENTIVO_PATH, arq);
+    res.json({ ok: true, ...resumoPreventivo(arq.atual) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+function resumoPreventivo(c) {
+  return { id: c.id, criadoEm: c.criadoEm, autor: c.autor, total: c.total, parametros: c.parametros,
+    porVencimento: c.porVencimento, marcados: Object.keys(c.marcados || {}).length };
+}
+
+// O que aconteceu com quem recebeu o lembrete: só conta quando o vencimento já passou E o Sonar
+// já cobre essa data (senão "em aberto" seria só falta de dado, não falta de pagamento).
+function resultadoPreventivo(arq, todos, hoje, sonarAte) {
+  const porOs = new Map(todos.map(c => [c.os, c]));
+  const out = { enviados: 0, aguardandoVencer: 0, aguardandoSonar: 0, pagoEmDia: 0, pagoComAtraso: 0, emAberto: 0 };
+  for (const e of Object.values(arq.enviados || {})) {
+    out.enviados++;
+    const v = parseDataBr(e.venc);
+    if (!v || v >= hoje) { out.aguardandoVencer++; continue; }
+    const c = porOs.get(e.os);
+    const f = c && (c.faturas || []).find(x => x.dataVencimento === e.venc);
+    if (!f) { out.aguardandoSonar++; continue; }
+    if (f.pagoManual) { out.pagoEmDia++; continue; }
+    const p = parseDataBr(f.dataPagamento);
+    if (p) { if (p <= v) out.pagoEmDia++; else out.pagoComAtraso++; continue; }
+    if (sonarAte && sonarAte >= v) out.emAberto++; else out.aguardandoSonar++;
+  }
+  return out;
+}
+
+app.get('/api/risco-iq/preventivo', (req, res) => {
+  try {
+    const arq = lerPreventivo();
+    const hoje = hojeBrasilia(req.query.hoje);
+    const resultado = resultadoPreventivo(arq, lerJSON(BASE_CRUZADA_PATH, []), hoje, frescorSonar(hoje).ate);
+    const at = arq.atual;
+    res.json({
+      atual: at ? { ...resumoPreventivo(at), ativa: Date.now() - new Date(at.ativadaEm || at.criadoEm).getTime() < PREVENTIVO_VALIDADE_MS } : null,
+      resultado,
+    });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Caminho de volta: o disparo registrou o envio de uma fatura para `telefone`. Só conta como
+// lembrete preventivo se a fatura enviada AINDA NÃO VENCEU e o número é de um cliente da última
+// base preventiva (até 10 dias). Uma vez por cliente por mês de vencimento. Retorna true se marcou.
+function marcarPreventivoPorDisparo(telefone, vencimento) {
+  const v = parseDataBr(vencimento);
+  if (!v || v < hojeBrasilia()) return false;           // vencida: é cobrança, não prevenção
+  const arq = lerPreventivo();
+  const camp = arq.atual;
+  if (!camp || Date.now() - new Date(camp.ativadaEm || camp.criadoEm).getTime() > PREVENTIVO_VALIDADE_MS) return false;
+  let os = null;
+  for (const k of chavesTelefone(telefone)) if (camp.mapa[k]) { os = camp.mapa[k]; break; }
+  if (!os) return false;
+  const chave = `${os}|${mesAnoDe(v)}`;
+  arq.enviados = arq.enviados || {};
+  if (arq.enviados[chave]) return false;
+
+  const agora = new Date().toISOString();
+  arq.enviados[chave] = { os, venc: vencimento, em: agora, campanha: camp.id };
+  for (const [k, e] of Object.entries(arq.enviados)) {
+    if (Date.now() - new Date(e.em).getTime() > PREVENTIVO_GUARDA_MS) delete arq.enviados[k];
+  }
+  camp.marcados = { ...(camp.marcados || {}), [os]: agora };
+
+  // Só uma anotação no cliente (sem marcador "cobrado": ele ainda nem está em atraso).
+  const dados = lerJSON(ANOTACOES_PATH, {});
+  const atual = dados[os] || { marcadores: [], anotacoes: [] };
+  atual.anotacoes = [...(atual.anotacoes || []), {
+    texto: `Lembrete preventivo enviado por WhatsApp (fatura com vencimento em ${vencimento})`, autor: 'WhatsApp (disparo)', criadoEm: agora,
+  }];
+  atual.atualizadoEm = agora;
+  dados[os] = atual;
+  salvarJSON(ANOTACOES_PATH, dados);
+  salvarJSON(RISCO_PREVENTIVO_PATH, arq);
+  return true;
+}
+
 // Só a VPS guarda histórico: lá estão a base e o Sonar atualizados. O PC local é
 // só o painel dos robôs e a base dele pode estar velha.
 if (MODO === 'vps') {
@@ -3089,8 +3241,11 @@ app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
 
   // Se esse número faz parte da base que o Risco IQ mandou para o robô, o envio
   // conta como "cobrado". Nunca pode derrubar o registro do envio em si.
-  try { marcarCobrancaPorDisparo(telefone); }
-  catch (e) { console.error('⚠️ Risco IQ: não consegui marcar a cobrança do disparo:', e.message); }
+  // Fatura que ainda não venceu = lembrete PREVENTIVO; vencida = cobrança. Cada caminho é independente.
+  const dv = parseDataBr(vencimento);
+  const aVencer = !!(dv && dv >= hojeBrasilia());
+  try { if (aVencer) marcarPreventivoPorDisparo(telefone, vencimento); else marcarCobrancaPorDisparo(telefone); }
+  catch (e) { console.error('⚠️ Risco IQ: não consegui marcar o envio do disparo:', e.message); }
 
   res.json({ ok: true });
 });

@@ -507,6 +507,24 @@
     </div>
     <div id="risco-campanha" class="risco-campanha" style="display:none"></div>
 
+    <details class="risco-prev" id="risco-prev">
+      <summary>📨 Lembrete preventivo — mandar a fatura antes de vencer</summary>
+      <div class="risco-prev-corpo">
+        <p class="risco-prev-ajuda">O Sonar não traz fatura a vencer; o portal traz. Aqui o próximo vencimento é <strong>previsto pelo dia fixo</strong> de cada cliente. O robô busca a fatura no portal e o disparo manda antes de vencer, para ninguém atrasar por não ter recebido. Usa os filtros de Safra, Estado e Vendedor acima. Quem já está inadimplente fica de fora (segue na cobrança).</p>
+        <div class="risco-prev-campos">
+          <label>Vence em até <input type="number" id="prev-dias" value="7" min="1" max="30" /> dias</label>
+          <label>Já atrasou mais de <input type="number" id="prev-atraso" value="10" min="0" max="60" /> dias</label>
+          <label title="Só quem a fatura prevista ainda pode tirar do IQ da safra (passa de 30 dias de atraso antes do fechamento)"><input type="checkbox" id="prev-iq" /> só quem pode perder o IQ</label>
+          <label title="Por padrão só entram safras em andamento"><input type="checkbox" id="prev-fechadas" /> incluir safras já fechadas</label>
+          <button class="btn btn-secondary" onclick="riscoPrevVer()">Ver quem entra</button>
+          <button class="btn btn-primary" id="prev-btn-robo" onclick="riscoPrevMandar()"
+                  title="Gera a base do robô (clientes.xlsx) no PC do robô. Não envia nada: o robô baixa as faturas e o disparo continua no painel local.">📨 Mandar para o robô</button>
+        </div>
+        <div id="risco-prev-resumo" class="risco-prev-resumo"></div>
+        <div id="risco-prev-status" class="risco-prev-status"></div>
+      </div>
+    </details>
+
     <div id="risco-explica" class="risco-explica"></div>
 
     <div class="kpi-grid risco-kpis" id="risco-kpis"></div>

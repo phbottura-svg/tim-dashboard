@@ -176,6 +176,7 @@ async function carregarRisco() {
     riscoRenderGraficoDist(d);
     riscoCarregarHistorico();
     riscoCarregarCampanha();
+    riscoPrevStatus();
     riscoAtualizarBadge(d.contadores);
   } catch (e) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="12" class="loading">Não foi possível carregar: ${escaparHtml(e.message)}</td></tr>`;
@@ -670,3 +671,145 @@ async function riscoCarregarCampanha() {
   topo.addEventListener('scroll', () => { if (wrapper.scrollLeft !== topo.scrollLeft) wrapper.scrollLeft = topo.scrollLeft; });
   wrapper.addEventListener('scroll', () => { if (topo.scrollLeft !== wrapper.scrollLeft) topo.scrollLeft = wrapper.scrollLeft; });
 })();
+
+// ─── Lembrete preventivo: fatura enviada ANTES de vencer ─────────────────────
+// A lista é montada no servidor (preventivo() em lib/risco-iq.js). Aqui: parâmetros,
+// prévia, entrega da base ao PC do robô e a linha de status/resultado. NÃO envia nada.
+
+function riscoPrevParametros() {
+  const p = {
+    diasAntes: document.getElementById('prev-dias').value,
+    atrasoMin: document.getElementById('prev-atraso').value,
+    somenteIQ: document.getElementById('prev-iq').checked,
+    incluirFechadas: document.getElementById('prev-fechadas').checked,
+  };
+  const estado = document.getElementById('risco-estado').value;
+  const vend = document.getElementById('risco-vendedor').value;
+  if (estado) p.estado = estado;
+  if (vend) p.vendedor = vend;
+  if (risco.modo === 'safra') {
+    const s = document.getElementById('risco-safra').value;
+    if (s) p.safra = s;
+  }
+  return p;
+}
+
+function riscoPrevLinhasExcluidos(ex, atrasoMin) {
+  const n = k => ex[k] || 0;
+  return [
+    n('inadimplentes') ? `${riscoFmtNum(n('inadimplentes'))} já estão inadimplentes (seguem na cobrança)` : '',
+    n('semHistorico') ? `${riscoFmtNum(n('semHistorico'))} costumam pagar em dia (atraso menor que ${atrasoMin} dias)` : '',
+    n('naoAfetaIQ') ? `${riscoFmtNum(n('naoAfetaIQ'))} não perdem o IQ com essa fatura` : '',
+    n('jaEnviado') ? `${riscoFmtNum(n('jaEnviado'))} já receberam o lembrete desse mês` : '',
+    n('cicloInstavel') ? `${riscoFmtNum(n('cicloInstavel'))} sem dia de vencimento fixo` : '',
+    (n('semCustcode') + n('semContato')) ? `${riscoFmtNum(n('semCustcode') + n('semContato'))} sem custcode ou sem telefone` : '',
+  ].filter(Boolean);
+}
+
+function riscoPrevResumoHtml(prev) {
+  const par = prev.parametros || {};
+  const venc = Object.entries(prev.porVencimento || {}).map(([d, n]) => `<strong>${escaparHtml(d)}</strong>: ${riscoFmtNum(n)}`).join(' · ');
+  const uf = Object.entries(prev.porUf || {}).map(([d, n]) => `${escaparHtml(d)} ${riscoFmtNum(n)}`).join(' · ');
+  const safra = Object.entries(prev.porSafra || {}).map(([d, n]) => `${escaparHtml(d)}: ${riscoFmtNum(n)}`).join(' · ');
+  const ex = riscoPrevLinhasExcluidos(prev.excluidos || {}, par.atrasoMin);
+  if (!prev.total) {
+    return `<strong>Ninguém entra agora.</strong> Nenhum cliente com vencimento previsto nos próximos ${par.diasAntes} dias passa pelos critérios. ` +
+      `Os vencimentos são nos dias 10 e 20 de cada mês: rode uns ${par.diasAntes} dias antes.` +
+      (ex.length ? `<br><span class="risco-prev-ex">Ficaram de fora: ${ex.join(' · ')}.</span>` : '');
+  }
+  const amostra = (prev.amostra || []).map(a => `${escaparHtml(a.nome)} (${escaparHtml(a.safra || '—')}, atrasou ${a.atrasoMax}d, vence ${escaparHtml(a.vencPrevisto)})`).join('<br>');
+  return `<strong>${riscoFmtNum(prev.total)} cliente${prev.total === 1 ? '' : 's'}</strong> receberiam o lembrete — vencimento previsto: ${venc}` +
+    (safra ? `<br>Safras: ${safra}` : '') + (uf ? ` · Estados: ${uf}` : '') +
+    (ex.length ? `<br><span class="risco-prev-ex">Ficaram de fora: ${ex.join(' · ')}.</span>` : '') +
+    (amostra ? `<details class="risco-prev-amostra"><summary>Quem são (os que mais atrasaram)</summary>${amostra}</details>` : '');
+}
+
+async function riscoPrevVer() {
+  const el = document.getElementById('risco-prev-resumo');
+  el.innerHTML = 'Calculando…';
+  try {
+    const prev = await riscoPost('/api/risco-iq/preventivo', riscoPrevParametros());
+    el.innerHTML = riscoPrevResumoHtml(prev);
+  } catch (e) {
+    el.innerHTML = `<span class="risco-pend">Não foi possível calcular: ${escaparHtml(e.message)}</span>`;
+  }
+}
+
+async function riscoPrevMandar() {
+  const btn = document.getElementById('prev-btn-robo');
+  const rotuloBtn = btn.textContent;
+  btn.disabled = true;
+  try {
+    // 1) Prévia: só calcula, não grava nada.
+    btn.textContent = '⏳ Calculando…';
+    const corpo = riscoPrevParametros();
+    const prev = await riscoPost('/api/risco-iq/preventivo', corpo);
+    document.getElementById('risco-prev-resumo').innerHTML = riscoPrevResumoHtml(prev);
+    if (!prev.total) { alert('Nenhum cliente elegível agora com esses parâmetros.\n\nVeja o resumo no card para entender quem ficou de fora.'); return; }
+    const venc = Object.entries(prev.porVencimento || {}).map(([d, n]) => `${d}: ${n}`).join(', ');
+    const msg = [
+      `Mandar ${riscoFmtNum(prev.total)} cliente${prev.total === 1 ? '' : 's'} para o robô (lembrete PREVENTIVO)?`,
+      `Vencimento previsto — ${venc}.`,
+      '',
+      'O robô vai buscar no portal a fatura que ainda não venceu. Se o portal ainda não liberou a fatura de algum cliente, ele fica como "Sem faturas" e não recebe nada.',
+      'Antes de rodar o disparo, confira se o texto do template serve para fatura a vencer (não pode dizer que está em atraso).',
+      '',
+      'Isso SOBRESCREVE o clientes.xlsx do PC do robô e reinicia a fila dele.',
+      'Nada é enviado por WhatsApp agora: depois você roda o robô e dispara pelo painel local.',
+      'Cada disparo de fatura a vencer registra aqui o lembrete (uma vez por cliente por mês).',
+    ].join('\n');
+    if (!confirm(msg)) return;
+
+    // 2) Calcula de verdade (fica pendente no servidor).
+    btn.textContent = '⏳ Gerando…';
+    const camp = await riscoPost('/api/risco-iq/preventivo', { ...corpo, confirmar: true });
+
+    // 3) Entrega ao PC do robô (o painel local precisa estar aberto — iniciar.bat).
+    btn.textContent = '⏳ Enviando ao robô…';
+    const r = await fetch('http://localhost:3000/api/receber-fila', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientes: camp.clientes }),
+    }).then(x => x.json()).catch(() => ({ erro: 'O painel local (localhost:3000) não respondeu. Abra este dashboard pelo PC do robô e confirme que o iniciar.bat está aberto.' }));
+    if (r.erro) {
+      alert('❌ A base não chegou ao robô.\n\n' + r.erro + '\n\nNada foi registrado. Corrija e clique de novo.');
+      return;
+    }
+
+    // 4) Só agora a base passa a valer para registrar o lembrete quando o disparo sair.
+    await riscoPost(`/api/risco-iq/preventivo/${encodeURIComponent(camp.id)}/ativar`);
+    alert(`✅ Base do robô gerada com ${riscoFmtNum(r.total)} clientes.\n\nPróximos passos:\n1) Rode o robô no painel local para baixar as faturas a vencer.\n2) Dispare pelo painel local.\n\nCada envio de fatura a vencer registra o lembrete aqui.`);
+    riscoPrevStatus();
+  } catch (e) {
+    alert('Não foi possível mandar para o robô: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = rotuloBtn;
+  }
+}
+
+// Última base preventiva e o que aconteceu com quem já recebeu o lembrete.
+async function riscoPrevStatus() {
+  const el = document.getElementById('risco-prev-status');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/risco-iq/preventivo');
+    if (!resp.ok) return;
+    const { atual, resultado } = await resp.json();
+    const linhas = [];
+    if (atual) {
+      const quando = new Date(atual.criadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      linhas.push(`📨 <strong>Última base preventiva:</strong> ${escaparHtml(quando)} por ${escaparHtml(atual.autor || '—')} · ${riscoFmtNum(atual.total)} clientes · ` +
+        `<strong>${riscoFmtNum(atual.marcados)}</strong> já receberam o lembrete` +
+        (atual.ativa ? '' : ' <span class="risco-campanha-venc">(passou de 10 dias — não registra mais)</span>'));
+    }
+    if (resultado && resultado.enviados) {
+      const r = resultado;
+      const fechados = r.pagoEmDia + r.pagoComAtraso + r.emAberto;
+      linhas.push(`Resultado de quem já recebeu (${riscoFmtNum(r.enviados)} no total): ` +
+        (fechados ? `✅ <strong>${riscoFmtNum(r.pagoEmDia)}</strong> pagaram em dia · ⚠ <strong>${riscoFmtNum(r.pagoComAtraso)}</strong> pagaram com atraso · ❌ <strong>${riscoFmtNum(r.emAberto)}</strong> ainda em aberto` : 'ainda sem vencimento conferido') +
+        ` · ⏳ ${riscoFmtNum(r.aguardandoVencer + r.aguardandoSonar)} aguardando vencimento ou Sonar`);
+    }
+    el.innerHTML = linhas.join('<br>');
+  } catch {}
+}

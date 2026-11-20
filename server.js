@@ -1189,6 +1189,135 @@ app.get('/api/risco-iq/historico', (req, res) => {
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 
+// ── Lembrete por WhatsApp: "Mandar para o robô" ──
+// A aba monta a base do robô (clientes.xlsx, o mesmo formato do "Gerar Base Robô")
+// só com quem ainda dá para salvar. NADA é enviado daqui: quem roda o robô e
+// dispara no WhatsApp continua sendo o painel local, com as travas de sempre.
+// A "campanha" guardada aqui serve para o caminho de volta: quando o disparo
+// registrar o envio (POST /api/faturas/envio), o cliente vira "Cobrado".
+const RISCO_CAMPANHA_PATH = path.join(DATA_PATH, 'risco-iq-campanha.json');
+const CAMPANHA_VALIDADE_MS = 7 * 24 * 3600 * 1000;
+const FAIXAS_CAMPANHA = ['avencer', 'd1_10', 'd11_20', 'd21_30', 'emRisco']; // "+30" não entra: não dá mais para salvar
+
+// A base traz custcodes de mentira ("null", "0.000000000") para quem não cruzou
+// com o Sonar — o robô não acharia o cliente com isso, então não entram na fila.
+function custcodeValido(v) {
+  const s = String(v == null ? '' : v).trim();
+  return !!s && !/^(null|undefined|nan)$/i.test(s) && !/^0+([.,]0+)?$/.test(s);
+}
+
+function montarCampanha(b) {
+  const faixa = b.faixa || 'd21_30'; // padrão: a faixa crítica
+  if (!FAIXAS_CAMPANHA.includes(faixa)) {
+    const e = new Error('Só dá para mandar para o robô clientes que ainda dá para salvar (a vencer, 1–10, 11–20, 21–30 ou 1–30 dias). Quem já passou de 30 dias já afetou o IQ.');
+    e.status = 400; throw e;
+  }
+  // Só os filtros conhecidos — o resto do corpo da requisição é ignorado.
+  const filtros = {};
+  for (const k of ['modo', 'safra', 'mesVenc', 'estado', 'vendedor', 'busca', 'cobranca', 'hoje']) if (b[k]) filtros[k] = String(b[k]);
+  filtros.faixa = faixa;
+
+  const todos = lerJSON(BASE_CRUZADA_PATH, []);
+  const anotacoes = lerJSON(ANOTACOES_PATH, {});
+  const r = criarServicoRisco().calcular(todos, { ...filtros, todos: true }, { anotacoes });
+  const porOs = new Map(todos.map(c => [c.os, c]));
+
+  const excluidos = { promessa: 0, semCustcode: 0, semContato: 0 };
+  const clientes = [];
+  const mapa = {};      // chave de telefone → OS (para o caminho de volta)
+  let jaCobrados = 0;
+  for (const d of r.tabela.dados) {
+    const c = porOs.get(d.os);
+    if (!c) continue;
+    if (d.cobranca.status === 'promessa') { excluidos.promessa++; continue; }   // prometeu pagar: não incomodar
+    if (!custcodeValido(c.custcode) || !c.nome) { excluidos.semCustcode++; continue; } // o robô precisa desses dados
+    if (!c.contatoPrincipal) { excluidos.semContato++; continue; }
+    if (d.cobranca.status === 'cobrado') jaCobrados++;
+    clientes.push({ nome: c.nome, cpf: c.cpf || '', custcode: c.custcode, contato: c.contatoPrincipal, mesGross: c.mesGross || c.mesGrossManual || '' });
+    for (const tel of [c.contatoPrincipal, c.contatoResponsavel]) {
+      for (const k of chavesTelefone(limparTelefone(tel))) if (!mapa[k]) mapa[k] = c.os;
+    }
+  }
+  return { faixa, filtros, referencia: r.referencia, clientes, excluidos, jaCobrados, mapa };
+}
+
+function resumoCampanha(c) {
+  return { id: c.id, criadoEm: c.criadoEm, autor: c.autor, faixa: c.faixa, total: c.total,
+    marcados: Object.keys(c.marcados || {}).length };
+}
+
+app.post('/api/risco-iq/campanha', (req, res) => {
+  try {
+    const b = req.body || {};
+    const c = montarCampanha(b);
+    const base = { faixa: c.faixa, total: c.clientes.length, excluidos: c.excluidos, jaCobrados: c.jaCobrados, referencia: c.referencia };
+    if (!b.confirmar) return res.json({ preview: true, ...base });            // só mostra o que ia acontecer
+    if (!c.clientes.length) return res.status(400).json({ erro: 'Nenhum cliente elegível com esses filtros.' });
+
+    // Fica "pendente" até a tela confirmar que a base chegou ao PC do robô
+    // (ver /ativar). Se a entrega falhar, nada passa a marcar cobrança.
+    const arq = lerJSON(RISCO_CAMPANHA_PATH, { atual: null, pendente: null, historico: [] });
+    arq.pendente = {
+      id: String(Date.now()), criadoEm: new Date().toISOString(), autor: req.session?.usuario?.nome || 'Sistema',
+      faixa: c.faixa, filtros: c.filtros, total: c.clientes.length, excluidos: c.excluidos, mapa: c.mapa, marcados: {},
+    };
+    salvarJSON(RISCO_CAMPANHA_PATH, arq);
+    res.json({ ok: true, id: arq.pendente.id, ...base, clientes: c.clientes });
+  } catch (err) { res.status(err.status || 500).json({ erro: err.message }); }
+});
+
+// A tela já entregou a base ao robô: agora ela vale para o caminho de volta.
+app.post('/api/risco-iq/campanha/:id/ativar', (req, res) => {
+  try {
+    const arq = lerJSON(RISCO_CAMPANHA_PATH, { atual: null, pendente: null, historico: [] });
+    if (!arq.pendente || arq.pendente.id !== req.params.id) {
+      return res.status(404).json({ erro: 'Campanha não encontrada (pode ter sido substituída por uma mais nova).' });
+    }
+    if (arq.atual) arq.historico = [resumoCampanha(arq.atual), ...(arq.historico || [])].slice(0, 30);
+    arq.atual = { ...arq.pendente, ativadaEm: new Date().toISOString() };
+    arq.pendente = null;
+    salvarJSON(RISCO_CAMPANHA_PATH, arq);
+    res.json({ ok: true, ...resumoCampanha(arq.atual) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Resumo da última base mandada ao robô (o que a tela mostra embaixo dos filtros).
+app.get('/api/risco-iq/campanha', (req, res) => {
+  try {
+    const arq = lerJSON(RISCO_CAMPANHA_PATH, { atual: null });
+    const at = arq.atual;
+    if (!at) return res.json({ atual: null });
+    res.json({ atual: { ...resumoCampanha(at), ativa: Date.now() - new Date(at.ativadaEm || at.criadoEm).getTime() < CAMPANHA_VALIDADE_MS } });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Caminho de volta: o disparo registrou o envio de uma fatura para `telefone`.
+// Se o número é de um cliente da última base mandada ao robô (até 7 dias), marca
+// "cobrado" — uma vez só por campanha. Retorna true se marcou.
+function marcarCobrancaPorDisparo(telefone) {
+  const arq = lerJSON(RISCO_CAMPANHA_PATH, { atual: null });
+  const camp = arq.atual;
+  if (!camp || Date.now() - new Date(camp.ativadaEm || camp.criadoEm).getTime() > CAMPANHA_VALIDADE_MS) return false;
+  let os = null;
+  for (const k of chavesTelefone(telefone)) if (camp.mapa[k]) { os = camp.mapa[k]; break; }
+  if (!os || (camp.marcados || {})[os]) return false;
+
+  const dados = lerJSON(ANOTACOES_PATH, {});
+  const atual = dados[os] || { marcadores: [], anotacoes: [] };
+  const agora = new Date().toISOString();
+  const autor = 'WhatsApp (disparo)';
+  atual.marcadores = [...new Set([...(atual.marcadores || []), 'cobrado'])];
+  atual.cobrancas = [...(atual.cobrancas || []), { em: agora, autor, tipo: 'cobrado', campanha: camp.id }].slice(-50);
+  atual.anotacoes = [...(atual.anotacoes || []), { texto: 'Lembrete de fatura enviado por WhatsApp (disparo do Risco IQ)', autor, criadoEm: agora }];
+  atual.atualizadoEm = agora;
+  dados[os] = atual;
+  salvarJSON(ANOTACOES_PATH, dados);
+
+  camp.marcados = { ...(camp.marcados || {}), [os]: agora };
+  salvarJSON(RISCO_CAMPANHA_PATH, arq);
+  return true;
+}
+
 // Só a VPS guarda histórico: lá estão a base e o Sonar atualizados. O PC local é
 // só o painel dos robôs e a base dele pode estar velha.
 if (MODO === 'vps') {
@@ -2946,6 +3075,12 @@ app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
   }
 
   salvarJSON(FATURA_ENVIOS_PATH, envios);
+
+  // Se esse número faz parte da base que o Risco IQ mandou para o robô, o envio
+  // conta como "cobrado". Nunca pode derrubar o registro do envio em si.
+  try { marcarCobrancaPorDisparo(telefone); }
+  catch (e) { console.error('⚠️ Risco IQ: não consegui marcar a cobrança do disparo:', e.message); }
+
   res.json({ ok: true });
 });
 

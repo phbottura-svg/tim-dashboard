@@ -175,6 +175,7 @@ async function carregarRisco() {
     riscoRenderLista(d);
     riscoRenderGraficoDist(d);
     riscoCarregarHistorico();
+    riscoCarregarCampanha();
     riscoAtualizarBadge(d.contadores);
   } catch (e) {
     if (tbody) tbody.innerHTML = `<tr><td colspan="12" class="loading">Não foi possível carregar: ${escaparHtml(e.message)}</td></tr>`;
@@ -517,4 +518,109 @@ function riscoRenderEvolucao(dias) {
   } else {
     risco.graficos.evo = new Chart(canvas, { type: 'line', data: dados, options: opcoes });
   }
+}
+
+// ─── Lembrete por WhatsApp: "Mandar para o robô" ─────────────────────────────
+// Gera o clientes.xlsx do robô (mesmo caminho do "Gerar Base Robô") só com a faixa
+// crítica e os filtros da tela. NÃO envia nada: o disparo segue no painel local.
+
+const RISCO_ROTULO_FAIXA = {
+  d21_30: 'faixa crítica (21 a 30 dias)', d11_20: '11 a 20 dias', d1_10: '1 a 10 dias',
+  avencer: 'a vencer (até 7 dias)', emRisco: 'todos que ainda dá para salvar (1 a 30 dias)',
+};
+
+function riscoCorpoCampanha(faixa) {
+  const p = new URLSearchParams(riscoQuery());
+  const corpo = { faixa };
+  for (const k of ['modo', 'safra', 'mesVenc', 'estado', 'vendedor', 'busca', 'cobranca']) {
+    if (p.get(k)) corpo[k] = p.get(k);
+  }
+  return corpo;
+}
+
+async function riscoPost(url, corpo) {
+  const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(corpo || {}) });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.erro || `HTTP ${r.status}`);
+  return d;
+}
+
+async function riscoMandarRobo() {
+  const btn = document.getElementById('risco-btn-robo');
+  const faixa = risco.faixa || 'd21_30'; // sem faixa escolhida: a crítica
+  if (faixa === 'queimado') {
+    alert('Esses clientes já passaram de 30 dias e já afetaram o IQ — não dá mais para salvar, então não vão para o robô.\n\nEscolha uma faixa de 1 a 30 dias (ou "Ainda dá para salvar").');
+    return;
+  }
+  const rotuloBtn = btn.textContent;
+  btn.disabled = true;
+  try {
+    // 1) Prévia: só calcula, não grava nada.
+    btn.textContent = '⏳ Calculando…';
+    const corpo = riscoCorpoCampanha(faixa);
+    const prev = await riscoPost('/api/risco-iq/campanha', corpo);
+    if (!prev.total) {
+      alert('Nenhum cliente elegível com os filtros atuais.' +
+        (prev.excluidos && prev.excluidos.promessa ? `\n(${prev.excluidos.promessa} prometeram pagar e ficam de fora.)` : ''));
+      return;
+    }
+    const ex = prev.excluidos || {};
+    const msg = [
+      `Mandar ${riscoFmtNum(prev.total)} cliente${prev.total === 1 ? '' : 's'} para o robô?`,
+      `Faixa: ${RISCO_ROTULO_FAIXA[faixa] || faixa}.`,
+      '',
+      ex.promessa ? `• ${ex.promessa} que prometeram pagar ficam de fora.` : '',
+      (ex.semCustcode || ex.semContato) ? `• ${(ex.semCustcode || 0) + (ex.semContato || 0)} sem custcode ou sem telefone ficam de fora.` : '',
+      prev.jaCobrados ? `• ⚠ ${prev.jaCobrados} já foram cobrados antes — para não repetir, filtre "Ainda não cobrados" antes.` : '',
+      '',
+      'Isso SOBRESCREVE o clientes.xlsx do PC do robô e reinicia a fila dele.',
+      'Nada é enviado por WhatsApp agora: depois você roda o robô e dispara pelo painel local.',
+      'Cada disparo que sair marca o cliente aqui como "Cobrado · WhatsApp (disparo)".',
+    ].filter((l, i, a) => l !== '' || (a[i - 1] !== '' && i !== 0)).join('\n');
+    if (!confirm(msg)) return;
+
+    // 2) Calcula de verdade (fica pendente no servidor).
+    btn.textContent = '⏳ Gerando…';
+    const camp = await riscoPost('/api/risco-iq/campanha', { ...corpo, confirmar: true });
+
+    // 3) Entrega ao PC do robô (o painel local precisa estar aberto — iniciar.bat).
+    btn.textContent = '⏳ Enviando ao robô…';
+    const r = await fetch('http://localhost:3000/api/receber-fila', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ clientes: camp.clientes }),
+    }).then(x => x.json()).catch(() => ({ erro: 'O painel local (localhost:3000) não respondeu. Abra este dashboard pelo PC do robô e confirme que o iniciar.bat está aberto.' }));
+    if (r.erro) {
+      alert('❌ A base não chegou ao robô.\n\n' + r.erro + '\n\nNada foi marcado como cobrado. Corrija e clique de novo.');
+      return;
+    }
+
+    // 4) Só agora a campanha passa a valer para marcar "cobrado" quando o disparo sair.
+    await riscoPost(`/api/risco-iq/campanha/${encodeURIComponent(camp.id)}/ativar`);
+    alert(`✅ Base do robô gerada com ${riscoFmtNum(r.total)} clientes.\n\nPróximos passos:\n1) Rode o robô no painel local para baixar as faturas.\n2) Dispare pelo painel local.\n\nCada envio marca o cliente como cobrado aqui.`);
+    riscoCarregarCampanha();
+  } catch (e) {
+    alert('Não foi possível mandar para o robô: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = rotuloBtn;
+  }
+}
+
+// Linha de status: última base entregue ao robô e quantos já receberam o lembrete.
+async function riscoCarregarCampanha() {
+  const el = document.getElementById('risco-campanha');
+  if (!el) return;
+  try {
+    const resp = await fetch('/api/risco-iq/campanha');
+    if (!resp.ok) return;
+    const { atual } = await resp.json();
+    if (!atual) { el.style.display = 'none'; return; }
+    const quando = new Date(atual.criadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+    const rotulo = (RISCO_ROTULO_FAIXA[atual.faixa] || atual.faixa);
+    el.style.display = '';
+    el.innerHTML = `🚀 <strong>Última base mandada ao robô:</strong> ${escaparHtml(quando)} por ${escaparHtml(atual.autor || '—')} · ${escaparHtml(rotulo)} · ` +
+      `${riscoFmtNum(atual.total)} clientes · <strong>${riscoFmtNum(atual.marcados)}</strong> já receberam o lembrete` +
+      (atual.ativa ? '' : ' <span class="risco-campanha-venc">(passou de 7 dias — não marca mais)</span>');
+  } catch {}
 }

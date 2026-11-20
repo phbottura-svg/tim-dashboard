@@ -502,7 +502,10 @@
       </div>
       <button class="btn btn-secondary" onclick="carregarRisco()">Atualizar</button>
       <button class="btn btn-success" onclick="riscoExportar()" title="Baixa a lista com os filtros atuais">⬇ Exportar Excel</button>
+      <button class="btn btn-primary" id="risco-btn-robo" onclick="riscoMandarRobo()"
+              title="Gera a base do robô (clientes.xlsx) no PC do robô com a faixa crítica e os filtros atuais. Não envia nada: o disparo continua no painel local.">🚀 Mandar para o robô</button>
     </div>
+    <div id="risco-campanha" class="risco-campanha" style="display:none"></div>
 
     <div id="risco-explica" class="risco-explica"></div>
 

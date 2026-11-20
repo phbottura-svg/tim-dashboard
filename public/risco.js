@@ -346,6 +346,7 @@ function riscoRenderLista(d) {
   if (!t.dados.length) {
     tbody.innerHTML = '<tr><td colspan="12" class="loading">Nenhum cliente nesta situação.</td></tr>';
     document.getElementById('risco-paginacao').innerHTML = '';
+    riscoAjustarTopo();
     return;
   }
   tbody.innerHTML = t.dados.map(c => {
@@ -370,6 +371,12 @@ function riscoRenderLista(d) {
     </tr>`;
   }).join('');
   renderPag('risco-paginacao', t.pagina, t.totalPaginas, pg => { risco.pagina = pg; carregarRisco(); });
+  riscoAjustarTopo();
+}
+
+// reajusta a barra de rolagem do topo depois que a lista muda de tamanho
+function riscoAjustarTopo() {
+  if (window.riscoAjustarScrollTopo) { window.riscoAjustarScrollTopo(); setTimeout(window.riscoAjustarScrollTopo, 0); }
 }
 
 // ─── Gráficos ────────────────────────────────────────────────────────────────
@@ -624,3 +631,24 @@ async function riscoCarregarCampanha() {
       (atual.ativa ? '' : ' <span class="risco-campanha-venc">(passou de 7 dias — não marca mais)</span>');
   } catch {}
 }
+
+// Barra de rolagem horizontal também no TOPO da lista (sincronizada com a de baixo)
+(function riscoScrollTopo() {
+  const wrapper = document.getElementById('risco-wrapper');
+  const topo = document.getElementById('risco-scroll-top');
+  const inner = document.getElementById('risco-scroll-top-inner');
+  const tabela = document.getElementById('risco-tabela');
+  if (!wrapper || !topo || !inner || !tabela) return;
+  const ajustar = () => {
+    inner.style.width = tabela.scrollWidth + 'px';
+    // sem rolagem horizontal (ex.: aba oculta ou tela larga) a barra de cima some
+    topo.style.display = tabela.scrollWidth > wrapper.clientWidth + 1 ? '' : 'none';
+  };
+  if (window.ResizeObserver) { const ro = new ResizeObserver(ajustar); ro.observe(wrapper); ro.observe(tabela); }
+  window.addEventListener('resize', ajustar);
+  window.riscoAjustarScrollTopo = ajustar;
+  ajustar();
+  // compara valores (o evento de scroll chega depois, uma trava booleana nao funciona)
+  topo.addEventListener('scroll', () => { if (wrapper.scrollLeft !== topo.scrollLeft) wrapper.scrollLeft = topo.scrollLeft; });
+  wrapper.addEventListener('scroll', () => { if (topo.scrollLeft !== wrapper.scrollLeft) topo.scrollLeft = wrapper.scrollLeft; });
+})();

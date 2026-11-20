@@ -8,7 +8,7 @@ const multer = require('multer');
 const { parse: parseCSV } = require('csv-parse/sync');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { criarServico: criarServicoRiscoIQ, hojeBrasilia } = require('./lib/risco-iq');
+const { criarServico: criarServicoRiscoIQ, hojeBrasilia, statusCobranca } = require('./lib/risco-iq');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -485,7 +485,7 @@ function cruzarBases() {
 // sobreviverem ao Recruzar e às reimportações do Sonar.
 
 const ANOTACOES_PATH = path.join(DATA_PATH, 'anotacoes-clientes.json');
-const MARCADORES_VALIDOS = ['pagou', 'promessa', 'problema_tecnico', 'problema_app', 'cancelamento', 'venda_errada'];
+const MARCADORES_VALIDOS = ['pagou', 'cobrado', 'promessa', 'problema_tecnico', 'problema_app', 'cancelamento', 'venda_errada'];
 
 // ─── Filtros ──────────────────────────────────────────────────────────────────
 
@@ -1036,32 +1036,166 @@ function aplicarFiltros(lista, q) {
 app.get('/api/risco-iq', (req, res) => {
   try {
     const todos = lerJSON(BASE_CRUZADA_PATH, []);
-    const servico = criarServicoRiscoIQ({
-      parseDataBr,
-      normalizarMes,
-      safraParaMeses,
-      carregarCestaOficialPorSafra: criarCacheCestaOficial(),
-    });
-    const resultado = servico.calcular(todos, req.query);
-
-    // Frescor dos dados: os atrasos só são confiáveis se o Sonar estiver em dia.
-    const hoje = hojeBrasilia(req.query.hoje);
-    const sonar = {};
-    let maisAntiga = null;
-    for (const uf of Object.keys(BASE_SONAR)) {
-      const txt = ultimaAtualizacaoBase(uf);
-      sonar[uf] = txt;
-      const d = parseDataBr(txt);
-      if (d && (!maisAntiga || d < maisAntiga)) maisAntiga = d;
-    }
-    resultado.dados = {
-      sonar,
-      defasagemDias: maisAntiga ? Math.round((hoje - maisAntiga) / 86400000) : null,
-      cruzamento: lerJSON(SONAR_META_PATH, {}).ultimaAtualizacao || null,
-    };
+    const resultado = criarServicoRisco().calcular(todos, req.query, { anotacoes: lerJSON(ANOTACOES_PATH, {}) });
+    resultado.dados = frescorSonar(hojeBrasilia(req.query.hoje));
     res.json(resultado);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
+
+function criarServicoRisco() {
+  return criarServicoRiscoIQ({
+    parseDataBr,
+    normalizarMes,
+    safraParaMeses,
+    carregarCestaOficialPorSafra: criarCacheCestaOficial(),
+  });
+}
+
+// Frescor dos dados: os atrasos só são confiáveis se o Sonar estiver em dia.
+function frescorSonar(hoje) {
+  const sonar = {};
+  let maisAntiga = null;
+  for (const uf of Object.keys(BASE_SONAR)) {
+    const txt = ultimaAtualizacaoBase(uf);
+    sonar[uf] = txt;
+    const d = parseDataBr(txt);
+    if (d && (!maisAntiga || d < maisAntiga)) maisAntiga = d;
+  }
+  return {
+    sonar,
+    defasagemDias: maisAntiga ? Math.round((hoje - maisAntiga) / 86400000) : null,
+    cruzamento: lerJSON(SONAR_META_PATH, {}).ultimaAtualizacao || null,
+  };
+}
+
+// ── Cobrança: registrar que o cliente foi cobrado / prometeu pagar ──
+// Reaproveita as anotações do cliente (marcadores "cobrado" e "promessa" +
+// uma anotação com autor e hora) e guarda cada ação em `cobrancas`, que é o
+// que a aba usa para mostrar "cobrado há N dias por fulano".
+const ROTULO_COBRANCA = {
+  cobrado: 'Cobrança registrada (Risco IQ)',
+  promessa: 'Promessa de pagamento registrada (Risco IQ)',
+  limpar: 'Cobrança desfeita (Risco IQ)',
+};
+app.post('/api/risco-iq/cobranca/:os', (req, res) => {
+  try {
+    const os = String(req.params.os || '').trim();
+    const tipo = req.body?.tipo;
+    if (!os) return res.status(400).json({ erro: 'OS obrigatória' });
+    if (!ROTULO_COBRANCA[tipo]) return res.status(400).json({ erro: 'tipo inválido (cobrado, promessa ou limpar)' });
+    if (!lerJSON(BASE_CLIENTES_PATH, []).some(c => String(c.os) === os)) {
+      return res.status(404).json({ erro: 'OS não encontrada na base de clientes' });
+    }
+
+    const dados = lerJSON(ANOTACOES_PATH, {});
+    const atual = dados[os] || { marcadores: [], anotacoes: [] };
+    const marc = new Set(atual.marcadores || []);
+    if (tipo === 'cobrado') marc.add('cobrado');
+    if (tipo === 'promessa') { marc.add('cobrado'); marc.add('promessa'); }
+    if (tipo === 'limpar') { marc.delete('cobrado'); marc.delete('promessa'); }
+    atual.marcadores = [...marc];
+
+    const autor = req.session?.usuario?.nome || 'Sistema';
+    const agora = new Date().toISOString();
+    atual.cobrancas = [...(atual.cobrancas || []), { em: agora, autor, tipo }].slice(-50);
+    const obs = String(req.body?.obs || '').trim().slice(0, 500);
+    atual.anotacoes = [...(atual.anotacoes || []), {
+      texto: obs ? `${ROTULO_COBRANCA[tipo]}: ${obs}` : ROTULO_COBRANCA[tipo],
+      autor,
+      criadoEm: agora,
+    }];
+    atual.atualizadoEm = agora;
+    dados[os] = atual;
+    salvarJSON(ANOTACOES_PATH, dados);
+    res.json({ ok: true, cobranca: statusCobranca(atual, hojeBrasilia()) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ── Exportar a lista (com os mesmos filtros da tela) para Excel ──
+const SITUACAO_ROTULO = { avencer: 'A vencer', d1_10: '1 a 10 dias', d11_20: '11 a 20 dias', d21_30: 'Crítico (21 a 30 dias)', queimado: 'Já afetou o IQ', ok: 'Em dia' };
+const COBRANCA_ROTULO = { pendente: 'Não cobrado', cobrado: 'Cobrado', promessa: 'Prometeu pagar' };
+app.get('/api/risco-iq/exportar', (req, res) => {
+  try {
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const r = criarServicoRisco().calcular(todos, { ...req.query, todos: true }, { anotacoes: lerJSON(ANOTACOES_PATH, {}) });
+    const fmtDia = iso => {
+      if (!iso) return '';
+      const d = new Date(iso);
+      return isNaN(d) ? '' : d.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+    };
+    const cab = ['Cliente', 'Situação', 'Atraso (dias)', 'Faltam (dias)', 'Data limite', 'Vencimento', 'Contato 1', 'Contato 2',
+      'Vendedor', 'UF', 'Safra', 'OS', 'CustCode', 'Faturas em aberto', 'Cobrança', 'Última cobrança', 'Cobrado por', 'Observação'];
+    const linhas = r.tabela.dados.map(c => [
+      c.nome || '', SITUACAO_ROTULO[c.faixa] || c.faixa,
+      c.diasAtraso != null && c.diasAtraso > 0 ? c.diasAtraso : '',
+      c.diasRestantes != null ? Math.max(c.diasRestantes, 0) : '',
+      c.dataLimite || '', c.vencimento || '', c.contato || '', c.contato2 || '',
+      c.vendedor || '', c.uf || '', c.safra || '', c.os || '', c.custcode || '', c.faturasAbertas || 0,
+      COBRANCA_ROTULO[c.cobranca.status] || '', c.cobranca.status === 'pendente' ? '' : fmtDia(c.cobranca.ultimaEm),
+      c.cobranca.status === 'pendente' ? '' : (c.cobranca.ultimaPor || ''), c.motivo || '',
+    ]);
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet([cab, ...linhas]);
+    ws['!cols'] = [34, 22, 12, 12, 13, 13, 16, 16, 24, 6, 10, 14, 14, 14, 16, 16, 18, 40].map(wch => ({ wch }));
+    XLSX.utils.book_append_sheet(wb, ws, 'Risco IQ');
+    const buf = XLSX.write(wb, { bookType: 'xlsx', type: 'buffer' });
+    const sufixo = r.modo === 'safra' ? (r.referencia.safra || 'em-andamento') : r.referencia.mesVenc;
+    const nome = `risco-iq_${r.modo}_${String(sufixo).replace('/', '-')}_${r.referencia.hoje.split('/').reverse().join('-')}.xlsx`;
+    res.setHeader('Content-Disposition', `attachment; filename="${nome}"`);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.send(buf);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// ── Histórico diário ──
+// Uma foto por dia (a última do dia vence) com os contadores do escopo "todas as
+// safras em andamento". É dela que sai "quantos foram salvos / queimaram / entraram
+// em risco". O estado por cliente fica só dos 2 últimos dias (é o que o fluxo precisa).
+const RISCO_HISTORICO_PATH = path.join(DATA_PATH, 'risco-iq-historico.json');
+const RISCO_HISTORICO_MAX_DIAS = 180;
+
+function registrarSnapshotRiscoIQ() {
+  const todos = lerJSON(BASE_CRUZADA_PATH, []);
+  if (!todos.length) return null;
+  const hoje = hojeBrasilia();
+  const hist = lerJSON(RISCO_HISTORICO_PATH, { dias: [], estados: {} });
+  hist.dias = hist.dias || [];
+  hist.estados = hist.estados || {};
+
+  const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
+  // "Anterior" = o fim do dia mais recente ANTES de hoje (o de hoje é reescrito a cada rodada).
+  const anteriorData = Object.keys(hist.estados).filter(d => d < hojeStr).sort().pop();
+  const anterior = anteriorData ? { data: anteriorData, estado: hist.estados[anteriorData] } : null;
+
+  const snap = criarServicoRisco().snapshot(todos, { anterior });
+  const { estado, ...resumo } = snap;
+  resumo.defasagemDias = frescorSonar(hoje).defasagemDias;
+
+  hist.dias = hist.dias.filter(d => d.data !== snap.data);
+  hist.dias.push(resumo);
+  hist.dias.sort((a, b) => a.data.localeCompare(b.data));
+  hist.dias = hist.dias.slice(-RISCO_HISTORICO_MAX_DIAS);
+  hist.estados[snap.data] = estado;
+  for (const d of Object.keys(hist.estados).sort().slice(0, -2)) delete hist.estados[d];
+  salvarJSON(RISCO_HISTORICO_PATH, hist);
+  return resumo;
+}
+
+app.get('/api/risco-iq/historico', (req, res) => {
+  try {
+    const hist = lerJSON(RISCO_HISTORICO_PATH, { dias: [] });
+    const n = Math.min(Math.max(parseInt(req.query.dias) || 60, 1), RISCO_HISTORICO_MAX_DIAS);
+    res.json({ dias: (hist.dias || []).slice(-n) });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Só a VPS guarda histórico: lá estão a base e o Sonar atualizados. O PC local é
+// só o painel dos robôs e a base dele pode estar velha.
+if (MODO === 'vps') {
+  const rodar = () => { try { registrarSnapshotRiscoIQ(); } catch (e) { console.error('⚠️ Histórico do Risco IQ:', e.message); } };
+  setTimeout(rodar, 30 * 1000);
+  setInterval(rodar, 30 * 60 * 1000);
+}
 
 // ─── Upload (memória) ─────────────────────────────────────────────────────────
 

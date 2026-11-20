@@ -304,6 +304,7 @@
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-dentro" onchange="onIqCheckbox('dentro')" title="Precisa de um Mês Gross selecionado no filtro"> ✅ Dentro do IQ</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-fora" onchange="onIqCheckbox('fora')" title="Precisa de um Mês Gross selecionado no filtro"> ❌ Fora do IQ</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-pagou" onchange="buscarTabela()"> 💰 Pagou</label>
+      <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-cobrado" onchange="buscarTabela()"> 📞 Cobrado</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-promessa" onchange="buscarTabela()"> 🤝 Promessa</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-problema_tecnico" onchange="buscarTabela()"> 🔧 Prob. técnico</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-mk-problema_app" onchange="buscarTabela()"> 📱 Prob. app</label>
@@ -490,7 +491,17 @@
         <label>Buscar</label>
         <input type="text" id="risco-busca" class="filtro-input-busca" placeholder="Nome, CPF, OS..." oninput="riscoBuscaDebounce()" />
       </div>
+      <div class="filtro-grupo">
+        <label>Cobrança</label>
+        <select id="risco-cobranca" onchange="riscoFiltrar()">
+          <option value="">Todas</option>
+          <option value="pendente">Ainda não cobrados</option>
+          <option value="cobrado">Já cobrados</option>
+          <option value="promessa">Prometeram pagar</option>
+        </select>
+      </div>
       <button class="btn btn-secondary" onclick="carregarRisco()">Atualizar</button>
+      <button class="btn btn-success" onclick="riscoExportar()" title="Baixa a lista com os filtros atuais">⬇ Exportar Excel</button>
     </div>
 
     <div id="risco-explica" class="risco-explica"></div>
@@ -508,6 +519,25 @@
           <thead id="risco-heat-head"></thead>
           <tbody id="risco-heat-body"></tbody>
         </table>
+      </div>
+    </section>
+
+    <section class="tabela-section" id="risco-sec-graficos">
+      <div class="tabela-header">
+        <h3>Gráficos</h3>
+        <span id="risco-graf-sub">—</span>
+      </div>
+      <div class="risco-graficos">
+        <div class="risco-graf-card">
+          <h4 id="risco-graf1-titulo">Situação por safra</h4>
+          <div class="risco-canvas"><canvas id="risco-chart-dist"></canvas></div>
+        </div>
+        <div class="risco-graf-card">
+          <h4>Evolução diária <small>(todas as safras em andamento)</small></h4>
+          <div id="risco-fluxo" class="risco-fluxo"></div>
+          <div class="risco-canvas" id="risco-evo-canvas-wrap"><canvas id="risco-chart-evo"></canvas></div>
+          <div id="risco-evo-vazio" class="risco-vazio" style="display:none"></div>
+        </div>
       </div>
     </section>
 
@@ -529,11 +559,11 @@
         <table>
           <thead>
             <tr>
-              <th>Cliente</th><th>Situação</th><th>Faltam</th><th>Data limite</th><th>Atraso</th>
+              <th>Cliente</th><th>Situação</th><th>Faltam</th><th>Data limite</th><th>Cobrança</th><th>Atraso</th>
               <th>Contato</th><th>Vendedor</th><th>UF</th><th>Safra</th><th>Vencimento</th><th>Obs.</th>
             </tr>
           </thead>
-          <tbody id="risco-tbody"><tr><td colspan="11" class="loading">Carregando…</td></tr></tbody>
+          <tbody id="risco-tbody"><tr><td colspan="12" class="loading">Carregando…</td></tr></tbody>
         </table>
       </div>
       <div class="paginacao" id="risco-paginacao"></div>
@@ -825,6 +855,7 @@
     <div class="anot-secao-label">Situação do cliente</div>
     <div class="anot-marcadores">
       <label class="anot-marcador"><input type="checkbox" id="anot-mk-pagou"> 💰 Cliente pagou</label>
+      <label class="anot-marcador"><input type="checkbox" id="anot-mk-cobrado"> 📞 Cliente cobrado</label>
       <label class="anot-marcador"><input type="checkbox" id="anot-mk-promessa"> 🤝 Promessa de pagamento</label>
       <label class="anot-marcador"><input type="checkbox" id="anot-mk-problema_tecnico"> 🔧 Problema técnico</label>
       <label class="anot-marcador"><input type="checkbox" id="anot-mk-problema_app"> 📱 Problema no app</label>

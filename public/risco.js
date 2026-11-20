@@ -75,14 +75,65 @@ function riscoQuery() {
   const estado = document.getElementById('risco-estado').value;
   const vend = document.getElementById('risco-vendedor').value;
   const busca = document.getElementById('risco-busca').value.trim();
+  const cobranca = document.getElementById('risco-cobranca').value;
   if (estado) p.set('estado', estado);
   if (vend) p.set('vendedor', vend);
   if (busca) p.set('busca', busca);
+  if (cobranca) p.set('cobranca', cobranca);
   if (risco.faixa) p.set('faixa', risco.faixa);
   p.set('ordenar', document.getElementById('risco-ordenar').value);
   p.set('pagina', risco.pagina);
   p.set('porPagina', 50);
   return p.toString();
+}
+
+// Baixa a lista inteira (sem paginar) com os filtros que estão na tela.
+function riscoExportar() {
+  const p = new URLSearchParams(riscoQuery());
+  p.delete('pagina');
+  p.delete('porPagina');
+  const a = document.createElement('a');
+  a.href = '/api/risco-iq/exportar?' + p.toString();
+  a.download = '';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+// Registra a cobrança direto na linha (usa as anotações do cliente).
+async function riscoAcao(os, tipo, btn) {
+  if (btn) btn.disabled = true;
+  try {
+    const r = await fetch('/api/risco-iq/cobranca/' + encodeURIComponent(os), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tipo }),
+    });
+    if (!r.ok) throw new Error((await r.json().catch(() => ({}))).erro || `HTTP ${r.status}`);
+    await carregarRisco();
+  } catch (e) {
+    if (btn) btn.disabled = false;
+    alert('Não foi possível registrar: ' + e.message);
+  }
+}
+
+function riscoCelulaCobranca(c) {
+  const cb = c.cobranca || { status: 'pendente' };
+  const os = escaparHtml(c.os);
+  if (cb.status === 'pendente') {
+    return `<div class="risco-cob">
+      <button type="button" class="risco-cob-btn" onclick="riscoAcao('${os}','cobrado',this)" title="Registrar que já cobrei este cliente">📞 Cobrei</button>
+      <button type="button" class="risco-cob-btn" onclick="riscoAcao('${os}','promessa',this)" title="Cliente prometeu pagar">🤝 Prometeu</button>
+    </div>`;
+  }
+  const quando = cb.diasDesde == null ? '' : (cb.diasDesde === 0 ? 'hoje' : `há ${cb.diasDesde}d`);
+  const quem = cb.ultimaPor ? ` · ${escaparHtml(cb.ultimaPor)}` : '';
+  const rot = cb.status === 'promessa' ? '🤝 Prometeu pagar' : '📞 Cobrado';
+  return `<div class="risco-cob">
+    <span class="risco-cob-chip ${cb.status}" title="Última ação registrada">${rot}${quando ? ' ' + quando : ''}${quem}</span>
+    ${cb.status === 'cobrado' ? `<button type="button" class="risco-cob-btn" onclick="riscoAcao('${os}','promessa',this)" title="Cliente prometeu pagar">🤝</button>` : ''}
+    <button type="button" class="risco-cob-btn desfazer" onclick="riscoAcao('${os}','limpar',this)" title="Desfazer o registro de cobrança">↩</button>
+  </div>`;
 }
 
 // Preenche os selects só na primeira carga (preservando a escolha do usuário
@@ -110,7 +161,7 @@ function riscoPreencherOpcoes(op, ref) {
 async function carregarRisco() {
   const meuId = ++risco.reqId;
   const tbody = document.getElementById('risco-tbody');
-  if (tbody && !tbody.children.length) tbody.innerHTML = '<tr><td colspan="11" class="loading">Carregando…</td></tr>';
+  if (tbody && !tbody.children.length) tbody.innerHTML = '<tr><td colspan="12" class="loading">Carregando…</td></tr>';
   try {
     const resp = await fetch('/api/risco-iq?' + riscoQuery());
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -122,9 +173,11 @@ async function carregarRisco() {
     riscoRenderKpis(d);
     riscoRenderImpacto(d);
     riscoRenderLista(d);
+    riscoRenderGraficoDist(d);
+    riscoCarregarHistorico();
     riscoAtualizarBadge(d.contadores);
   } catch (e) {
-    if (tbody) tbody.innerHTML = `<tr><td colspan="11" class="loading">Não foi possível carregar: ${escaparHtml(e.message)}</td></tr>`;
+    if (tbody) tbody.innerHTML = `<tr><td colspan="12" class="loading">Não foi possível carregar: ${escaparHtml(e.message)}</td></tr>`;
   }
 }
 
@@ -199,11 +252,15 @@ function riscoRenderKpis(d) {
             onclick="riscoFiltrarFaixa('emRisco')" title="Clique para filtrar a lista">
       <div class="kpi-label">Ainda dá para salvar</div>
       <div class="kpi-value">${riscoFmtNum(c.emRisco)}</div>
-      <div class="kpi-sub">1 a 30 dias de atraso</div>
+      <div class="kpi-sub">1 a 30 dias de atraso${c.emRisco ? `<br><strong class="risco-pend">${riscoFmtNum(c.emRiscoPendentes)} sem cobrança</strong>` : ''}</div>
     </button>`;
   document.getElementById('risco-kpis').innerHTML = salvaveis + cartoes;
 
   const extras = [];
+  if (c.emRisco) {
+    const cobrados = c.emRisco - (c.emRiscoPendentes || 0);
+    extras.push(`<span title="Dos clientes que ainda dá para salvar"><strong>${riscoFmtNum(cobrados)}</strong> de ${riscoFmtNum(c.emRisco)} já cobrados</span>`);
+  }
   extras.push(`<span><strong>${riscoFmtNum(c.ok)}</strong> em dia</span>`);
   extras.push(`<span><strong>${riscoFmtNum(c.total)}</strong> clientes no recorte</span>`);
   if (d.modo === 'safra' && c.semDados) extras.push(`<span title="Sem nenhuma fatura no Sonar — não dá para medir atraso"><strong>${riscoFmtNum(c.semDados)}</strong> sem dados no Sonar</span>`);
@@ -286,7 +343,7 @@ function riscoRenderLista(d) {
 
   const tbody = document.getElementById('risco-tbody');
   if (!t.dados.length) {
-    tbody.innerHTML = '<tr><td colspan="11" class="loading">Nenhum cliente nesta situação.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="12" class="loading">Nenhum cliente nesta situação.</td></tr>';
     document.getElementById('risco-paginacao').innerHTML = '';
     return;
   }
@@ -301,6 +358,7 @@ function riscoRenderLista(d) {
       <td>${riscoTagFaixa(c.faixa)}</td>
       <td>${faltam}</td>
       <td>${escaparHtml(c.dataLimite || '—')}</td>
+      <td>${riscoCelulaCobranca(c)}</td>
       <td>${atraso}</td>
       <td>${escaparHtml(c.contato || '—')}</td>
       <td>${escaparHtml(c.vendedor || '—')}</td>
@@ -311,4 +369,152 @@ function riscoRenderLista(d) {
     </tr>`;
   }).join('');
   renderPag('risco-paginacao', t.pagina, t.totalPaginas, pg => { risco.pagina = pg; carregarRisco(); });
+}
+
+// ─── Gráficos ────────────────────────────────────────────────────────────────
+
+risco.graficos = { dist: null, evo: null };
+
+function riscoCss(nome, padrao) {
+  const v = getComputedStyle(document.documentElement).getPropertyValue(nome).trim();
+  return v || padrao;
+}
+
+function riscoOpcoesEixos() {
+  const texto = riscoCss('--dim', '#8892A4');
+  const grade = riscoCss('--border', '#1E2436');
+  return { texto, grade };
+}
+
+// Barras empilhadas: como cada safra (ou estado) se divide entre as faixas de atraso.
+function riscoRenderGraficoDist(d) {
+  const canvas = document.getElementById('risco-chart-dist');
+  if (!canvas || typeof Chart === 'undefined') return;
+  const linhas = d.distribuicao.linhas;
+  const porSafra = d.modo === 'safra';
+  document.getElementById('risco-graf1-titulo').textContent = porSafra ? 'Situação dos clientes por safra' : 'Situação dos clientes por estado';
+  document.getElementById('risco-graf-sub').textContent = porSafra ? 'Clique numa barra para filtrar a safra' : 'Clique numa barra para filtrar o estado';
+
+  const series = [
+    ['Em dia', 'ok', '#00D68F'],
+    ['A vencer', 'avencer', '#9B8CFF'],
+    ['1–10 dias', 'd1_10', '#F0B90B'],
+    ['11–20 dias', 'd11_20', '#FF9142'],
+    ['21–30 dias', 'd21_30', '#FF6B4A'],
+    ['+30 dias (afetou o IQ)', 'queimado', '#FF4757'],
+  ];
+  const { texto, grade } = riscoOpcoesEixos();
+  const dados = {
+    labels: linhas.map(l => l.nome),
+    datasets: series.map(([label, chave, cor]) => ({
+      label, data: linhas.map(l => l[chave] || 0), backgroundColor: cor, borderWidth: 0,
+    })),
+  };
+  const opcoes = {
+    indexAxis: 'y',
+    responsive: true,
+    maintainAspectRatio: false,
+    onClick: (_e, els) => { if (els.length) riscoFiltrarLinha(linhas[els[0].index].nome); },
+    scales: {
+      x: { stacked: true, ticks: { color: texto }, grid: { color: grade } },
+      y: { stacked: true, ticks: { color: texto }, grid: { display: false } },
+    },
+    plugins: {
+      legend: { position: 'bottom', labels: { color: texto, boxWidth: 12, font: { size: 11 } } },
+      tooltip: { callbacks: { footer: items => {
+        const l = linhas[items[0].dataIndex];
+        return l.total ? `Total: ${riscoFmtNum(l.total)} clientes` : '';
+      } } },
+    },
+  };
+  if (risco.graficos.dist) {
+    risco.graficos.dist.data = dados;
+    risco.graficos.dist.options = opcoes;
+    risco.graficos.dist.update();
+  } else {
+    risco.graficos.dist = new Chart(canvas, { type: 'bar', data: dados, options: opcoes });
+  }
+}
+
+// 'YYYY-MM-DD' → 'dd/mm'
+function riscoDiaCurto(iso) {
+  const [, m, d] = String(iso).split('-');
+  return `${d}/${m}`;
+}
+
+async function riscoCarregarHistorico() {
+  try {
+    const resp = await fetch('/api/risco-iq/historico?dias=60');
+    if (!resp.ok) return;
+    const h = await resp.json();
+    riscoRenderEvolucao(h.dias || []);
+  } catch {}
+}
+
+// Linha do tempo (foto diária) + resumo do que mudou desde o dia anterior.
+function riscoRenderEvolucao(dias) {
+  const vazio = document.getElementById('risco-evo-vazio');
+  const wrap = document.getElementById('risco-evo-canvas-wrap');
+  const fluxoEl = document.getElementById('risco-fluxo');
+  if (!vazio || !wrap || !fluxoEl) return;
+
+  if (!dias.length) {
+    wrap.style.display = 'none';
+    fluxoEl.innerHTML = '';
+    vazio.style.display = '';
+    vazio.textContent = 'O histórico começa a ser gravado automaticamente — a primeira foto aparece em instantes e o gráfico ganha forma a partir do segundo dia.';
+    return;
+  }
+  wrap.style.display = '';
+  vazio.style.display = dias.length < 2 ? '' : 'none';
+  if (dias.length < 2) vazio.textContent = `Primeira foto gravada em ${riscoDiaCurto(dias[0].data)}. A linha de evolução aparece a partir do segundo dia.`;
+
+  // O que mudou desde a foto anterior (usa o último dia que já tem comparação).
+  const ultimo = dias[dias.length - 1];
+  const f = ultimo.fluxo;
+  if (f) {
+    const aviso = ultimo.defasagemDias != null && ultimo.defasagemDias >= 2
+      ? `<span class="risco-fluxo-aviso" title="Os atrasos desse dia foram calculados com dados do Sonar de ${ultimo.defasagemDias} dias atrás">⚠ Sonar defasado</span>` : '';
+    fluxoEl.innerHTML = `
+      <span class="risco-fluxo-ref">Desde ${riscoDiaCurto(f.desde)}:</span>
+      <span class="risco-fluxo-chip salvos" title="Estavam com 1–30 dias de atraso e hoje estão em dia">✅ ${riscoFmtNum(f.salvos)} salvos</span>
+      <span class="risco-fluxo-chip queimaram" title="Estavam com 1–30 dias e passaram de 30 sem pagar">🔥 ${riscoFmtNum(f.queimaram)} queimaram</span>
+      <span class="risco-fluxo-chip novos" title="Entraram na faixa de 1–30 dias">➕ ${riscoFmtNum(f.novosEmRisco)} novos em risco</span>
+      ${aviso}`;
+  } else {
+    fluxoEl.innerHTML = '';
+  }
+
+  if (typeof Chart === 'undefined') return;
+  const canvas = document.getElementById('risco-chart-evo');
+  const { texto, grade } = riscoOpcoesEixos();
+  const linha = (label, chave, cor) => ({
+    label, data: dias.map(x => x.contadores[chave] || 0), borderColor: cor, backgroundColor: cor,
+    tension: 0.25, pointRadius: dias.length > 30 ? 0 : 3, borderWidth: 2,
+  });
+  const dados = {
+    labels: dias.map(x => riscoDiaCurto(x.data)),
+    datasets: [
+      linha('Ainda dá para salvar (1–30)', 'emRisco', '#7B5CFA'),
+      linha('Críticos (21–30)', 'd21_30', '#FF6B4A'),
+      linha('Já afetaram o IQ (+30)', 'queimado', '#FF4757'),
+    ],
+  };
+  const opcoes = {
+    responsive: true,
+    maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    scales: {
+      x: { ticks: { color: texto, maxTicksLimit: 10 }, grid: { color: grade } },
+      y: { beginAtZero: true, ticks: { color: texto }, grid: { color: grade } },
+    },
+    plugins: { legend: { position: 'bottom', labels: { color: texto, boxWidth: 12, font: { size: 11 } } } },
+  };
+  if (risco.graficos.evo) {
+    risco.graficos.evo.data = dados;
+    risco.graficos.evo.options = opcoes;
+    risco.graficos.evo.update();
+  } else {
+    risco.graficos.evo = new Chart(canvas, { type: 'line', data: dados, options: opcoes });
+  }
 }

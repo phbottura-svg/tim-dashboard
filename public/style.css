@@ -1519,3 +1519,34 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
   .risco-kpis { padding-left: 16px; padding-right: 16px; }
   .risco-kpi { min-width: 130px; }
 }
+
+/* ─── Risco IQ — fase 2 (cobrança, gráficos) ───────────────────────────────── */
+.risco-pend { color: var(--laranja); font-weight: 700; }
+.risco-graficos { display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 16px; padding: 18px 22px 22px; }
+.risco-graf-card { background: var(--bg3); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px 12px; min-width: 0; }
+.risco-graf-card h4 { font-size: 13px; font-weight: 700; color: var(--texto); margin-bottom: 10px; }
+.risco-graf-card h4 small { font-weight: 500; color: var(--dim); font-size: 11px; }
+.risco-canvas { position: relative; height: 280px; }
+.risco-vazio { font-size: 12.5px; color: var(--dim); padding: 8px 0 0; line-height: 1.5; }
+.risco-fluxo { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; font-size: 12px; }
+.risco-fluxo-ref { color: var(--dim); font-weight: 600; }
+.risco-fluxo-chip { padding: 3px 10px; border-radius: 20px; font-weight: 700; border: 1px solid transparent; }
+.risco-fluxo-chip.salvos    { background: rgba(0,214,143,.14);  color: var(--verde);    border-color: rgba(0,214,143,.35); }
+.risco-fluxo-chip.queimaram { background: rgba(255,71,87,.14);  color: var(--vermelho); border-color: rgba(255,71,87,.35); }
+.risco-fluxo-chip.novos     { background: rgba(123,92,250,.15); color: var(--azul-c);   border-color: rgba(123,92,250,.4); }
+.risco-fluxo-aviso { color: var(--laranja); font-weight: 600; }
+
+.risco-cob { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+.risco-cob-btn { background: var(--bg3); border: 1px solid var(--border2); color: var(--texto); border-radius: 8px; padding: 4px 9px;
+  font: 600 11.5px var(--fonte); cursor: pointer; white-space: nowrap; transition: all .15s; }
+.risco-cob-btn:hover:not(:disabled) { border-color: var(--azul); color: var(--azul-c); }
+.risco-cob-btn:disabled { opacity: .45; cursor: wait; }
+.risco-cob-btn.desfazer { padding: 4px 8px; color: var(--dim); }
+.risco-cob-chip { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 700; border: 1px solid transparent; }
+.risco-cob-chip.cobrado  { background: rgba(240,185,11,.14); color: var(--amarelo); border-color: rgba(240,185,11,.35); }
+.risco-cob-chip.promessa { background: rgba(0,214,143,.14);  color: var(--verde);   border-color: rgba(0,214,143,.35); }
+
+@media (max-width: 700px) {
+  .risco-graficos { grid-template-columns: 1fr; padding: 14px 12px 16px; }
+  .risco-canvas { height: 240px; }
+}

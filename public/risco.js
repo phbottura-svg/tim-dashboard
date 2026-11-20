@@ -225,6 +225,10 @@ function riscoRenderExplica(d) {
   if (d.modo === 'safra') {
     txt = `Regra do IQ: fatura da janela da safra com <strong>mais de 30 dias de atraso</strong> já afetou o IQ. ` +
       `De 1 a 30 dias ainda dá para salvar — basta o cliente pagar dentro do prazo. Posição em <strong>${escaparHtml(hoje)}</strong>.`;
+    if (d.referencia?.corte && !info?.fechada) {
+      txt += ` O IQ é medido no fechamento da safra (<strong>${escaparHtml(d.referencia.corte)}</strong>): ` +
+        `só é risco a fatura que passa de 30 dias de atraso até essa data. Atraso que não chega lá não afeta o IQ desta safra.`;
+    }
     if (info?.fechada) {
       txt += ` <strong>Safra fechada${info.oficial ? ' (fechamento oficial da TIM)' : ''}:</strong> o IQ vale na data de corte e não muda mais; os números mostram como ficou.`;
     } else if (!safraSel && d.opcoes.safras.every(s => s.fechada)) {
@@ -253,7 +257,7 @@ function riscoRenderKpis(d) {
             onclick="riscoFiltrarFaixa('emRisco')" title="Clique para filtrar a lista">
       <div class="kpi-label">Ainda dá para salvar</div>
       <div class="kpi-value">${riscoFmtNum(c.emRisco)}</div>
-      <div class="kpi-sub">1 a 30 dias de atraso${c.emRisco ? `<br><strong class="risco-pend">${riscoFmtNum(c.emRiscoPendentes)} sem cobrança</strong>` : ''}</div>
+      <div class="kpi-sub">${d.modo === 'safra' ? 'vão passar de 30 dias antes do fechamento' : '1 a 30 dias de atraso'}${c.emRisco ? `<br><strong class="risco-pend">${riscoFmtNum(c.emRiscoPendentes)} sem cobrança</strong>` : ''}</div>
     </button>`;
   document.getElementById('risco-kpis').innerHTML = salvaveis + cartoes;
 
@@ -262,7 +266,10 @@ function riscoRenderKpis(d) {
     const cobrados = c.emRisco - (c.emRiscoPendentes || 0);
     extras.push(`<span title="Dos clientes que ainda dá para salvar"><strong>${riscoFmtNum(cobrados)}</strong> de ${riscoFmtNum(c.emRisco)} já cobrados</span>`);
   }
-  extras.push(`<span><strong>${riscoFmtNum(c.ok)}</strong> em dia</span>`);
+  extras.push(`<span><strong>${riscoFmtNum(c.ok - (c.semRisco || 0))}</strong> em dia</span>`);
+  if (d.modo === 'safra' && c.semRisco) {
+    extras.push(`<span title="Têm fatura atrasada, mas ela não passa de 30 dias até o fechamento da safra — não afeta o IQ"><strong>${riscoFmtNum(c.semRisco)}</strong> atrasados sem risco para o IQ</span>`);
+  }
   extras.push(`<span><strong>${riscoFmtNum(c.total)}</strong> clientes no recorte</span>`);
   if (d.modo === 'safra' && c.semDados) extras.push(`<span title="Sem nenhuma fatura no Sonar — não dá para medir atraso"><strong>${riscoFmtNum(c.semDados)}</strong> sem dados no Sonar</span>`);
   if (d.modo === 'mes' && c.churn) extras.push(`<span title="Clientes cancelados, fora da cobrança"><strong>${riscoFmtNum(c.churn)}</strong> churn (fora da conta)</span>`);
@@ -281,18 +288,19 @@ function riscoRenderImpacto(d) {
   const ehSafra = d.modo === 'safra';
   document.getElementById('risco-impacto-titulo').textContent = ehSafra ? 'Impacto no IQ por safra' : 'Distribuição por estado';
   document.getElementById('risco-impacto-sub').textContent = ehSafra
-    ? 'IQ hoje × IQ se nenhum cliente de 1 a 30 dias pagar a tempo · clique numa linha para filtrar'
+    ? 'IQ hoje × IQ se ninguém que ainda pode queimar pagar a tempo · clique numa linha para filtrar'
     : 'Clique numa linha para filtrar';
 
   const cab = `<tr>
     <th>${d.distribuicao.rotulo}</th><th>Clientes</th><th>Em dia</th>
+    ${ehSafra ? '<th title="Têm fatura atrasada, mas ela não passa de 30 dias até o fechamento da safra — não afeta o IQ">Atraso sem risco</th>' : ''}
     <th>A vencer</th><th>1–10</th><th>11–20</th><th>21–30</th><th>+30</th>
-    ${ehSafra ? '<th title="% de clientes dentro do IQ hoje">IQ hoje</th><th title="IQ se nenhum cliente com 1 a 30 dias de atraso pagar a tempo (todos viram +30)">Se ninguém pagar</th><th title="Pontos de IQ que ainda dá para salvar com cobrança">Em jogo</th>' : ''}
+    ${ehSafra ? '<th title="% de clientes dentro do IQ hoje">IQ hoje</th><th title="IQ se nenhum cliente que ainda pode passar de 30 dias até o fechamento pagar a tempo (todos viram +30)">Se ninguém pagar</th><th title="Pontos de IQ que ainda dá para salvar com cobrança">Em jogo</th>' : ''}
   </tr>`;
   document.getElementById('risco-heat-head').innerHTML = cab;
 
   const linhas = d.distribuicao.linhas;
-  const cols = ehSafra ? 11 : 8;
+  const cols = ehSafra ? 12 : 8;
   if (!linhas.length) {
     document.getElementById('risco-heat-body').innerHTML = `<tr><td colspan="${cols}" class="loading">Nenhum cliente neste recorte.</td></tr>`;
     return;
@@ -310,7 +318,8 @@ function riscoRenderImpacto(d) {
     return `<tr class="risco-linha" onclick="riscoFiltrarLinha('${nome}')">
       <td><strong>${nome}</strong>${tag}</td>
       <td class="num">${riscoFmtNum(l.total)}</td>
-      <td class="num">${riscoFmtNum(l.ok)}</td>
+      <td class="num">${riscoFmtNum(l.ok - (l.semRisco || 0))}</td>
+      ${ehSafra ? `<td class="num">${l.semRisco ? riscoFmtNum(l.semRisco) : '–'}</td>` : ''}
       ${riscoCelula(l.avencer, l.total, '#9B8CFF')}
       ${riscoCelula(l.d1_10, l.total, '#F0B90B')}
       ${riscoCelula(l.d11_20, l.total, '#FF9142')}
@@ -333,7 +342,7 @@ function riscoRenderLista(d) {
   const f = RISCO_FAIXAS.find(x => x.chave === risco.faixa);
   const chip = document.getElementById('risco-faixa-ativa');
   if (risco.faixa) {
-    const rotulo = risco.faixa === 'emRisco' ? 'Ainda dá para salvar (1–30 dias)' : (f ? f.rotulo : risco.faixa);
+    const rotulo = risco.faixa === 'emRisco' ? 'Ainda dá para salvar' : (f ? f.rotulo : risco.faixa);
     chip.style.display = '';
     chip.innerHTML = `${escaparHtml(rotulo)} <button type="button" onclick="riscoFiltrarFaixa('${risco.faixa}')" title="Limpar filtro">✕</button>`;
   } else {

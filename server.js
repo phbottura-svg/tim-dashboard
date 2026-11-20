@@ -8,7 +8,7 @@ const multer = require('multer');
 const { parse: parseCSV } = require('csv-parse/sync');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
-const { criarServico: criarServicoRiscoIQ, hojeBrasilia, statusCobranca } = require('./lib/risco-iq');
+const { criarServico: criarServicoRiscoIQ, hojeBrasilia, statusCobranca, REGRA_VERSAO: REGRA_VERSAO_RISCO } = require('./lib/risco-iq');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1161,11 +1161,15 @@ function registrarSnapshotRiscoIQ() {
   const hist = lerJSON(RISCO_HISTORICO_PATH, { dias: [], estados: {} });
   hist.dias = hist.dias || [];
   hist.estados = hist.estados || {};
+  hist.regras = hist.regras || {}; // dia → versão da regra com que o estado foi gravado
 
   const hojeStr = `${hoje.getFullYear()}-${String(hoje.getMonth() + 1).padStart(2, '0')}-${String(hoje.getDate()).padStart(2, '0')}`;
   // "Anterior" = o fim do dia mais recente ANTES de hoje (o de hoje é reescrito a cada rodada).
+  // Só vale se foi gravado com a MESMA regra de risco de hoje; senão o fluxo contaria como
+  // "salvos" quem só deixou de ser considerado risco pela mudança de regra.
   const anteriorData = Object.keys(hist.estados).filter(d => d < hojeStr).sort().pop();
-  const anterior = anteriorData ? { data: anteriorData, estado: hist.estados[anteriorData] } : null;
+  const anterior = anteriorData && hist.regras[anteriorData] === REGRA_VERSAO_RISCO
+    ? { data: anteriorData, estado: hist.estados[anteriorData] } : null;
 
   const snap = criarServicoRisco().snapshot(todos, { anterior });
   const { estado, ...resumo } = snap;
@@ -1176,7 +1180,9 @@ function registrarSnapshotRiscoIQ() {
   hist.dias.sort((a, b) => a.data.localeCompare(b.data));
   hist.dias = hist.dias.slice(-RISCO_HISTORICO_MAX_DIAS);
   hist.estados[snap.data] = estado;
+  hist.regras[snap.data] = REGRA_VERSAO_RISCO;
   for (const d of Object.keys(hist.estados).sort().slice(0, -2)) delete hist.estados[d];
+  for (const d of Object.keys(hist.regras)) if (!(d in hist.estados)) delete hist.regras[d];
   salvarJSON(RISCO_HISTORICO_PATH, hist);
   return resumo;
 }
@@ -1185,7 +1191,9 @@ app.get('/api/risco-iq/historico', (req, res) => {
   try {
     const hist = lerJSON(RISCO_HISTORICO_PATH, { dias: [] });
     const n = Math.min(Math.max(parseInt(req.query.dias) || 60, 1), RISCO_HISTORICO_MAX_DIAS);
-    res.json({ dias: (hist.dias || []).slice(-n) });
+    // Só fotos feitas com a regra de risco atual: as anteriores contavam todo atraso de 1 a 30
+    // dias como "dá para salvar" e não são comparáveis com as de hoje.
+    res.json({ dias: (hist.dias || []).filter(d => d.regra === REGRA_VERSAO_RISCO).slice(-n) });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

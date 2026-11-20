@@ -8,6 +8,7 @@ const multer = require('multer');
 const { parse: parseCSV } = require('csv-parse/sync');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const { criarServico: criarServicoRiscoIQ, hojeBrasilia } = require('./lib/risco-iq');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -1027,6 +1028,40 @@ function aplicarFiltros(lista, q) {
   }
   return l;
 }
+
+// ─── Risco de IQ ──────────────────────────────────────────────────────────────
+// Alerta antecipado: quem ainda dá para salvar (1–30 dias de atraso) e quem já
+// afetou o IQ (+30). Regra e janela são as mesmas do cálculo oficial do IQ —
+// ver lib/risco-iq.js.
+app.get('/api/risco-iq', (req, res) => {
+  try {
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const servico = criarServicoRiscoIQ({
+      parseDataBr,
+      normalizarMes,
+      safraParaMeses,
+      carregarCestaOficialPorSafra: criarCacheCestaOficial(),
+    });
+    const resultado = servico.calcular(todos, req.query);
+
+    // Frescor dos dados: os atrasos só são confiáveis se o Sonar estiver em dia.
+    const hoje = hojeBrasilia(req.query.hoje);
+    const sonar = {};
+    let maisAntiga = null;
+    for (const uf of Object.keys(BASE_SONAR)) {
+      const txt = ultimaAtualizacaoBase(uf);
+      sonar[uf] = txt;
+      const d = parseDataBr(txt);
+      if (d && (!maisAntiga || d < maisAntiga)) maisAntiga = d;
+    }
+    resultado.dados = {
+      sonar,
+      defasagemDias: maisAntiga ? Math.round((hoje - maisAntiga) / 86400000) : null,
+      cruzamento: lerJSON(SONAR_META_PATH, {}).ultimaAtualizacao || null,
+    };
+    res.json(resultado);
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
 
 // ─── Upload (memória) ─────────────────────────────────────────────────────────
 

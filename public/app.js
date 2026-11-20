@@ -240,9 +240,16 @@ async function aplicarModoVps() {
       document.querySelectorAll('.apenas-local').forEach(el => el.style.display = 'none');
       const aviso = document.getElementById('aviso-vps');
       if (aviso) aviso.style.display = '';
+      // No VPS os comandos dos robôs não funcionam (só rodam no PC local), então
+      // a aba "Comandos" não tem o que fazer aqui — o lugar dela é do Risco IQ.
+      // Só esconde o botão: a aba continua no HTML e o PC local segue usando.
+      const btnComandos = document.querySelector('.nav-btn[data-tab="comandos"]');
+      if (btnComandos) btnComandos.style.display = 'none';
+      carregarBadgeRisco();
     } else {
-      // Modo local: remove abas Dashboard, Faturas e Ajustes — só Comandos
-      ['dashboard', 'faturas', 'ajustes'].forEach(aba => {
+      // Modo local: remove abas Dashboard, Faturas e Ajustes — só Comandos.
+      // O Risco IQ também sai: ele usa a base do VPS, o PC local é só o painel dos robôs.
+      ['dashboard', 'faturas', 'ajustes', 'risco'].forEach(aba => {
         document.querySelector(`.nav-btn[data-tab="${aba}"]`)?.remove();
         document.getElementById(`tab-${aba}`)?.remove();
       });
@@ -394,6 +401,7 @@ function mudarAba(btn) {
   if (el) el.classList.add('active');
   if (document.getElementById('sidebar')?.classList.contains('aberta')) toggleSidebar(false);
   if (aba === 'comandos') { carregarRelatorios(); carregarRelatoriosDisparo(); }
+  if (aba === 'risco') carregarRisco();
   if (aba === 'faturas') carregarFaturas(1);
   if (aba === 'ajustes') carregarAjustes();
   if (aba === 'usuarios') carregarUsuarios();

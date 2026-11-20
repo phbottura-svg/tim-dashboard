@@ -267,6 +267,10 @@ function riscoRenderKpis(d) {
     extras.push(`<span title="Dos clientes que ainda dá para salvar"><strong>${riscoFmtNum(cobrados)}</strong> de ${riscoFmtNum(c.emRisco)} já cobrados</span>`);
   }
   extras.push(`<span><strong>${riscoFmtNum(c.ok - (c.semRisco || 0))}</strong> em dia</span>`);
+  if (d.modo === 'safra' && c.cega) {
+    const ate = d.referencia && d.referencia.sonarAte ? ` (Sonar com pagamentos até ${escaparHtml(d.referencia.sonarAte)})` : '';
+    extras.push(`<button type="button" class="risco-cega" onclick="riscoFiltrarFaixa('cega')" title="Clientes que aparecem como +30 dias só porque o Sonar ainda não trouxe os pagamentos mais recentes. Se pagaram dentro do prazo, continuam no IQ. Clique para ver a lista.">⏳ <strong>${riscoFmtNum(c.cega)}</strong> podem ter pago e ainda não aparecem${ate}</button>`);
+  }
   if (d.modo === 'safra' && c.semRisco) {
     extras.push(`<span title="Têm fatura atrasada, mas ela não passa de 30 dias até o fechamento da safra — não afeta o IQ"><strong>${riscoFmtNum(c.semRisco)}</strong> atrasados sem risco para o IQ</span>`);
   }
@@ -295,12 +299,12 @@ function riscoRenderImpacto(d) {
     <th>${d.distribuicao.rotulo}</th><th>Clientes</th><th>Em dia</th>
     ${ehSafra ? '<th title="Têm fatura atrasada, mas ela não passa de 30 dias até o fechamento da safra — não afeta o IQ">Atraso sem risco</th>' : ''}
     <th>A vencer</th><th>1–10</th><th>11–20</th><th>21–30</th><th>+30</th>
-    ${ehSafra ? '<th title="% de clientes dentro do IQ hoje">IQ hoje</th><th title="IQ se nenhum cliente que ainda pode passar de 30 dias até o fechamento pagar a tempo (todos viram +30)">Se ninguém pagar</th><th title="Pontos de IQ que ainda dá para salvar com cobrança">Em jogo</th>' : ''}
+    ${ehSafra ? '<th title="% de clientes dentro do IQ hoje (com os pagamentos que o Sonar já trouxe)">IQ hoje</th><th title="IQ se todos os clientes que podem ter pago e ainda não aparecem no Sonar tiverem pago dentro do prazo">Pode chegar a</th><th title="IQ se nenhum cliente que ainda pode passar de 30 dias até o fechamento pagar a tempo (todos viram +30)">Se ninguém pagar</th><th title="Pontos de IQ que ainda dá para salvar com cobrança">Em jogo</th>' : ''}
   </tr>`;
   document.getElementById('risco-heat-head').innerHTML = cab;
 
   const linhas = d.distribuicao.linhas;
-  const cols = ehSafra ? 12 : 8;
+  const cols = ehSafra ? 13 : 8;
   if (!linhas.length) {
     document.getElementById('risco-heat-body').innerHTML = `<tr><td colspan="${cols}" class="loading">Nenhum cliente neste recorte.</td></tr>`;
     return;
@@ -312,6 +316,7 @@ function riscoRenderImpacto(d) {
     if (ehSafra) {
       const emJogo = l.pontosEmJogo;
       iq = `<td class="num">${riscoFmtPct(l.iqAtual)}</td>
+            <td class="num">${l.cega ? riscoFmtPct(l.iqTeto) : '–'}</td>
             <td class="num">${riscoFmtPct(l.iqPiorCaso)}</td>
             <td class="num ${emJogo > 0 ? 'risco-jogo' : ''}">${emJogo > 0 ? '−' + String(emJogo).replace('.', ',') + ' p.p.' : '—'}</td>`;
     }
@@ -342,7 +347,7 @@ function riscoRenderLista(d) {
   const f = RISCO_FAIXAS.find(x => x.chave === risco.faixa);
   const chip = document.getElementById('risco-faixa-ativa');
   if (risco.faixa) {
-    const rotulo = risco.faixa === 'emRisco' ? 'Ainda dá para salvar' : (f ? f.rotulo : risco.faixa);
+    const rotulo = risco.faixa === 'emRisco' ? 'Ainda dá para salvar' : (risco.faixa === 'cega' ? 'Podem ter pago (Sonar defasado)' : (f ? f.rotulo : risco.faixa));
     chip.style.display = '';
     chip.innerHTML = `${escaparHtml(rotulo)} <button type="button" onclick="riscoFiltrarFaixa('${risco.faixa}')" title="Limpar filtro">✕</button>`;
   } else {
@@ -366,7 +371,7 @@ function riscoRenderLista(d) {
         : (c.diasAtraso < 0 ? 'vence em ' + Math.abs(c.diasAtraso) + 'd' : c.diasAtraso + ' dias'));
     return `<tr>
       <td><strong>${escaparHtml(c.nome || '—')}</strong></td>
-      <td>${riscoTagFaixa(c.faixa)}</td>
+      <td>${riscoTagFaixa(c.faixa)}${c.podeTerPago ? ` <span class="risco-mini-tag" title="Aparece como +30 dias, mas o Sonar ainda não trouxe os pagamentos mais recentes — pode ter pago dentro do prazo">⏳ pode ter pago</span>` : ""}</td>
       <td>${faltam}</td>
       <td>${escaparHtml(c.dataLimite || '—')}</td>
       <td>${riscoCelulaCobranca(c)}</td>
@@ -542,7 +547,7 @@ function riscoRenderEvolucao(dias) {
 
 const RISCO_ROTULO_FAIXA = {
   d21_30: 'faixa crítica (21 a 30 dias)', d11_20: '11 a 20 dias', d1_10: '1 a 10 dias',
-  avencer: 'a vencer (até 7 dias)', emRisco: 'todos que ainda dá para salvar (1 a 30 dias)',
+  avencer: 'a vencer (até 7 dias)', emRisco: 'todos que ainda dá para salvar (1 a 30 dias)', cega: 'podem ter pago (Sonar defasado)',
 };
 
 function riscoCorpoCampanha(faixa) {
@@ -564,6 +569,10 @@ async function riscoPost(url, corpo) {
 async function riscoMandarRobo() {
   const btn = document.getElementById('risco-btn-robo');
   const faixa = risco.faixa || 'd21_30'; // sem faixa escolhida: a crítica
+  if (faixa === 'cega') {
+    alert('Esses clientes podem já ter pago (o Sonar ainda não trouxe os pagamentos mais recentes). Não faz sentido mandar lembrete para eles.\n\nEscolha uma faixa de 1 a 30 dias (ou "Ainda dá para salvar").');
+    return;
+  }
   if (faixa === 'queimado') {
     alert('Esses clientes já passaram de 30 dias e já afetaram o IQ — não dá mais para salvar, então não vão para o robô.\n\nEscolha uma faixa de 1 a 30 dias (ou "Ainda dá para salvar").');
     return;

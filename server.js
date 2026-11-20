@@ -1036,8 +1036,10 @@ function aplicarFiltros(lista, q) {
 app.get('/api/risco-iq', (req, res) => {
   try {
     const todos = lerJSON(BASE_CRUZADA_PATH, []);
-    const resultado = criarServicoRisco().calcular(todos, req.query, { anotacoes: lerJSON(ANOTACOES_PATH, {}) });
-    resultado.dados = frescorSonar(hojeBrasilia(req.query.hoje));
+    const { ate: sonarAte, ...frescor } = frescorSonar(hojeBrasilia(req.query.hoje));
+    // sonarAte: último dia com pagamentos no Sonar — é o que define a "janela cega" (quem pode ter pago e ainda não aparece)
+    const resultado = criarServicoRisco().calcular(todos, req.query, { anotacoes: lerJSON(ANOTACOES_PATH, {}), sonarAte });
+    resultado.dados = frescor;
     res.json(resultado);
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
@@ -1065,6 +1067,7 @@ function frescorSonar(hoje) {
     sonar,
     defasagemDias: maisAntiga ? Math.round((hoje - maisAntiga) / 86400000) : null,
     cruzamento: lerJSON(SONAR_META_PATH, {}).ultimaAtualizacao || null,
+    ate: maisAntiga, // Date do dado mais antigo entre os estados (uso interno)
   };
 }
 
@@ -1171,7 +1174,7 @@ function registrarSnapshotRiscoIQ() {
   const anterior = anteriorData && hist.regras[anteriorData] === REGRA_VERSAO_RISCO
     ? { data: anteriorData, estado: hist.estados[anteriorData] } : null;
 
-  const snap = criarServicoRisco().snapshot(todos, { anterior });
+  const snap = criarServicoRisco().snapshot(todos, { anterior, sonarAte: frescorSonar(hoje).ate });
   const { estado, ...resumo } = snap;
   resumo.defasagemDias = frescorSonar(hoje).defasagemDias;
 

@@ -1577,3 +1577,24 @@ tbody td { padding: 10px 16px; font-size: 13.5px; white-space: nowrap; }
 .risco-prev-amostra { margin-top: 6px; }
 .risco-prev-amostra summary { cursor: pointer; }
 @media (max-width: 768px) { .risco-prev { margin-left: 16px; margin-right: 16px; } }
+.funil-topo { font-size: 12.5px; color: var(--dim); margin-bottom: 8px; }
+.funil-topo strong { color: var(--texto); }
+.funil-etapa { display: grid; grid-template-columns: 170px 1fr 110px; align-items: center; gap: 10px; margin: 5px 0; font-size: 12.5px; }
+.funil-rotulo { color: var(--dim); }
+.funil-barra { height: 14px; border-radius: 7px; background: var(--border2); overflow: hidden; }
+.funil-barra-cheia { height: 100%; border-radius: 7px; min-width: 2px; }
+.funil-num strong { color: var(--texto); }
+.funil-num span { color: var(--dim); margin-left: 4px; }
+.funil-nota { font-size: 12.5px; color: var(--dim); margin: 10px 0 0; line-height: 1.6; }
+.funil-nota strong { color: var(--texto); }
+.funil-motivos { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+.funil-motivo { border: 1px solid var(--border2); border-radius: 8px; }
+.funil-motivo > summary { cursor: pointer; padding: 8px 12px; font-size: 13px; }
+.funil-motivo-corpo { padding: 0 12px 12px; font-size: 12.5px; color: var(--dim); line-height: 1.5; }
+.funil-motivo-corpo p { margin: 6px 0; }
+.funil-motivo-corpo strong { color: var(--texto); }
+.funil-tabela-wrap { max-height: 320px; overflow: auto; border: 1px solid var(--border2); border-radius: 8px; }
+.funil-tabela { width: 100%; border-collapse: collapse; font-size: 12px; }
+.funil-tabela th, .funil-tabela td { padding: 5px 8px; text-align: left; border-bottom: 1px solid var(--border2); white-space: nowrap; }
+.funil-tabela th { position: sticky; top: 0; background: var(--bg, #fff); color: var(--texto); }
+@media (max-width: 600px) { .funil-etapa { grid-template-columns: 1fr; gap: 3px; } }

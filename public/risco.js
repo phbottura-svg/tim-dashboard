@@ -641,6 +641,8 @@ async function riscoCarregarCampanha() {
     const resp = await fetch('/api/risco-iq/campanha');
     if (!resp.ok) return;
     const { atual } = await resp.json();
+    const funil = document.getElementById('risco-funil');
+    if (funil) funil.style.display = atual ? '' : 'none';
     if (!atual) { el.style.display = 'none'; return; }
     const quando = new Date(atual.criadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
     const rotulo = (RISCO_ROTULO_FAIXA[atual.faixa] || atual.faixa);
@@ -650,6 +652,73 @@ async function riscoCarregarCampanha() {
       (atual.ativa ? '' : ' <span class="risco-campanha-venc">(passou de 7 dias — não marca mais)</span>');
   } catch {}
 }
+
+// ── Funil da última base: onde cada cliente parou ──
+const riscoFunilDados = { motivos: [] };
+
+function riscoFunilLinhaEtapa(rotulo, n, base, cor) {
+  const pct = base ? Math.round(n * 100 / base) : 0;
+  return `<div class="funil-etapa"><div class="funil-rotulo">${escaparHtml(rotulo)}</div>` +
+    `<div class="funil-barra"><div class="funil-barra-cheia" style="width:${pct}%;background:${cor}"></div></div>` +
+    `<div class="funil-num"><strong>${riscoFmtNum(n)}</strong> <span>${pct}%</span></div></div>`;
+}
+
+function riscoFunilHtml(f) {
+  const e = f.etapas;
+  const d = new Date(f.campanha.criadoEm).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  let h = `<div class="funil-topo">Base gerada em <strong>${escaparHtml(d)}</strong> · ${riscoFmtNum(e.base)} clientes</div>`;
+  h += riscoFunilLinhaEtapa('Na base do robô', e.base, e.base, '#6366f1');
+  h += riscoFunilLinhaEtapa('Robô baixou a fatura', e.baixou, e.base, '#0ea5e9');
+  h += riscoFunilLinhaEtapa('Disparo enviou', e.enviou, e.base, '#f59e0b');
+  h += riscoFunilLinhaEtapa('Marcado como cobrado', e.marcou, e.base, '#22c55e');
+  h += `<p class="funil-nota">Já saíram do risco (pagaram): <strong>${riscoFmtNum(f.saiuDoRisco)}</strong> · prometeram pagar ou foram cobrados à mão: <strong>${riscoFmtNum(f.tratados)}</strong> · ` +
+    `<strong>sem cobrança hoje: ${riscoFmtNum(f.pendentes)}</strong></p>`;
+  if (!f.motivos.length) return h + '<p class="funil-nota">✅ Ninguém ficou para trás.</p>';
+  riscoFunilDados.motivos = f.motivos;
+  h += '<div class="funil-motivos">';
+  f.motivos.forEach((m, i) => {
+    h += `<details class="funil-motivo"><summary><strong>${riscoFmtNum(m.qtd)}</strong> · ${escaparHtml(m.titulo)}</summary>` +
+      `<div class="funil-motivo-corpo"><p>${escaparHtml(m.explicacao)}</p><p><strong>O que fazer:</strong> ${escaparHtml(m.acao)}</p>` +
+      `<p><button class="btn btn-secondary" onclick="riscoFunilBaixar(${i})">⬇ Baixar esta lista (CSV)</button></p>` +
+      `<div class="funil-tabela-wrap"><table class="funil-tabela"><thead><tr><th>Cliente</th><th>Telefone</th><th>Venc.</th><th>Atraso</th><th>Vendedor</th><th>Detalhe</th></tr></thead><tbody>` +
+      m.clientes.map(c => `<tr><td>${escaparHtml(c.nome || '')}</td><td>${escaparHtml(c.telefone || '')}</td><td>${escaparHtml(c.vencimento || '')}</td>` +
+        `<td>${c.diasAtraso == null ? '' : c.diasAtraso + 'd'}</td><td>${escaparHtml(c.vendedor || '')}</td><td>${escaparHtml(c.detalhe || '')}</td></tr>`).join('') +
+      `</tbody></table></div>` +
+      (m.qtd > m.clientes.length ? `<p class="funil-nota">Mostrando ${m.clientes.length} de ${m.qtd}.</p>` : '') +
+      `</div></details>`;
+  });
+  return h + '</div>';
+}
+
+async function riscoCarregarFunil() {
+  const corpo = document.getElementById('risco-funil-corpo');
+  if (!corpo) return;
+  corpo.textContent = 'Carregando…';
+  try {
+    const resp = await fetch('/api/risco-iq/funil');
+    const d = await resp.json();
+    if (!resp.ok) throw new Error(d.erro || `HTTP ${resp.status}`);
+    corpo.innerHTML = d.atual ? riscoFunilHtml(d.atual) : 'Nenhuma base foi mandada ao robô ainda.';
+  } catch (e) { corpo.textContent = 'Não consegui carregar o funil: ' + e.message; }
+}
+
+function riscoFunilBaixar(i) {
+  const m = riscoFunilDados.motivos[i]; if (!m) return;
+  const cel = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"';
+  const linhas = [['Cliente', 'Custcode', 'Telefone', 'Vencimento', 'Dias de atraso', 'Vendedor', 'UF', 'Detalhe'].map(cel).join(';')];
+  for (const c of m.clientes) linhas.push([c.nome, c.custcode, c.telefone, c.vencimento, c.diasAtraso, c.vendedor, c.uf, c.detalhe].map(cel).join(';'));
+  const blob = new Blob(['﻿' + linhas.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = `funil-${m.codigo}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+
+// O funil só aparece se já existe uma base mandada ao robô; carrega ao abrir.
+(function riscoFunilInit() {
+  const det = document.getElementById('risco-funil');
+  if (det) det.addEventListener('toggle', () => { if (det.open) riscoCarregarFunil(); });
+})();
 
 // Barra de rolagem horizontal também no TOPO da lista (sincronizada com a de baixo)
 (function riscoScrollTopo() {

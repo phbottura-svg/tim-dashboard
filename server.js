@@ -8,6 +8,7 @@ const multer = require('multer');
 const { parse: parseCSV } = require('csv-parse/sync');
 const session = require('express-session');
 const bcrypt = require('bcryptjs');
+const { funilCampanha } = require('./lib/funil-cobranca');
 const { criarServico: criarServicoRiscoIQ, hojeBrasilia, statusCobranca, REGRA_VERSAO: REGRA_VERSAO_RISCO } = require('./lib/risco-iq');
 
 const app = express();
@@ -1299,6 +1300,28 @@ app.get('/api/risco-iq/campanha', (req, res) => {
     const at = arq.atual;
     if (!at) return res.json({ atual: null });
     res.json({ atual: { ...resumoCampanha(at), ativa: Date.now() - new Date(at.ativadaEm || at.criadoEm).getTime() < CAMPANHA_VALIDADE_MS } });
+  } catch (err) { res.status(500).json({ erro: err.message }); }
+});
+
+// Funil da última base: quantos o robô baixou, quantos o disparo enviou, quantos foram marcados e,
+// para quem ficou para trás, onde parou. Só leitura.
+app.get('/api/risco-iq/funil', (req, res) => {
+  try {
+    const camp = lerJSON(RISCO_CAMPANHA_PATH, { atual: null }).atual;
+    if (!camp) return res.json({ atual: null });
+    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const { ate: sonarAte } = frescorSonar(hojeBrasilia());
+    const filtros = { ...(camp.filtros || {}), faixa: 'emRisco', todos: true };
+    delete filtros.hoje;
+    const r = criarServicoRisco().calcular(todos, filtros, { anotacoes: lerJSON(ANOTACOES_PATH, {}), sonarAte });
+    const pdfs = fs.existsSync(PDFS_PATH)
+      ? fs.readdirSync(PDFS_PATH).filter(f => f.toLowerCase().endsWith('.pdf')).map(nome => {
+          let em = null; try { em = fs.statSync(path.join(PDFS_PATH, nome)).mtime.toISOString(); } catch {}
+          return { nome, em };
+        })
+      : [];
+    const funil = funilCampanha({ camp, todos, linhasRisco: r.tabela.dados, pdfs, envios: lerJSON(FATURA_ENVIOS_PATH, {}), parseDataBr });
+    res.json({ atual: funil });
   } catch (err) { res.status(500).json({ erro: err.message }); }
 });
 

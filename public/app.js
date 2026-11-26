@@ -15,7 +15,7 @@ const C = {
   roxo: '#7b5cfa', cinza: '#8892a4',
 };
 
-const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', PAGO_ATRASO: 'Pago com atraso', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
+const STATUS_LABEL = { ADIMPLENTE: 'Adimplente', INADIMPLENTE: 'Inadimplente', PAGO_ATRASO: 'Pago com atraso', 'A VENCER': 'A vencer', 'SEM DADOS': 'Sem Dados', CHURN: 'Churn' };
 const STATUS_COR = { ADIMPLENTE: C.verde, INADIMPLENTE: C.vermelho, PAGO_ATRASO: C.laranja, 'SEM DADOS': C.cinza };
 
 // Marcadores de atendimento — a ordem aqui define a ordem nos filtros e no modal.
@@ -138,6 +138,8 @@ async function enviarFilaParaRobo() {
   if (vencimentos.length) p.set('dataVencimento', vencimentos.join(','));
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
+  const portal = document.getElementById('tabela-filtro-portal')?.value;
+  if (portal) p.set('portal', portal);
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
   if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
   if (document.getElementById('tabela-filtro-iq-dentro')?.checked) p.set('iqSafra', 'dentro');
@@ -1224,6 +1226,8 @@ async function carregarTabela() {
   if (vencimentos.length) p.set('dataVencimento', vencimentos.join(','));
   if (document.getElementById('tabela-filtro-churn')?.checked) p.set('churn', '1');
   if (document.getElementById('tabela-filtro-sem-match')?.checked) p.set('semMatch', '1');
+  const portal = document.getElementById('tabela-filtro-portal')?.value;
+  if (portal) p.set('portal', portal);
   if (document.getElementById('tabela-filtro-acionaveis')?.checked) p.set('acionaveis', '1');
   if (document.getElementById('tabela-filtro-pago-manual')?.checked) p.set('pagoManual', '1');
   if (document.getElementById('tabela-filtro-iq-dentro')?.checked) p.set('iqSafra', 'dentro');
@@ -1273,9 +1277,9 @@ async function carregarTabela() {
       const fCells = Array.from({length: maxF}, (_, i) => {
         const fat = (c.faturas || []).find(f => f.numero === i + 1);
         if (!fat) return '<td class="dim">—</td>';
-        const cls = fat.pagoManual ? 'status-PAGO-MANUAL' : fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'PAGO_ATRASO' ? 'status-PAGO-ATRASO' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : '';
-        const icone = fat.pagoManual ? '💛' : fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'PAGO_ATRASO' ? '🟠' : fat.status === 'INADIMPLENTE' ? '❌' : '—';
-        const label = fat.pagoManual ? 'Pago (marcado manualmente via Base Pagos) — clique para desmarcar' : (fat.detalhamento || fat.statusPagamento || '—');
+        const cls = fat.pagoManual ? 'status-PAGO-MANUAL' : fat.status === 'ADIMPLENTE' ? 'status-ADIMPLENTE' : fat.status === 'PAGO_ATRASO' ? 'status-PAGO-ATRASO' : fat.status === 'INADIMPLENTE' ? 'status-INADIMPLENTE' : fat.status === 'A VENCER' ? 'status-A_VENCER' : '';
+        const icone = fat.pagoManual ? '💛' : fat.status === 'ADIMPLENTE' ? '✅' : fat.status === 'PAGO_ATRASO' ? '🟠' : fat.status === 'INADIMPLENTE' ? '❌' : fat.status === 'A VENCER' ? '🕒' : '—';
+        const label = fat.pagoManual ? 'Pago (marcado manualmente via Base Pagos) — clique para desmarcar' : fat.portal ? `Portal TIM · ${fat.valor || ''} · ${fat.status === 'ADIMPLENTE' ? 'paga (sumiu do portal)' : fat.status === 'A VENCER' ? 'a vencer' : 'vencida'} · consultado em ${fmtTs(fat.consultadoEm)}` : (fat.detalhamento || fat.statusPagamento || '—');
         const acao = fat.pagoManual ? ` onclick="desmarcarPagoManual(${idx}, ${i + 1})" style="cursor:pointer"` : '';
         return `<td><span class="status-tag ${cls}" title="${label}"${acao}>${icone} ${fat.dataVencimento || ''}</span></td>`;
       }).join('');
@@ -1300,7 +1304,7 @@ async function carregarTabela() {
         <td id="tb-vendedor-${idx}">${c.vendedor || '—'}</td>
         <td>${c.uf || '—'}</td>
         <td>${c.mesGross || '—'}</td>
-        <td>${c.totalFaturas || 0} (${c.faturasPagas || 0} pagas)</td>
+        <td>${c.totalFaturas || 0} (${c.faturasPagas || 0} pagas)${c.fonte === 'portal' ? ` <span class="status-tag status-PORTAL" title="Dados do portal TIM, consultado em ${fmtTs(c.consultadoPortalEm)} (cliente ainda sem fatura no Sonar)">portal</span>` : ''}</td>
         <td><span class="status-tag status-${(c.status||'SEM_DADOS').replace(' ','_')}">${STATUS_LABEL[c.status]||c.status||'—'}</span></td>
         <td>${c.churn ? '⚠️' : '—'}</td>
         ${fCells}
@@ -1341,7 +1345,7 @@ function onIqCheckbox(qual) {
 }
 
 function limparTodosFiltros() {
-  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra'];
+  const ids = ['busca-tabela', 'tabela-filtro-status', 'tabela-filtro-uf', 'tabela-filtro-safra', 'tabela-filtro-portal'];
   ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
   // Limpa a seleção múltipla de vencimentos
   document.querySelectorAll('#venc-multi-lista input:checked').forEach(c => { c.checked = false; });

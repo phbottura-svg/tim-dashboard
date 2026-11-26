@@ -299,6 +299,13 @@
       </div>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-churn" onchange="buscarTabela()"> Churn</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-sem-match" onchange="buscarTabela()"> Sem Match</label>
+      <select id="tabela-filtro-portal" class="filtro-select-sm" onchange="buscarTabela()" title="Faturas localizadas pelo robô no portal, de clientes ainda sem Sonar">
+        <option value="">Portal: ignorar</option>
+        <option value="todos">Portal: todos</option>
+        <option value="avencer">Portal: a vencer</option>
+        <option value="vencida">Portal: vencida</option>
+        <option value="semfatura">Portal: sem fatura aberta</option>
+      </select>
       <label class="filtro-toggle filtro-acionaveis"><input type="checkbox" id="tabela-filtro-acionaveis" onchange="buscarTabela()"> ⚡ Acionáveis</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-pago-manual" onchange="buscarTabela()"> 💛 Base Pagos</label>
       <label class="filtro-toggle"><input type="checkbox" id="tabela-filtro-iq-dentro" onchange="onIqCheckbox('dentro')" title="Precisa de um Mês Gross selecionado no filtro"> ✅ Dentro do IQ</label>

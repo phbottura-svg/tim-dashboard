@@ -38,6 +38,8 @@ const HISTORICO_ROBOS_PATH = path.join(DATA_PATH, 'historico-robos.json');
 // Faturas marcadas manualmente como pagas ("Base Pagos") — persiste entre cruzamentos.
 // Estrutura: { [custcodeNormalizado]: { cpf, vencimentos: ["10/06/2026", ...] } }
 const PAGOS_MANUAIS_PATH = path.join(DATA_PATH, 'pagos-manuais.json');
+const FATURAS_PORTAL_PATH = path.join(DATA_PATH, 'faturas-portal.json');
+const { registrarConsulta, comPortal, filtrarPortal } = require('./portal');
 const USUARIOS_PATH = path.join(DATA_PATH, 'usuarios.json');
 // Fechamento oficial mensal da TIM (planilha "Cesta de Qualidade") — quando existe
 // pra uma safra, substitui a nossa estimativa por atraso (ver calcularIQSafra).
@@ -102,6 +104,7 @@ const ROTAS_PUBLICAS = [
   { method: 'POST', path: '/api/upload-pdf' },
   { method: 'POST', path: '/api/faturas/codigos' },
   { method: 'POST', path: '/api/faturas/envio' },
+  { method: 'POST', path: '/api/faturas/portal' },
   { method: 'GET',  path: '/api/faturas/nomes' },
   { method: 'GET',  path: '/api/iq-safra/comparar' },
   { method: 'GET',  path: '/api/iq-safra/diagnostico' },
@@ -953,6 +956,8 @@ function aplicarFiltros(lista, q) {
     // última fatura casar com QUALQUER uma das datas selecionadas.
     const datasAlvo = new Set(String(q.dataVencimento).split(',').map(s => s.trim()).filter(Boolean));
     l = l.filter(c => {
+      // Portal: vale qualquer fatura em aberto na data (vencida ou a vencer)
+      if (c.fonte === 'portal') return (c.faturas || []).some(f => datasAlvo.has(f.dataVencimento) && f.status !== 'ADIMPLENTE');
       const faturas = (c.faturas || []).filter(f => f.dataVencimento);
       if (!faturas.length) return false;
       const ultima = faturas[faturas.length - 1];
@@ -978,11 +983,13 @@ function aplicarFiltros(lista, q) {
   if (q.contatos === '1') l = l.filter(c => (c.contatos?.length || 0) === 1);
   if (q.churn === '1') l = l.filter(c => c.churn);
   if (q.semMatch === '1') l = l.filter(c => !c.cruzado);
+  if (q.portal) l = filtrarPortal(l, q.portal);
   if (q.pagoManual === '1') l = l.filter(c => (c.faturas || []).some(f => f.pagoManual));
   if (q.iqSafra === 'dentro' || q.iqSafra === 'fora') {
     const getRef = criarCacheReferenciaSafra();
     const getOficial = criarCacheCestaOficial();
     l = l.filter(c => {
+      if (c.fonte === 'portal') return false; // IQ considera so Sonar
       if (!c.mesGross) return false; // sem safra definida, nao entra em nenhum dos dois lados
       const oficialPorOS = getOficial(c.mesGross);
       if (oficialPorOS) {
@@ -1973,7 +1980,7 @@ app.get('/api/resumo', (req, res) => {
 
 app.get('/api/clientes', (req, res) => {
   try {
-    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const todos = comPortal(lerJSON(BASE_CRUZADA_PATH, []), lerJSON(FATURAS_PORTAL_PATH, {}));
     let lista = aplicarFiltros(todos, req.query);
 
     if (req.query.busca) {
@@ -2061,7 +2068,7 @@ app.delete('/api/clientes/anotacoes/:os/:indice', (req, res) => {
 
 app.get('/api/clientes/exportar', (req, res) => {
   try {
-    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const todos = comPortal(lerJSON(BASE_CRUZADA_PATH, []), lerJSON(FATURAS_PORTAL_PATH, {}));
     let lista = aplicarFiltros(todos, req.query);
     if (req.query.busca) {
       const b = req.query.busca.toLowerCase();
@@ -2491,7 +2498,7 @@ app.get('/api/modo', (req, res) => res.json({ modo: MODO }));
 // Retorna os clientes filtrados como JSON (chamado pelo VPS, usado pelo browser)
 app.get('/api/gerar-fila-dados', (req, res) => {
   try {
-    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const todos = comPortal(lerJSON(BASE_CRUZADA_PATH, []), lerJSON(FATURAS_PORTAL_PATH, {}));
     let lista = aplicarFiltros(todos, req.query);
     if (req.query.busca) {
       const b = req.query.busca.toLowerCase();
@@ -2534,7 +2541,7 @@ app.post('/api/receber-fila', apenasLocal, (req, res) => {
 
 app.post('/api/gerar-fila-robo', apenasLocal, (req, res) => {
   try {
-    const todos = lerJSON(BASE_CRUZADA_PATH, []);
+    const todos = comPortal(lerJSON(BASE_CRUZADA_PATH, []), lerJSON(FATURAS_PORTAL_PATH, {}));
     let lista = aplicarFiltros(todos, req.body || {});
     if (req.body?.busca) {
       const b = req.body.busca.toLowerCase();
@@ -3224,6 +3231,14 @@ function chavesTelefone(telefone) {
 // no uso real ele clica no botão dias depois; com 24h o sistema "esquecia" a
 // fatura enviada e respondia "não encontramos" pra quem só demorou pra pagar.
 const JANELA_ENVIOS_MS = 45 * 24 * 60 * 60 * 1000;
+
+// Resultado de uma consulta do robo no portal da TIM (ver portal.js)
+app.post('/api/faturas/portal', autorizarUpload, (req, res) => {
+  const base = lerJSON(FATURAS_PORTAL_PATH, {});
+  const gravado = registrarConsulta(base, req.body || {});
+  if (gravado) salvarJSON(FATURAS_PORTAL_PATH, base);
+  res.json({ ok: true, gravado });
+});
 
 app.post('/api/faturas/envio', autorizarUpload, (req, res) => {
   const { telefone, arquivo, vencimento, mesRef, wamid } = req.body || {};

@@ -10,6 +10,7 @@ const session = require('express-session');
 const bcrypt = require('bcryptjs');
 const { funilCampanha } = require('./lib/funil-cobranca');
 const { mesclarClientes } = require('./lib/mesclar-clientes');
+const { protegerCustcode } = require('./lib/proteger-custcode');
 const { criarServico: criarServicoRiscoIQ, hojeBrasilia, statusCobranca, REGRA_VERSAO: REGRA_VERSAO_RISCO } = require('./lib/risco-iq');
 
 const app = express();
@@ -1734,7 +1735,9 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
     })).filter(r => r.os && !(UFS_SONAR.includes(r.uf) && r.uf !== ufEstado));
 
     const anteriores = lerJSON(BASE_SONAR[estado], []);
-    const merge = mesclarSonar(anteriores, processados, estado);
+    // Custcode válido nunca é trocado por "0"/vazio (ver lib/proteger-custcode.js)
+    const protecao = protegerCustcode(anteriores, processados, custcodeValido);
+    const merge = mesclarSonar(anteriores, protecao.registros, estado);
     backupJSON(BASE_SONAR[estado]);
     salvarJSON(BASE_SONAR[estado], merge.registros);
 
@@ -1762,6 +1765,7 @@ app.post('/api/importar-sonar', uploadMemory.single('arquivo'), (req, res) => {
     res.json({
       ok: true,
       estado,
+      avisoCustcode: protecao.aviso,
       total: merge.registros.length,
       noArquivo: processados.length,
       adicionados: merge.adicionados,

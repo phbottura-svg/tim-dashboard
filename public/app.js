@@ -814,6 +814,7 @@ async function importarSonar(input, estado) {
     if (d.erro) mostrarMsg(`❌ Erro ${estado}: ` + d.erro, 'erro');
     else {
       mostrarMsg(`✅ ${estado}: ${d.clientesNoArquivo} clientes / ${d.noArquivo} faturas no arquivo · ${d.preservados} faturas preservadas (${d.osPreservadas} OS que sairam da TIM) · ${d.clientes} clientes / ${d.total} faturas na base · ${d.cruzados} cruzamentos`, 'ok');
+      if (d.avisoCustcode) { mostrarMsg(`⚠️ ${estado}: ${d.avisoCustcode}`, 'erro'); alert(`Sonar ${estado}\n\n${d.avisoCustcode}`); }
       await carregarStatusImportacao();
       await carregarOpcoesFiltrosReset();
       await carregarTudo();
